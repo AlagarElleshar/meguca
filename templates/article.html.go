@@ -351,269 +351,276 @@ func streamrenderArticle(qw422016 *qt422016.Writer, p common.Post, c articleCont
 
 //line article.html:141
 		if tokid != nil {
-//line article.html:141
+//line article.html:142
+			timeago := "Posted " + relativeTime(*tokid)
+
+//line article.html:142
 			qw422016.N().S(`<a class="sourcelink" href="https://www.tiktok.com/share/video/`)
-//line article.html:142
+//line article.html:143
 			qw422016.N().S(*tokid)
-//line article.html:142
-			qw422016.N().S(`">source</a>`)
 //line article.html:143
+			qw422016.N().S(`" title="`)
+//line article.html:143
+			qw422016.N().S(timeago)
+//line article.html:143
+			qw422016.N().S(`" target="_blank" rel="noopener noreferrer">source</a>`)
+//line article.html:144
 		}
-//line article.html:143
+//line article.html:144
 		qw422016.N().S(`</figcaption>`)
-//line article.html:145
+//line article.html:146
 	}
-//line article.html:145
+//line article.html:146
 	qw422016.N().S(`<div class="post-container">`)
-//line article.html:147
-	if p.Image != nil {
 //line article.html:148
+	if p.Image != nil {
+//line article.html:149
 		img := *p.Image
 
-//line article.html:148
+//line article.html:149
 		qw422016.N().S(`<figure><a target="_blank" href="`)
-//line article.html:150
-		qw422016.N().S(src)
-//line article.html:150
-		qw422016.N().S(`">`)
 //line article.html:151
-		switch {
+		qw422016.N().S(src)
+//line article.html:151
+		qw422016.N().S(`">`)
 //line article.html:152
-		case img.ThumbType == common.NoFile:
+		switch {
 //line article.html:153
+		case img.ThumbType == common.NoFile:
+//line article.html:154
 			var file string
 
-//line article.html:154
-			switch img.FileType {
 //line article.html:155
-			case common.WEBM, common.MP4, common.MP3, common.OGG, common.FLAC:
+			switch img.FileType {
 //line article.html:156
+			case common.WEBM, common.MP4, common.MP3, common.OGG, common.FLAC:
+//line article.html:157
 				file = "audio"
 
-//line article.html:157
-			default:
 //line article.html:158
+			default:
+//line article.html:159
 				file = "file"
 
-//line article.html:159
+//line article.html:160
 			}
-//line article.html:159
+//line article.html:160
 			qw422016.N().S(`<img src="/assets/`)
-//line article.html:160
-			qw422016.N().S(file)
-//line article.html:160
-			qw422016.N().S(`.png" width="150" height="150" loading="lazy">`)
 //line article.html:161
+			qw422016.N().S(file)
+//line article.html:161
+			qw422016.N().S(`.png" width="150" height="150" loading="lazy">`)
+//line article.html:162
 		case img.Spoiler:
-//line article.html:164
+//line article.html:165
 			qw422016.N().S(`<img src="/assets/spoil/default.jpg" width="150" height="150" loading="lazy">`)
-//line article.html:166
+//line article.html:167
 		default:
-//line article.html:166
+//line article.html:167
 			qw422016.N().S(`<img src="`)
-//line article.html:167
+//line article.html:168
 			qw422016.N().S(assets.ThumbPath(img.ThumbType, img.SHA1))
-//line article.html:167
+//line article.html:168
 			qw422016.N().S(`" width="`)
-//line article.html:167
+//line article.html:168
 			qw422016.N().D(int(img.Dims[2]))
-//line article.html:167
+//line article.html:168
 			qw422016.N().S(`" height="`)
-//line article.html:167
+//line article.html:168
 			qw422016.N().D(int(img.Dims[3]))
-//line article.html:167
+//line article.html:168
 			qw422016.N().S(`" loading="lazy">`)
-//line article.html:168
+//line article.html:169
 		}
-//line article.html:168
+//line article.html:169
 		qw422016.N().S(`</a></figure>`)
-//line article.html:171
+//line article.html:172
 	}
-//line article.html:171
+//line article.html:172
 	qw422016.N().S(`<blockquote>`)
-//line article.html:173
+//line article.html:174
 	streambody(qw422016, p, c.op, c.board, c.index, c.rbText, c.pyu)
-//line article.html:173
+//line article.html:174
 	qw422016.N().S(`</blockquote>`)
-//line article.html:175
+//line article.html:176
 	for _, e := range p.Moderation {
-//line article.html:175
+//line article.html:176
 		qw422016.N().S(`<b class="admin post-moderation">`)
-//line article.html:177
+//line article.html:178
 		streampostModeration(qw422016, e)
-//line article.html:177
+//line article.html:178
 		qw422016.N().S(`<br></b>`)
-//line article.html:180
+//line article.html:181
 	}
-//line article.html:180
+//line article.html:181
 	qw422016.N().S(`</div>`)
-//line article.html:182
+//line article.html:183
 	if c.omit != 0 {
-//line article.html:182
+//line article.html:183
 		qw422016.N().S(`<span class="omit spaced" data-omit="`)
-//line article.html:183
-		qw422016.N().D(c.omit)
-//line article.html:183
-		qw422016.N().S(`" data-image-omit="`)
-//line article.html:183
-		qw422016.N().D(c.imageOmit)
-//line article.html:183
-		qw422016.N().S(`">`)
 //line article.html:184
-		if c.imageOmit == 0 {
-//line article.html:185
-			qw422016.N().S(fmt.Sprintf(ln.Common.Format["postsOmitted"], c.omit))
-//line article.html:186
-		} else {
-//line article.html:187
-			qw422016.N().S(fmt.Sprintf(ln.Common.Format["postsAndImagesOmitted"], c.omit, c.imageOmit))
-//line article.html:188
-		}
-//line article.html:188
-		qw422016.N().S(`<span class="act"><a href="`)
-//line article.html:190
-		qw422016.N().S(strconv.FormatUint(c.op, 10))
-//line article.html:190
+		qw422016.N().D(c.omit)
+//line article.html:184
+		qw422016.N().S(`" data-image-omit="`)
+//line article.html:184
+		qw422016.N().D(c.imageOmit)
+//line article.html:184
 		qw422016.N().S(`">`)
-//line article.html:191
-		qw422016.N().S(ln.Common.Posts["seeAll"])
-//line article.html:191
-		qw422016.N().S(`</a></span></span>`)
-//line article.html:195
-	}
-//line article.html:196
-	if bls := c.backlinks[p.ID]; len(bls) != 0 {
-//line article.html:196
-		qw422016.N().S(`<span class="backlinks spaced">`)
-//line article.html:198
-		for _, l := range bls {
-//line article.html:198
-			qw422016.N().S(`<em>`)
-//line article.html:200
-			streampostLink(qw422016, l, c.index || l.OP != c.op, c.index)
-//line article.html:200
-			qw422016.N().S(`</em>`)
-//line article.html:202
+//line article.html:185
+		if c.imageOmit == 0 {
+//line article.html:186
+			qw422016.N().S(fmt.Sprintf(ln.Common.Format["postsOmitted"], c.omit))
+//line article.html:187
+		} else {
+//line article.html:188
+			qw422016.N().S(fmt.Sprintf(ln.Common.Format["postsAndImagesOmitted"], c.omit, c.imageOmit))
+//line article.html:189
 		}
-//line article.html:202
-		qw422016.N().S(`</span>`)
-//line article.html:204
+//line article.html:189
+		qw422016.N().S(`<span class="act"><a href="`)
+//line article.html:191
+		qw422016.N().S(strconv.FormatUint(c.op, 10))
+//line article.html:191
+		qw422016.N().S(`">`)
+//line article.html:192
+		qw422016.N().S(ln.Common.Posts["seeAll"])
+//line article.html:192
+		qw422016.N().S(`</a></span></span>`)
+//line article.html:196
 	}
-//line article.html:204
+//line article.html:197
+	if bls := c.backlinks[p.ID]; len(bls) != 0 {
+//line article.html:197
+		qw422016.N().S(`<span class="backlinks spaced">`)
+//line article.html:199
+		for _, l := range bls {
+//line article.html:199
+			qw422016.N().S(`<em>`)
+//line article.html:201
+			streampostLink(qw422016, l, c.index || l.OP != c.op, c.index)
+//line article.html:201
+			qw422016.N().S(`</em>`)
+//line article.html:203
+		}
+//line article.html:203
+		qw422016.N().S(`</span>`)
+//line article.html:205
+	}
+//line article.html:205
 	qw422016.N().S(`</article>`)
-//line article.html:206
+//line article.html:207
 }
 
-//line article.html:206
+//line article.html:207
 func writerenderArticle(qq422016 qtio422016.Writer, p common.Post, c articleContext) {
-//line article.html:206
+//line article.html:207
 	qw422016 := qt422016.AcquireWriter(qq422016)
-//line article.html:206
+//line article.html:207
 	streamrenderArticle(qw422016, p, c)
-//line article.html:206
+//line article.html:207
 	qt422016.ReleaseWriter(qw422016)
-//line article.html:206
+//line article.html:207
 }
 
-//line article.html:206
+//line article.html:207
 func renderArticle(p common.Post, c articleContext) string {
-//line article.html:206
+//line article.html:207
 	qb422016 := qt422016.AcquireByteBuffer()
-//line article.html:206
+//line article.html:207
 	writerenderArticle(qb422016, p, c)
-//line article.html:206
+//line article.html:207
 	qs422016 := string(qb422016.B)
-//line article.html:206
+//line article.html:207
 	qt422016.ReleaseByteBuffer(qb422016)
-//line article.html:206
+//line article.html:207
 	return qs422016
-//line article.html:206
+//line article.html:207
 }
 
 // Render image search links according to file type
 
-//line article.html:209
-func streamimageSearch(qw422016 *qt422016.Writer, root string, img common.Image) {
 //line article.html:210
-	if img.ThumbType == common.NoFile || img.FileType == common.PDF {
+func streamimageSearch(qw422016 *qt422016.Writer, root string, img common.Image) {
 //line article.html:211
-		return
+	if img.ThumbType == common.NoFile || img.FileType == common.PDF {
 //line article.html:212
+		return
+//line article.html:213
 	}
-//line article.html:214
+//line article.html:215
 	url := root + assets.ImageSearchPath(img.ImageCommon)
 
-//line article.html:214
+//line article.html:215
 	qw422016.N().S(`<a class="image-search google" target="_blank" rel="nofollow" href="https://www.google.com/searchbyimage?image_url=`)
-//line article.html:215
+//line article.html:216
 	qw422016.N().S(url)
-//line article.html:215
+//line article.html:216
 	qw422016.N().S(`">G</a><a class="image-search yandex" target="_blank" rel="nofollow" href="https://yandex.com/images/search?source=collections&rpt=imageview&url=`)
-//line article.html:218
+//line article.html:219
 	qw422016.N().S(url)
-//line article.html:218
+//line article.html:219
 	qw422016.N().S(`">Yd</a><a class="image-search iqdb" target="_blank" rel="nofollow" href="http://iqdb.org/?url=`)
-//line article.html:221
+//line article.html:222
 	qw422016.N().S(url)
-//line article.html:221
+//line article.html:222
 	qw422016.N().S(`">Iq</a><a class="image-search saucenao" target="_blank" rel="nofollow" href="http://saucenao.com/search.php?db=999&url=`)
-//line article.html:224
+//line article.html:225
 	qw422016.N().S(url)
-//line article.html:224
+//line article.html:225
 	qw422016.N().S(`">Sn</a><a class="image-search tracemoe" target="_blank" rel="nofollow" href="https://trace.moe/?url=`)
-//line article.html:227
+//line article.html:228
 	qw422016.N().S(url)
-//line article.html:227
+//line article.html:228
 	qw422016.N().S(`">Tm</a>`)
-//line article.html:230
-	switch img.FileType {
 //line article.html:231
+	switch img.FileType {
+//line article.html:232
 	case common.JPEG, common.PNG, common.GIF, common.WEBM:
-//line article.html:231
+//line article.html:232
 		qw422016.N().S(`<a class="image-search desuarchive" target="_blank" rel="nofollow" href="https://desuarchive.org/_/search/image/`)
-//line article.html:232
+//line article.html:233
 		qw422016.N().S(img.MD5)
-//line article.html:232
+//line article.html:233
 		qw422016.N().S(`">Da</a>`)
-//line article.html:235
-	}
 //line article.html:236
-	switch img.FileType {
-//line article.html:237
-	case common.JPEG, common.PNG:
-//line article.html:237
-		qw422016.N().S(`<a class="image-search exhentai" target="_blank" rel="nofollow" href="http://exhentai.org/?fs_similar=1&fs_exp=1&f_shash=`)
-//line article.html:238
-		qw422016.N().S(img.SHA1)
-//line article.html:238
-		qw422016.N().S(`">Ex</a>`)
-//line article.html:241
 	}
+//line article.html:237
+	switch img.FileType {
+//line article.html:238
+	case common.JPEG, common.PNG:
+//line article.html:238
+		qw422016.N().S(`<a class="image-search exhentai" target="_blank" rel="nofollow" href="http://exhentai.org/?fs_similar=1&fs_exp=1&f_shash=`)
+//line article.html:239
+		qw422016.N().S(img.SHA1)
+//line article.html:239
+		qw422016.N().S(`">Ex</a>`)
 //line article.html:242
+	}
+//line article.html:243
 }
 
-//line article.html:242
+//line article.html:243
 func writeimageSearch(qq422016 qtio422016.Writer, root string, img common.Image) {
-//line article.html:242
+//line article.html:243
 	qw422016 := qt422016.AcquireWriter(qq422016)
-//line article.html:242
+//line article.html:243
 	streamimageSearch(qw422016, root, img)
-//line article.html:242
+//line article.html:243
 	qt422016.ReleaseWriter(qw422016)
-//line article.html:242
+//line article.html:243
 }
 
-//line article.html:242
+//line article.html:243
 func imageSearch(root string, img common.Image) string {
-//line article.html:242
+//line article.html:243
 	qb422016 := qt422016.AcquireByteBuffer()
-//line article.html:242
+//line article.html:243
 	writeimageSearch(qb422016, root, img)
-//line article.html:242
+//line article.html:243
 	qs422016 := string(qb422016.B)
-//line article.html:242
+//line article.html:243
 	qt422016.ReleaseByteBuffer(qb422016)
-//line article.html:242
+//line article.html:243
 	return qs422016
-//line article.html:242
+//line article.html:243
 }

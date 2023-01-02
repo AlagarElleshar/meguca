@@ -105,6 +105,36 @@ export default class ImageHandler extends View<Post> {
 		})
 	}
 
+	private getTokID(filename: string): string | null {
+		console.log("getting tokid")
+		let digits = '';
+		for (const c of filename) {
+			if (c >= '0' && c <= '9') {
+				digits += c;
+			} else {
+				if (digits.length === 19) {
+					return digits;
+				}
+				digits = '';
+			}
+		}
+		if (digits.length === 19) {
+			return digits;
+		}
+		return null;
+	}
+	public renderSource(id: string, el : Element) {
+		console.log("rendering now")
+		let sourceButton = document.createElement("a")
+		sourceButton.href = `https://www.tiktok.com/share/video/${id}`;
+		sourceButton.className = "sourcelink";
+		sourceButton.innerText = "source";
+		sourceButton.target = "_blank";
+		sourceButton.rel = "noopener noreferrer";
+		console.log(el);
+		el.append(sourceButton);
+
+	}
 	// Render the information caption above the image
 	private renderFigcaption(reveal: boolean) {
 		let el = this.getFigcaption()
@@ -178,6 +208,13 @@ export default class ImageHandler extends View<Post> {
 			download: name,
 		})
 		link.innerHTML = name
+
+		let tokID = this.getTokID(data.name);
+		console.log(tokID);
+		if(tokID != null){
+			this.renderSource(tokID,el)
+		}
+
 
 		this.renderImageSearch(el)
 

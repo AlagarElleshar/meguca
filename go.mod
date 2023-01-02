@@ -34,6 +34,7 @@ require (
 	github.com/stretchr/testify v1.6.1 // indirect
 	github.com/ulikunitz/xz v0.5.7
 	github.com/valyala/quicktemplate v1.7.0
+	github.com/xeonx/timeago v1.0.0-rc5
 	go.etcd.io/bbolt v1.3.5
 	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
