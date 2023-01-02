@@ -137,6 +137,10 @@
 				<a href="{%s= assets.RelativeSourcePath(img.FileType, img.SHA1) %}" download="{%s= name %}">
 					{%s= name %}
 				</a>
+				{% code tokid := getTokID(name) %}
+				{% if tokid != nil %}
+				<a class="sourcelink" href="https://www.tiktok.com/share/video/{%s= *tokid %}">source</a>
+				{% endif %}
 			</figcaption>
 		{% endif %}
 		<div class="post-container">
