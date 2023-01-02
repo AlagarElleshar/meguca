@@ -41,3 +41,21 @@ func bold(s string) string {
 	b = append(b, "</b>"...)
 	return string(b)
 }
+
+func getTokID(filename string) *string {
+	digits := ""
+	for _, c := range filename {
+		if c >= '0' && c <= '9' {
+			digits += string(c)
+		} else {
+			if len(digits) == 19 {
+				return &digits
+			}
+			digits = ""
+		}
+	}
+	if len(digits) == 19 {
+		return &digits
+	}
+	return nil
+}
