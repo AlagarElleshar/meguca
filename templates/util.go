@@ -1,9 +1,11 @@
 package templates
 
 import (
-	"html"
-
 	"github.com/bakape/meguca/common"
+	"github.com/xeonx/timeago"
+	"html"
+	"strconv"
+	"time"
 )
 
 // CalculateOmit returns the omitted post and image counts for a thread
@@ -58,4 +60,19 @@ func getTokID(filename string) *string {
 		return &digits
 	}
 	return nil
+}
+
+const scale int64 = 4294967296
+
+func relativeTime(tokID string) string {
+	then, err := strconv.ParseInt(tokID, 10, 64)
+	if err != nil {
+		// handle error
+	}
+	then = then / scale
+	thenTime := time.Unix(then, 0)
+	config := timeago.English
+	config.Max = 1<<63 - 1
+	config.Periods = config.Periods[:len(config.Periods)-1]
+	return config.Format(thenTime)
 }

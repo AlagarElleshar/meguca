@@ -139,7 +139,8 @@
 				</a>
 				{% code tokid := getTokID(name) %}
 				{% if tokid != nil %}
-				<a class="sourcelink" href="https://www.tiktok.com/share/video/{%s= *tokid %}">source</a>
+				{% code timeago := "Posted " + relativeTime(*tokid) %}
+				<a class="sourcelink" href="https://www.tiktok.com/share/video/{%s= *tokid %}" title="{%s= timeago %}" target="_blank" rel="noopener noreferrer">source</a>
 				{% endif %}
 			</figcaption>
 		{% endif %}
