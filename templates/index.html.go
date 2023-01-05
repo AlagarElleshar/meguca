@@ -255,395 +255,399 @@ func streamrenderIndex(qw422016 *qt422016.Writer, pos common.ModerationLevel) {
 //line index.html:223
 	qw422016.N().S(ln.UI["watcher"])
 //line index.html:223
-	qw422016.N().S(`"><svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M4.03 0c-2.53 0-4.03 3-4.03 3s1.5 3 4.03 3c2.47 0 3.97-3 3.97-3s-1.5-3-3.97-3zm-.03 1c1.11 0 2 .9 2 2 0 1.11-.89 2-2 2-1.1 0-2-.89-2-2 0-1.1.9-2 2-2zm0 1c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1c0-.1-.04-.19-.06-.28-.08.16-.24.28-.44.28-.28 0-.5-.22-.5-.5 0-.2.12-.36.28-.44-.09-.03-.18-.06-.28-.06z" transform="translate(0 1)"/></svg></a></span></span>`)
-//line index.html:232
+	qw422016.N().S(`"><svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M4.03 0c-2.53 0-4.03 3-4.03 3s1.5 3 4.03 3c2.47 0 3.97-3 3.97-3s-1.5-3-3.97-3zm-.03 1c1.11 0 2 .9 2 2 0 1.11-.89 2-2 2-1.1 0-2-.89-2-2 0-1.1.9-2 2-2zm0 1c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1c0-.1-.04-.19-.06-.28-.08.16-.24.28-.44.28-.28 0-.5-.22-.5-.5 0-.2.12-.36.28-.44-.09-.03-.18-.06-.28-.06z" transform="translate(0 1)"/></svg></a><a id="banner-flv-player" class="banner-float noscript-hide" title="`)
+//line index.html:228
+	qw422016.N().S(ln.UI["flv-player"])
+//line index.html:228
+	qw422016.N().S(`">FLV PLAYER</a></span></span>`)
+//line index.html:235
 	qw422016.N().S(`<div id="modal-overlay" class="overlay">`)
-//line index.html:236
+//line index.html:239
 	qw422016.N().S(`<div id="FAQ" class="modal glass">meguca is licensed under the`)
-//line index.html:238
+//line index.html:241
 	qw422016.N().S(` `)
-//line index.html:238
+//line index.html:241
 	qw422016.N().S(`<a href="https://www.gnu.org/licenses/gpl.html" target="_blank">GNU General Public License version 3</a><br>Source code repository:`)
-//line index.html:243
+//line index.html:246
 	qw422016.N().S(` `)
-//line index.html:243
+//line index.html:246
 	qw422016.N().S(`<a href="https://github.com/bakape/meguca" target="_blank">github.com/bakape/meguca</a><hr>`)
-//line index.html:248
+//line index.html:251
 	qw422016.N().S(strings.Replace(conf.FAQ, "\n", "<br>", -1))
-//line index.html:248
+//line index.html:251
 	qw422016.N().S(`</div>`)
-//line index.html:252
+//line index.html:255
 	qw422016.N().S(`<div id="identity" class="modal glass">`)
-//line index.html:254
+//line index.html:257
 	fields := specs["identity"]
 
-//line index.html:255
+//line index.html:258
 	if pos > common.NotStaff {
-//line index.html:256
+//line index.html:259
 		fields = make([]inputSpec, 1, len(fields)+1)
 
-//line index.html:257
+//line index.html:260
 		fields[0] = staffTitleSpec
 
-//line index.html:258
+//line index.html:261
 		fields = append(fields, specs["identity"]...)
 
-//line index.html:259
+//line index.html:262
 	}
-//line index.html:260
+//line index.html:263
 	streamtable(qw422016, fields)
-//line index.html:260
+//line index.html:263
 	qw422016.N().S(`</div>`)
-//line index.html:264
+//line index.html:267
 	qw422016.N().S(`<div id="account-panel" class="modal glass">`)
-//line index.html:266
+//line index.html:269
 	if pos == common.NotLoggedIn {
-//line index.html:266
+//line index.html:269
 		qw422016.N().S(`<div id="login-forms">`)
-//line index.html:268
+//line index.html:271
 		f := ln.Forms
 
-//line index.html:269
+//line index.html:272
 		streamtabButts(qw422016, []string{f["id"][0], f["register"][0]})
-//line index.html:269
+//line index.html:272
 		qw422016.N().S(`<div class="tab-cont"><div class="tab-sel" data-id="0"><form id="login-form">`)
-//line index.html:273
+//line index.html:276
 		streamtable(qw422016, specs["login"])
-//line index.html:274
+//line index.html:277
 		streamcaptcha(qw422016, "all")
-//line index.html:275
+//line index.html:278
 		streamsubmit(qw422016, false)
-//line index.html:275
+//line index.html:278
 		qw422016.N().S(`</form></div><div data-id="1"><form id="registration-form">`)
-//line index.html:280
+//line index.html:283
 		streamtable(qw422016, specs["register"])
-//line index.html:281
+//line index.html:284
 		streamcaptcha(qw422016, "all")
-//line index.html:282
+//line index.html:285
 		streamsubmit(qw422016, false)
-//line index.html:282
+//line index.html:285
 		qw422016.N().S(`</form></div></div></div>`)
-//line index.html:287
+//line index.html:290
 	} else {
-//line index.html:287
+//line index.html:290
 		qw422016.N().S(`<div id="form-selection">`)
-//line index.html:289
+//line index.html:292
 		for _, l := range [...]string{
 			"logout", "logoutAll", "changePassword",
 			"createBoard", "configureBoard", "deleteBoard",
 			"assignStaff", "setBanners", "setLoading",
 		} {
-//line index.html:293
+//line index.html:296
 			qw422016.N().S(`<a id="`)
-//line index.html:294
+//line index.html:297
 			qw422016.N().S(l)
-//line index.html:294
+//line index.html:297
 			qw422016.N().S(`">`)
-//line index.html:295
-			qw422016.N().S(ln.UI[l])
-//line index.html:295
-			qw422016.N().S(`<br></a>`)
 //line index.html:298
-		}
-//line index.html:299
-		if pos >= common.ActionPrivilege[common.ConfigureServer] {
-//line index.html:299
-			qw422016.N().S(`<a id="configureServer">`)
-//line index.html:301
-			qw422016.N().S(ln.UI["configureServer"])
-//line index.html:301
+			qw422016.N().S(ln.UI[l])
+//line index.html:298
 			qw422016.N().S(`<br></a>`)
-//line index.html:304
+//line index.html:301
 		}
+//line index.html:302
+		if pos >= common.ActionPrivilege[common.ConfigureServer] {
+//line index.html:302
+			qw422016.N().S(`<a id="configureServer">`)
 //line index.html:304
+			qw422016.N().S(ln.UI["configureServer"])
+//line index.html:304
+			qw422016.N().S(`<br></a>`)
+//line index.html:307
+		}
+//line index.html:307
 		qw422016.N().S(`</div>`)
-//line index.html:306
+//line index.html:309
 	}
-//line index.html:306
+//line index.html:309
 	qw422016.N().S(`</div>`)
-//line index.html:310
+//line index.html:313
 	qw422016.N().S(`<div id="options" class="modal glass">`)
-//line index.html:312
+//line index.html:315
 	streamtabButts(qw422016, ln.Tabs)
-//line index.html:312
+//line index.html:315
 	qw422016.N().S(`<div class="tab-cont">`)
-//line index.html:314
+//line index.html:317
 	for i, sp := range optionSpecs {
-//line index.html:314
+//line index.html:317
 		qw422016.N().S(`<div data-id="`)
-//line index.html:315
+//line index.html:318
 		qw422016.N().D(i)
-//line index.html:315
+//line index.html:318
 		qw422016.N().S(`"`)
-//line index.html:315
+//line index.html:318
 		if i == 0 {
-//line index.html:315
+//line index.html:318
 			qw422016.N().S(` `)
-//line index.html:315
+//line index.html:318
 			qw422016.N().S(`class="tab-sel"`)
-//line index.html:315
+//line index.html:318
 		}
-//line index.html:315
+//line index.html:318
 		qw422016.N().S(`>`)
-//line index.html:316
+//line index.html:319
 		streamoptions(qw422016, sp, ln)
-//line index.html:320
+//line index.html:323
 		if i == 0 {
-//line index.html:320
+//line index.html:323
 			qw422016.N().S(`<br><span class="spaced">`)
-//line index.html:323
+//line index.html:326
 			for _, id := range [...]string{"export", "import", "hidden"} {
-//line index.html:323
+//line index.html:326
 				qw422016.N().S(`<a id="`)
-//line index.html:324
+//line index.html:327
 				qw422016.N().S(id)
-//line index.html:324
+//line index.html:327
 				qw422016.N().S(`" title="`)
-//line index.html:324
+//line index.html:327
 				qw422016.N().S(ln.Forms[id][1])
-//line index.html:324
+//line index.html:327
 				qw422016.N().S(`">`)
-//line index.html:325
+//line index.html:328
 				qw422016.N().S(ln.Forms[id][0])
-//line index.html:325
+//line index.html:328
 				qw422016.N().S(`</a>`)
-//line index.html:327
+//line index.html:330
 			}
-//line index.html:327
+//line index.html:330
 			qw422016.N().S(`</span>`)
-//line index.html:331
+//line index.html:334
 			qw422016.N().S(`<input type="file" id="importSettings" hidden>`)
-//line index.html:333
+//line index.html:336
 		}
-//line index.html:333
+//line index.html:336
 		qw422016.N().S(`</div>`)
-//line index.html:335
+//line index.html:338
 	}
-//line index.html:335
+//line index.html:338
 	qw422016.N().S(`</div></div>`)
-//line index.html:340
+//line index.html:343
 	qw422016.N().S(`<div id="watcher" class="modal glass"><table><thead><tr><th>`)
-//line index.html:345
+//line index.html:348
 	qw422016.N().S(ln.Common.UI["board"])
-//line index.html:345
+//line index.html:348
 	qw422016.N().S(`</th><th>`)
-//line index.html:346
+//line index.html:349
 	qw422016.N().S(ln.Common.UI["thread"])
-//line index.html:346
+//line index.html:349
 	qw422016.N().S(`</th><th>`)
-//line index.html:347
+//line index.html:350
 	qw422016.N().S(ln.Common.UI["status"])
-//line index.html:347
+//line index.html:350
 	qw422016.N().S(`</th><th>`)
-//line index.html:348
+//line index.html:351
 	qw422016.N().S(ln.Common.UI["markSeen"])
-//line index.html:348
+//line index.html:351
 	qw422016.N().S(`</th><th>`)
-//line index.html:349
+//line index.html:352
 	qw422016.N().S(ln.Common.UI["unwatch"])
-//line index.html:349
+//line index.html:352
 	qw422016.N().S(`</th></tr></thead><tbody></tbody></table></div>`)
-//line index.html:359
+//line index.html:362
 	if pos > common.NotStaff {
-//line index.html:359
+//line index.html:362
 		qw422016.N().S(`<div id="moderation-panel" class="modal glass"><span title="`)
-//line index.html:361
+//line index.html:364
 		qw422016.N().S(ln.Common.UI["meidovisionTT"])
-//line index.html:361
+//line index.html:364
 		qw422016.N().S(`">`)
-//line index.html:362
+//line index.html:365
 		qw422016.N().S(ln.Common.UI["meidoVisionPost"] + ": ")
-//line index.html:362
+//line index.html:365
 		qw422016.N().S(`<input type="button" id="meidovision" value="`)
-//line index.html:363
+//line index.html:366
 		qw422016.N().S(ln.Common.UI["submit"])
-//line index.html:363
+//line index.html:366
 		qw422016.N().S(`"></span><hr>`)
-//line index.html:366
+//line index.html:369
 		if pos >= common.ActionPrivilege[common.RedirectIP] {
-//line index.html:366
+//line index.html:369
 			qw422016.N().S(`<span  title="`)
-//line index.html:367
+//line index.html:370
 			qw422016.N().S(ln.Common.UI["redirectTT"])
-//line index.html:367
+//line index.html:370
 			qw422016.N().S(`">`)
-//line index.html:368
+//line index.html:371
 			qw422016.N().S(ln.Common.UI["redirectPoster"] + ": ")
-//line index.html:368
+//line index.html:371
 			qw422016.N().S(`<input type="button" id="redirect-ip" value="`)
-//line index.html:369
+//line index.html:372
 			qw422016.N().S(ln.Common.UI["submit"])
-//line index.html:369
+//line index.html:372
 			qw422016.N().S(`"></span><br><input type="text" id="redirect-location" class="full-width" placeholder="`)
-//line index.html:372
+//line index.html:375
 			qw422016.N().S(ln.Common.UI["location"])
-//line index.html:372
-			qw422016.N().S(`"><hr>`)
-//line index.html:374
-		}
 //line index.html:375
+			qw422016.N().S(`"><hr>`)
+//line index.html:377
+		}
+//line index.html:378
 		if pos >= common.ActionPrivilege[common.AdminNotification] {
-//line index.html:375
+//line index.html:378
 			qw422016.N().S(`<span title="`)
-//line index.html:376
+//line index.html:379
 			qw422016.N().S(ln.UI["notificationTT"])
-//line index.html:376
+//line index.html:379
 			qw422016.N().S(`">`)
-//line index.html:377
+//line index.html:380
 			qw422016.N().S(ln.UI["notification"] + ": ")
-//line index.html:377
+//line index.html:380
 			qw422016.N().S(`<input type="button" id="admin-notification" value="`)
-//line index.html:378
+//line index.html:381
 			qw422016.N().S(ln.Common.UI["submit"])
-//line index.html:378
+//line index.html:381
 			qw422016.N().S(`"></span><br><input type="text" id="notification-text" class="full-width" placeholder="`)
-//line index.html:381
+//line index.html:384
 			qw422016.N().S(ln.UI["text"])
-//line index.html:381
+//line index.html:384
 			qw422016.N().S(`"><hr>`)
-//line index.html:383
+//line index.html:386
 		}
-//line index.html:383
+//line index.html:386
 		qw422016.N().S(`<form>`)
-//line index.html:385
+//line index.html:388
 		if pos >= common.ActionPrivilege[common.BanPost] {
-//line index.html:385
+//line index.html:388
 			qw422016.N().S(`<label><input type="checkbox" name="ban-poster">`)
-//line index.html:386
+//line index.html:389
 			qw422016.N().S(ln.UI["ban"])
-//line index.html:386
+//line index.html:389
 			qw422016.N().S(`</label><br>`)
-//line index.html:388
+//line index.html:391
 			for _, id := range [...]string{"day", "hour", "minute"} {
-//line index.html:388
+//line index.html:391
 				qw422016.N().S(`<input type="number" name="`)
-//line index.html:389
+//line index.html:392
 				qw422016.N().S(id)
-//line index.html:389
+//line index.html:392
 				qw422016.N().S(`" min="0" placeholder="`)
-//line index.html:389
+//line index.html:392
 				qw422016.N().S(strings.Title(ln.Common.Plurals[id][1]))
-//line index.html:389
+//line index.html:392
 				qw422016.N().S(`">`)
-//line index.html:390
+//line index.html:393
 			}
-//line index.html:390
+//line index.html:393
 			qw422016.N().S(`<br><input type="text" name="ban-reason" class="full-width" placeholder="`)
-//line index.html:392
+//line index.html:395
 			qw422016.N().S(ln.Common.UI["reason"])
-//line index.html:392
+//line index.html:395
 			qw422016.N().S(`"><br><label><input type="checkbox" name="shadow">`)
-//line index.html:394
+//line index.html:397
 			qw422016.N().S(ln.UI["shadow"])
-//line index.html:394
+//line index.html:397
 			qw422016.N().S(`</label>`)
-//line index.html:395
+//line index.html:398
 			if pos == common.Admin {
-//line index.html:395
+//line index.html:398
 				qw422016.N().S(`<label><input type="checkbox" name="global">`)
-//line index.html:398
+//line index.html:401
 				qw422016.N().S(ln.UI["global"])
-//line index.html:398
+//line index.html:401
 				qw422016.N().S(`</label>`)
-//line index.html:400
+//line index.html:403
 			}
-//line index.html:400
+//line index.html:403
 			qw422016.N().S(`<hr>`)
-//line index.html:402
+//line index.html:405
 		}
-//line index.html:402
+//line index.html:405
 		qw422016.N().S(`<label><input type="checkbox" name="delete-post">`)
-//line index.html:403
+//line index.html:406
 		qw422016.N().S(ln.UI["deletePost"])
-//line index.html:403
+//line index.html:406
 		qw422016.N().S(`</label><br><label><input type="checkbox" name="spoiler-image">`)
-//line index.html:405
+//line index.html:408
 		qw422016.N().S(ln.UI["spoilerImage"])
-//line index.html:405
+//line index.html:408
 		qw422016.N().S(`</label><br><label><input type="checkbox" name="delete-image">`)
-//line index.html:407
+//line index.html:410
 		qw422016.N().S(ln.UI["deleteImage"])
-//line index.html:407
+//line index.html:410
 		qw422016.N().S(`</label><br>`)
-//line index.html:409
+//line index.html:412
 		if pos >= common.ActionPrivilege[common.PurgePost] {
-//line index.html:409
+//line index.html:412
 			qw422016.N().S(`<label><input type="checkbox" name="purge-post">`)
-//line index.html:410
+//line index.html:413
 			qw422016.N().S(ln.UI["purgePost"])
-//line index.html:410
+//line index.html:413
 			qw422016.N().S(`</label><br><input type="text" name="purge-reason" class="full-width" placeholder="`)
-//line index.html:412
+//line index.html:415
 			qw422016.N().S(ln.Common.UI["purgeReason"])
-//line index.html:412
+//line index.html:415
 			qw422016.N().S(`"><br>`)
-//line index.html:414
+//line index.html:417
 		}
-//line index.html:414
+//line index.html:417
 		qw422016.N().S(`<label><input type="checkbox" name="all">`)
-//line index.html:415
+//line index.html:418
 		qw422016.N().S(ln.Common.UI["applyAll"])
-//line index.html:415
+//line index.html:418
 		qw422016.N().S(`</label><hr><input type="checkbox" name="showCheckboxes"><input type="button" value="`)
-//line index.html:418
+//line index.html:421
 		qw422016.N().S(ln.UI["clear"])
-//line index.html:418
+//line index.html:421
 		qw422016.N().S(`" name="clear">`)
-//line index.html:419
+//line index.html:422
 		streamsubmit(qw422016, false)
-//line index.html:419
+//line index.html:422
 		qw422016.N().S(`</form></div>`)
-//line index.html:422
+//line index.html:425
 	}
-//line index.html:422
+//line index.html:425
 	qw422016.N().S(`</div></div>`)
-//line index.html:427
+//line index.html:430
 	qw422016.N().S(`<div class="overlay top-overlay" id="hover-overlay"></div><div id="captcha-overlay" class="overlay top-overlay"></div>`)
-//line index.html:433
+//line index.html:436
 	qw422016.N().S(`<section id="threads">`)
-//line index.html:437
+//line index.html:440
 	qw422016.N().S(`$$$</section>`)
-//line index.html:442
-	qw422016.N().S(`<script src="/assets/js/vendor/almond.js"></script><script id="lang-data" type="application/json">`)
 //line index.html:445
+	qw422016.N().S(`<script src="/assets/js/vendor/mpegts.js"></script><script src="/assets/js/vendor/almond.js"></script><script id="lang-data" type="application/json">`)
+//line index.html:449
 	buf, _ := json.Marshal(ln.Common)
 
-//line index.html:446
+//line index.html:450
 	qw422016.N().Z(buf)
-//line index.html:446
+//line index.html:450
 	qw422016.N().S(`</script><script id="board-title-data" type="application/json">`)
-//line index.html:449
+//line index.html:453
 	buf, _ = json.Marshal(config.GetBoardTitles())
 
-//line index.html:450
+//line index.html:454
 	qw422016.N().Z(buf)
-//line index.html:450
+//line index.html:454
 	qw422016.N().S(`</script><script src="/assets/js/scripts/loader.js"></script></body>`)
-//line index.html:454
+//line index.html:458
 }
 
-//line index.html:454
+//line index.html:458
 func writerenderIndex(qq422016 qtio422016.Writer, pos common.ModerationLevel) {
-//line index.html:454
+//line index.html:458
 	qw422016 := qt422016.AcquireWriter(qq422016)
-//line index.html:454
+//line index.html:458
 	streamrenderIndex(qw422016, pos)
-//line index.html:454
+//line index.html:458
 	qt422016.ReleaseWriter(qw422016)
-//line index.html:454
+//line index.html:458
 }
 
-//line index.html:454
+//line index.html:458
 func renderIndex(pos common.ModerationLevel) string {
-//line index.html:454
+//line index.html:458
 	qb422016 := qt422016.AcquireByteBuffer()
-//line index.html:454
+//line index.html:458
 	writerenderIndex(qb422016, pos)
-//line index.html:454
+//line index.html:458
 	qs422016 := string(qb422016.B)
-//line index.html:454
+//line index.html:458
 	qt422016.ReleaseByteBuffer(qb422016)
-//line index.html:454
+//line index.html:458
 	return qs422016
-//line index.html:454
+//line index.html:458
 }
