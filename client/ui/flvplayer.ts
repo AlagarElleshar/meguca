@@ -1,10 +1,10 @@
 import {setAttrs} from "../util";
 
-// declare let mpegts : any;
-import Mpegts from "mpegts.js";
+declare let mpegts : any;
+// import mpegts from "mpegts.js";
 
-let player = Mpegts.createPlayer({
-    type: 'flv',  // could also be Mpegts, m2ts, flv
+let player = mpegts.createPlayer({
+    type: 'flv',  // could also be mpegts, m2ts, flv
     isLive: true,
 });
 export function openFlvPlayer() {
@@ -17,7 +17,7 @@ export function openFlvPlayer() {
             style: "display: block;",
         });
         document.getElementById("modal-overlay").prepend(cont);
-        if (Mpegts.getFeatureList().mseLivePlayback) {
+        if (mpegts.getFeatureList().mseLivePlayback) {
             var videoElement = document.createElement("video");
             videoElement.id = "flv-player"
             cont.appendChild(videoElement);
@@ -28,10 +28,10 @@ var checkBoxFields = ['isLive', 'withCredentials', 'liveBufferLatencyChasing'];
 var streamURL, mediaSourceURL;
 
 export function playLive(url : string) {
-    if (Mpegts.getFeatureList().mseLivePlayback) {
+    if (mpegts.getFeatureList().mseLivePlayback) {
         var videoElement = document.getElementById('flv-player');
-        var player = Mpegts.createPlayer({
-            type: 'flv',  // could also be Mpegts, m2ts, flv
+        var player = mpegts.createPlayer({
+            type: 'flv',  // could also be mpegts, m2ts, flv
             isLive: true,
             url: url
         });
