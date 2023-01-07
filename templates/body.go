@@ -505,6 +505,27 @@ func (c *bodyContext) newTabLink(href, text string) {
 	c.string(`</a>`)
 }
 
+func writeAttrs(attrs map[string]string, c *bodyContext) {
+	for key, val := range attrs {
+		c.string(" ")
+		c.string(key)
+		if val != "" {
+			c.string(fmt.Sprintf(`="%s"`, val))
+		}
+	}
+}
+
+// bit := "video_or4.flv"
+//
+//	if strings.HasSuffix(bit, "_or4.flv") {
+//		attrs := map[string]string{
+//			"type":       "button",
+//			"class":      "live-button",
+//			"data-live-url": bit,
+//		}
+//		fmt.Printf("<button%s>PLAY</button>", makeAttrs(attrs))
+//	}
+//
 // Parse generic URLs and magnet links
 func (c *bodyContext) parseURL(bit string) {
 	s := string(bit)
@@ -520,6 +541,17 @@ func (c *bodyContext) parseURL(bit string) {
 		c.string(`">`)
 		c.string(s)
 		c.string(`</a>`)
+	case strings.HasSuffix(s, "_or4.flv"):
+		c.newTabLink(s, s)
+		attrs := map[string]string{
+			"type":          "button",
+			"class":         "live-button",
+			"data-live-url": bit,
+			"onclick":       "playLive('" + bit + "')",
+		}
+		c.string("<button ")
+		writeAttrs(attrs, c)
+		c.string(">PLAY</button>")
 	default:
 		c.newTabLink(s, s)
 	}

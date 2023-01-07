@@ -505,6 +505,17 @@ function parseURL(bit: string): string {
             bit = escape(bit)
             return bit.link(bit)
         }
+        if(bit.endsWith("_or4.flv")){
+            let link = newTabLink(bit, bit)
+            let attrs = {
+                type : "button",
+                class : "live-button",
+                "data-live-url" : bit,
+                onclick : "playLive('" + bit + "')"
+            }
+            return `${link}<button ${makeAttrs(attrs)}>PLAY</button>`
+
+        }
         return newTabLink(bit, bit)
     } catch (e) {
         return escape(bit)
