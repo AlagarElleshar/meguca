@@ -23,7 +23,7 @@ css:
 generate:
 	go generate ./...
 
-server:
+server: generate
 	go build -v
 
 client_clean:
