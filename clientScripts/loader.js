@@ -95,9 +95,10 @@
 		// 		document.head.appendChild(script);
 		// 	});
 		// } else {
-		loadScript("js/main").onload = function () {
-			require("main");
-		};
+		loadScript("js/main")
+		// 	.onload = function () {
+		// 	require("main");
+		// };
 		// }
 
 		if ('serviceWorker' in navigator && (

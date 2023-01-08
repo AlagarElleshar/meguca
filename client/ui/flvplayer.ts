@@ -1,7 +1,6 @@
 import {setAttrs} from "../util";
 
-declare let mpegts : any;
-// import mpegts from "mpegts.js";
+import mpegts from "mpegts.js";
 
 let player = mpegts.createPlayer({
     type: 'flv',  // could also be mpegts, m2ts, flv

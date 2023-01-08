@@ -1,8 +1,8 @@
 import { Post } from "./post"
 // Have to be very specific with imports
-import { fetchJSON } from "../client/util/fetch"
-import { emitChanges, ChangeEmitter } from "../client/util/changes"
-import { PostData } from "../client/common"
+import { fetchJSON } from "../util/fetch"
+import { emitChanges, ChangeEmitter } from "../util/changes"
+import { PostData } from "../common"
 
 interface MouseMove extends ChangeEmitter {
     event: MouseEvent;
