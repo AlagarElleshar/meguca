@@ -608,7 +608,7 @@ func streamrenderIndex(qw422016 *qt422016.Writer, pos common.ModerationLevel) {
 //line index.html:440
 	qw422016.N().S(`$$$</section>`)
 //line index.html:445
-	qw422016.N().S(`<script src="/assets/js/vendor/mpegts.js"></script><script src="/assets/js/vendor/almond.js"></script><script id="lang-data" type="application/json">`)
+	qw422016.N().S(`<script src="/assets/js/vendor/almond.js"></script><script src="/assets/js/vendor/mpegts.js"></script><script id="lang-data" type="application/json">`)
 //line index.html:449
 	buf, _ := json.Marshal(ln.Common)
 
