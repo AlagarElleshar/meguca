@@ -65,7 +65,7 @@ var (
 			"hakurei_reimu"},
 		OverrideCaptchaTags: map[string]string{},
 		Public: Public{
-			DefaultCSS:      "moe",
+			DefaultCSS:      "neko",
 			DefaultLang:     "en_GB",
 			ThreadExpiryMin: 7,
 			ThreadExpiryMax: 14,

@@ -76,6 +76,7 @@ var (
 		"mawaru",
 		"moe",
 		"moon",
+		"neko",
 		"ocean",
 		"rave",
 		"tavern",
