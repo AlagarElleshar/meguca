@@ -1,6 +1,7 @@
 export node_bins=$(PWD)/node_modules/.bin
 export uglifyjs=$(node_bins)/uglifyjs
 export gulp=$(node_bins)/gulp
+export webpack=$(node_bins)/webpack
 export GO111MODULE=on
 
 .PHONY: server client imager test
@@ -8,6 +9,7 @@ export GO111MODULE=on
 all: server client
 
 client: client_vendor
+	$(webpack)
 	$(gulp)
 
 client_deps:
@@ -15,7 +17,6 @@ client_deps:
 
 client_vendor: client_deps
 	mkdir -p www/js/vendor
-	$(uglifyjs) node_modules/almond/almond.js -o www/js/vendor/almond.js
 
 css:
 	$(gulp) css
@@ -23,7 +24,8 @@ css:
 generate:
 	go generate ./...
 
-server: generate
+server:
+	go generate
 	go build -v
 
 client_clean:

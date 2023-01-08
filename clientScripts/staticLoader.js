@@ -8,7 +8,8 @@
 		return script;
 	}
 
-	loadScript("js/static/main").onload = function () {
-		require("clientStatic/main");
-	};
+	loadScript("js/static/main")
+	// 	.onload = function () {
+	// 	require("client/static/main");
+	// };
 })();

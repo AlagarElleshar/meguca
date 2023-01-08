@@ -1,11 +1,11 @@
 import {
     PostData, PostLink, ModerationLevel, ModerationEntry, Command, ImageData,
     ModerationAction, fileTypes
-} from "../client/common"
-import { importTemplate } from "../client/util/render"
-import countries from "../client/posts/countries"
-import lang from "../client/lang"
-import { secondsToTime } from "../client/util/time"
+} from "../common"
+import { importTemplate } from "../util/render"
+import countries from "../posts/countries"
+import lang from "../lang"
+import { secondsToTime } from "../util/time"
 
 const modLevelStrings = ["", "janitor", "moderators", "owners", "admin"];
 

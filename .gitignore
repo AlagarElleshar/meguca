@@ -36,3 +36,4 @@ debug.test
 /config.json
 db_*.db
 .mypy_cache/
+/templates/*.html.go
