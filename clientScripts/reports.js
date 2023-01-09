@@ -26,6 +26,7 @@
 	}
 
 	loadScript("js/static/main").onload = function () {
-		require("client/sse/index").default(processEvent);
+		// require("client/sse/index").default(processEvent);
+		window.sse(processEvent)
 	};
 })();
