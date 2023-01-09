@@ -1,12 +1,11 @@
 import {setAttrs} from "../util";
 
-import mpegts from "mpegts.js";
+// import mpegts from "mpegts.js";
 
-let player = mpegts.createPlayer({
-    type: 'flv',  // could also be mpegts, m2ts, flv
-    isLive: true,
-});
-export function openFlvPlayer() {
+let mpegtsjs = import("mpegts.js")
+
+export async function openFlvPlayer() {
+    let mpegts = (await mpegtsjs).default
     let cont = document.getElementById("flv-player-cont")
     if (!cont) {
         cont = document.createElement("div")
@@ -23,10 +22,9 @@ export function openFlvPlayer() {
         }
     }
 }
-var checkBoxFields = ['isLive', 'withCredentials', 'liveBufferLatencyChasing'];
-var streamURL, mediaSourceURL;
 
-export function playLive(url : string) {
+export async function playLive(url : string) {
+    let mpegts = (await mpegtsjs).default
     if (mpegts.getFeatureList().mseLivePlayback) {
         var videoElement = document.getElementById('flv-player');
         var player = mpegts.createPlayer({
