@@ -41,6 +41,29 @@ aside {
 	margin : 1px;
 }
 
+article.op {
+	min-width:48em
+}
+
+article {
+	min-width: 18em;
+}
+
+article time {
+	margin-left:2.5px;
+	margin-right:1px;
+	cursor:default
+}
+
+article:not(.reply-form) .control {
+	display: none;
+}
+
+article:not(.reply-form):hover .control {
+	display: initial;
+}
+
+
 body {
 	overflow-x: hidden;
 	margin    : 0;
@@ -304,7 +327,6 @@ td {
 
 	blockquote {
 		margin   : 0.5em 0 0.5em 0.5em;
-		min-width: 15em;
 	}
 
 	#threads {
