@@ -54,7 +54,9 @@ export const specs: { [id: string]: OptionSpec } = {
 		default: true,
 	},
 	// WebM hover expansion
-	webmHover: {},
+	webmHover: {
+		default: true,
+	},
 	// Volume of audio for music and video players
 	audioVolume: {
 		type: optionType.range,
@@ -99,7 +101,9 @@ export const specs: { [id: string]: OptionSpec } = {
 		),
 	},
 	// Relative post timestamps
-	relativeTime: {},
+	relativeTime: {
+		default: true
+	},
 	// Now playing banners
 	horizontalNowPlaying: {
 		default: true,
@@ -256,7 +260,6 @@ export const specs: { [id: string]: OptionSpec } = {
 	alwaysLock: {},
 	// Image search link toggles
 	google: {
-		default: true,
 		exec: toggleImageSearch("google"),
 	},
 	yandex: {
@@ -266,7 +269,6 @@ export const specs: { [id: string]: OptionSpec } = {
 		exec: toggleImageSearch("iqdb"),
 	},
 	saucenao: {
-		default: true,
 		exec: toggleImageSearch("saucenao"),
 	},
 	tracemoe: {
