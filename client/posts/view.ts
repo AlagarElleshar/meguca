@@ -10,7 +10,7 @@ import lang from "../lang"
 import { page, mine, posts } from "../state"
 import options from "../options"
 import countries from "./countries"
-import { secondsToTime } from "../util/time"
+import {relativeTimeAbbreviated, secondsToTime} from "../util/time"
 import { ModerationAction } from '../common';
 
 
@@ -196,16 +196,16 @@ export default class PostView extends ImageHandler {
     // Renders a time element. Can be either absolute or relative.
     public renderTime() {
         const abs = this.readableTime()
-        const rel = relativeTime(this.model.time)
+        const rel = relativeTimeAbbreviated(this.model.time)
         const el = this.el.querySelector("time")
         // this is called on all posts in a thread by a timer
         // minimize DOM mutations when there's nothing to update
         const currentTitle = el.getAttribute("title")
+        const currentText = el.textContent;
         const newTitle = options.relativeTime ? abs : rel
         if (currentTitle != newTitle) {
             el.setAttribute("title", newTitle)
         }
-        const currentText = el.textContent;
         const newText = options.relativeTime ? rel : abs;
         if (currentText != newText) {
             el.textContent = newText
