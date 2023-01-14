@@ -88,7 +88,7 @@ export default class FormModel extends Post {
 			// Commit a character appendage to the end of the line to the server
 			const char = val.slice(-1);
 			this.inputBody += char
-			this.send(message.append, char.codePointAt(0))
+			this.send(message.append, char, false)
 		} else if (lenDiff === -1 && old.slice(0, -1) === val) {
 			// Send a message about removing the last character of the line to
 			// the server
@@ -122,9 +122,9 @@ export default class FormModel extends Post {
 		return val;
 	}
 
-	private send(type: message, msg: any) {
+	private send(type: message, msg: any,encode=true) {
 		if (postSM.state !== postState.halted) {
-			send(type, msg)
+			send(type, msg,encode)
 		}
 	}
 
