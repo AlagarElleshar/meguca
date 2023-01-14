@@ -45,3 +45,13 @@ func (c *Client) runHandler(typ common.MessageType, msg []byte) error {
 		return errInvalidPayload(msg)
 	}
 }
+
+func (c *Client) runHandlerBinary(typ common.MessageType, msg []byte) error {
+	data := msg[:len(msg)-1]
+	switch typ {
+	case common.MessageAppend:
+		return c.appendRune(data)
+	default:
+		return errInvalidPayload(msg)
+	}
+}

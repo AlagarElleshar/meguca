@@ -113,9 +113,9 @@ export default () => {
 		handle(id, m =>
 			m.spoilerImage())
 
-	handlers[message.append] = ([id, char]: [number, number]) =>
+	handlers[message.append] = ([id, char]: [number, string]) =>
 		handle(id, m =>
-			m.append(char))
+			m.appendString(char))
 
 	handlers[message.backspace] = (id: number) =>
 		handle(id, m =>

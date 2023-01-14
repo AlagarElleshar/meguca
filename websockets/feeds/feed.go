@@ -294,7 +294,7 @@ func (f *Feed) SetOpenBody(id uint64, body string, msg []byte) {
 
 // AppendBody special hotpath for SetOpenBody
 func (f *Feed) AppendBody(id uint64, body string, msg []byte) {
-	f.sendToAll(msg)
+	f.sendToAllBinary(msg)
 	f.setOpenBody <- postBodyModMessage{
 		message: message{
 			id:  id,

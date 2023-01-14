@@ -115,6 +115,22 @@ export class Post extends Model implements PostData {
 		}
 	}
 
+	// Append a character to the text body
+	public appendString(char :string) {
+		this.body += char
+
+		// It is possible to receive text body updates after a post closes,
+		// due to server-side buffering optimizations. If so, rerender the body.
+		const needReparse = char === "\n"
+			|| !this.editing
+			|| this.state.code
+			|| endsWithTag(this.body)
+		if (needReparse) {
+			this.view.reparseBody()
+		} else {
+			this.view.appendString(char)
+		}
+	}
 	// Backspace one character in the current line
 	public backspace() {
 		const needReparse = this.body[this.body.length - 1] === "\n"

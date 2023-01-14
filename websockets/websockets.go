@@ -85,6 +85,9 @@ type Client struct {
 	// Only used to pass messages from the Send method.
 	sendExternal chan []byte
 
+	// Only used to pass messages from the Send method.
+	sendBinaryExternal chan []byte
+
 	// Redirect client to target board
 	redirect chan string
 
@@ -152,8 +155,9 @@ func newClient(
 		// Allows for ~60 seconds of messages, until the buffer overflows.
 		// A larger gap is more acceptable to shitty connections and mobile
 		// phones, especially while uploading.
-		sendExternal: make(chan []byte, time.Second*60/feeds.TickerInterval),
-		conn:         conn,
+		sendExternal:       make(chan []byte, time.Second*60/feeds.TickerInterval),
+		sendBinaryExternal: make(chan []byte, time.Second*60/feeds.TickerInterval),
+		conn:               conn,
 	}, nil
 }
 
@@ -181,6 +185,10 @@ func (c *Client) listenerLoop() error {
 			return err
 		case msg := <-c.sendExternal:
 			if err := c.send(msg); err != nil {
+				return err
+			}
+		case msg := <-c.sendBinaryExternal:
+			if err := c.sendBinary(msg); err != nil {
 				return err
 			}
 		case <-ping.C:
@@ -253,10 +261,20 @@ func (c *Client) Send(msg []byte) {
 		c.Close(errors.New("send buffer overflow"))
 	}
 }
+func (c *Client) SendBinary(msg []byte) {
+	select {
+	case c.sendBinaryExternal <- msg:
+	default:
+		c.Close(errors.New("send buffer overflow"))
+	}
+}
 
 // Sends a message to the client. Not safe for concurrent use.
 func (c *Client) send(msg []byte) error {
 	return c.conn.WriteMessage(websocket.TextMessage, msg)
+}
+func (c *Client) sendBinary(msg []byte) error {
+	return c.conn.WriteMessage(websocket.BinaryMessage, msg)
 }
 
 // Format a message type as JSON and send it to the client. Not safe for
@@ -293,7 +311,7 @@ func (c *Client) receiverLoop() {
 
 // handleMessage parses a message received from the client through websockets
 func (c *Client) handleMessage(msgType int, msg []byte) (err error) {
-	if msgType != websocket.TextMessage {
+	if msgType != websocket.TextMessage && msgType != websocket.BinaryMessage {
 		return errInvalidFrame("only text frames allowed")
 	}
 	if len(msg) < 2 {
@@ -301,11 +319,18 @@ func (c *Client) handleMessage(msgType int, msg []byte) (err error) {
 	}
 
 	// First two characters of a message define its type
-	uncast, err := strconv.ParseUint(string(msg[:2]), 10, 8)
-	if err != nil {
-		return errInvalidPayload(msg)
+	var typ common.MessageType
+	if msgType == websocket.BinaryMessage {
+		// Get last character of message
+		last := msg[len(msg)-1]
+		typ = common.MessageType(last)
+	} else {
+		uncast, err := strconv.ParseUint(string(msg[:2]), 10, 8)
+		if err != nil {
+			return errInvalidPayload(msg)
+		}
+		typ = common.MessageType(uncast)
 	}
-	typ := common.MessageType(uncast)
 	if !c.gotFirstMessage {
 		if typ != common.MessageSynchronise {
 			return errInvalidPayload(msg)
@@ -339,6 +364,12 @@ func (c *Client) handleMessage(msgType int, msg []byte) (err error) {
 		}
 	}
 
+	if msgType == websocket.BinaryMessage {
+		// Get last character of message
+		last := msg[len(msg)-1]
+		c.runHandlerBinary(common.MessageType(last), msg)
+		return
+	}
 	return c.runHandler(typ, msg)
 }
 

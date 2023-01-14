@@ -88,6 +88,7 @@ var (
 // without causing circular imports
 type Client interface {
 	Send([]byte)
+	SendBinary([]byte)
 	Redirect(board string)
 	IP() string
 	LastTime() int64

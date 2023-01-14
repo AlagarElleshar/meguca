@@ -3,6 +3,7 @@ package websockets
 import (
 	"bytes"
 	"database/sql"
+	"encoding/binary"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -113,17 +114,24 @@ func (c *Client) appendRune(data []byte) (err error) {
 		return
 	}
 
-	msg, err := common.EncodeMessage(
-		common.MessageAppend,
-		[2]uint64{c.post.id, uint64(char)},
-	)
+	//var msg = [len(data) + 16]byte
+	msg := make([]byte, len(data)+9)
+	//write c.post.id into msg
+	binary.LittleEndian.PutUint64(msg, c.post.id)
+	copy(msg[8:], data)
+	msg[8+len(data)] = byte(common.MessageAppend)
+	//msg, err := common.EncodeMessage(
+	//	common.MessageAppend,
+	//	[2]uint64{c.post.id, uint64(char)},
+	//)
+
 	if err != nil {
 		return
 	}
 
 	c.post.body = append(c.post.body, data...)
 	c.post.len++
-	return c.updateBody(msg, 1)
+	return c.appendBody(msg, 1)
 }
 
 // Send message to thread update feed and writes the open post's buffer to the

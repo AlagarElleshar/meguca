@@ -89,3 +89,10 @@ func (b *baseFeed) sendToAll(msg []byte) {
 		c.Send(msg)
 	}
 }
+
+// Send a message to all connected clients
+func (b *baseFeed) sendToAllBinary(msg []byte) {
+	for c := range b.clients {
+		c.SendBinary(msg)
+	}
+}
