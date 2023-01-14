@@ -193,6 +193,9 @@ export default class ImageHandler extends View<Post> {
 		if (data.title) {
 			arr.push(data.title);
 		}
+		if (data.codec) {
+			arr.push(data.codec.toUpperCase());
+		}
 
 		let html = "";
 		for (let s of arr) {

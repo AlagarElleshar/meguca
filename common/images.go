@@ -67,4 +67,5 @@ type ImageCommon struct {
 	Title     string    `json:"title"`
 	MD5       string    `json:"md5"`
 	SHA1      string    `json:"sha1"`
+	Codec     string    `json:"codec"`
 }

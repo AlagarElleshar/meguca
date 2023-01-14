@@ -58,10 +58,10 @@ const (
 )
 
 type imageScanner struct {
-	Audio, Video, Spoiler             sql.NullBool
-	FileType, ThumbType, Length, Size sql.NullInt64
-	Name, SHA1, MD5, Title, Artist    sql.NullString
-	Dims                              pq.Int64Array
+	Audio, Video, Spoiler                 sql.NullBool
+	FileType, ThumbType, Length, Size     sql.NullInt64
+	Name, SHA1, MD5, Title, Artist, Codec sql.NullString
+	Dims                                  pq.Int64Array
 }
 
 // Returns and array of pointers to the struct fields for passing to
@@ -69,7 +69,7 @@ type imageScanner struct {
 func (i *imageScanner) ScanArgs() []interface{} {
 	return []interface{}{
 		&i.Audio, &i.Video, &i.FileType, &i.ThumbType, &i.Dims,
-		&i.Length, &i.Size, &i.MD5, &i.SHA1, &i.Title, &i.Artist,
+		&i.Length, &i.Size, &i.MD5, &i.SHA1, &i.Title, &i.Artist, &i.Codec,
 	}
 }
 
@@ -99,6 +99,7 @@ func (i *imageScanner) Val() *common.Image {
 			SHA1:      i.SHA1.String,
 			Title:     i.Title.String,
 			Artist:    i.Artist.String,
+			Codec:     i.Codec.String,
 		},
 	}
 }

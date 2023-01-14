@@ -130,6 +130,11 @@
 							{%s img.Title %}
 						</span>
 					{% endif %}
+					{% if img.Codec != "" %}
+						<span>
+							{%s= strings.ToUpper(img.Codec) %}
+						</span>
+					{% endif %}
 				</span>
 				{% code name := imageName(img.FileType, img.Name) %}
 				<a href="{%s= assets.RelativeSourcePath(img.FileType, img.SHA1) %}" download="{%s= name %}">

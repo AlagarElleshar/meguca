@@ -3,10 +3,13 @@ package imager
 
 import (
 	"bytes"
+	"context"
 	"crypto/md5"
 	"database/sql"
 	"encoding/base64"
 	"errors"
+	"fmt"
+	"gopkg.in/vansante/go-ffprobe.v2"
 	"image"
 	"image/jpeg"
 	"io"
@@ -306,6 +309,18 @@ func newThumbnail(f multipart.File, SHA1 string) (
 	return
 }
 
+func getCodec(file io.Reader) (string, error) {
+	ctx, cancelFn := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelFn()
+
+	data, err := ffprobe.ProbeReader(ctx, file)
+
+	if err != nil {
+		return "", err
+	}
+	return data.Streams[0].CodecName, nil
+}
+
 // Separate function for easier testability
 func processFile(f multipart.File, img *common.ImageCommon,
 	opts thumbnailer.Options,
@@ -315,6 +330,7 @@ func processFile(f multipart.File, img *common.ImageCommon,
 	jpegThumb := config.Get().JPEGThumbnails
 
 	src, thumbImage, err := thumbnailer.Process(f, opts)
+
 	defer func() {
 		// Add image internal buffer to pool
 		if thumbImage == nil {
@@ -345,6 +361,9 @@ func processFile(f multipart.File, img *common.ImageCommon,
 	img.Audio = src.HasAudio
 	img.Video = src.HasVideo
 	img.Length = uint32(src.Length / time.Second)
+	f.Seek(0, 0)
+	img.Codec, err = getCodec(f)
+	fmt.Println(img.Codec)
 
 	// Some media has retardedly long meta strings. Just truncate them, instead
 	// of rejecting. Must ensure it's still valid unicode after trancation,
