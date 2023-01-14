@@ -291,3 +291,15 @@ func (f *Feed) SetOpenBody(id uint64, body string, msg []byte) {
 		body: body,
 	}
 }
+
+// AppendBody special hotpath for SetOpenBody
+func (f *Feed) AppendBody(id uint64, body string, msg []byte) {
+	f.sendToAll(msg)
+	f.setOpenBody <- postBodyModMessage{
+		message: message{
+			id:  id,
+			msg: nil,
+		},
+		body: body,
+	}
+}

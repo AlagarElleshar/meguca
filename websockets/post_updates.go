@@ -95,9 +95,10 @@ func (c *Client) appendRune(data []byte) (err error) {
 	}
 
 	var char rune
-	err = decodeMessage(data, &char)
+	//err = decodeMessage(data, &char)
+	char, runeLen := utf8.DecodeRune(data)
 	switch {
-	case err != nil:
+	case err != nil || char == utf8.RuneError || runeLen != len(data):
 		return
 	case char == 0:
 		return common.ErrContainsNull
@@ -120,7 +121,7 @@ func (c *Client) appendRune(data []byte) (err error) {
 		return
 	}
 
-	c.post.body = append(c.post.body, string(char)...)
+	c.post.body = append(c.post.body, data...)
 	c.post.len++
 	return c.updateBody(msg, 1)
 }
@@ -130,6 +131,13 @@ func (c *Client) appendRune(data []byte) (err error) {
 // n specifies the number of characters updated.
 func (c *Client) updateBody(msg []byte, n int) error {
 	c.feed.SetOpenBody(c.post.id, string(c.post.body), msg)
+	c.incrementSpamScore(uint(n) * config.Get().CharScore)
+	return db.SetOpenBody(c.post.id, c.post.body)
+}
+
+// Special case of UpdateBody for appending a single rune to a message
+func (c *Client) appendBody(msg []byte, n int) error {
+	c.feed.AppendBody(c.post.id, string(c.post.body), msg)
 	c.incrementSpamScore(uint(n) * config.Get().CharScore)
 	return db.SetOpenBody(c.post.id, c.post.body)
 }

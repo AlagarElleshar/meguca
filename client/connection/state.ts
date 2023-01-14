@@ -57,7 +57,7 @@ function close_socket() {
 
 // Send a message to the server. If msg is null, it is omitted from sent
 // websocket message.
-export function send(type: message, msg: any) {
+export function send(type: message, msg: any, encode = true) {
 	if (socket.readyState !== 1) {
 		console.warn("Attempting to send while socket closed")
 		return
@@ -65,7 +65,11 @@ export function send(type: message, msg: any) {
 
 	let str = leftPad(type)
 	if (msg !== null) {
-		str += JSON.stringify(msg)
+		if (encode) {
+			str += JSON.stringify(msg)
+		} else {
+			str += msg
+		}
 	}
 
 	if (debug) {
