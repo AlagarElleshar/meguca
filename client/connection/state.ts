@@ -12,6 +12,7 @@ let socket: WebSocket,
 	attempts: number,
 	attemptTimer: number
 
+let decoder = new TextDecoder('utf-8')
 // Websocket connection and synchronization with server states
 export const enum syncStatus {
 	disconnected, connecting, syncing, synced, desynced,
@@ -37,6 +38,7 @@ function connect() {
 		return
 	}
 	socket = new WebSocket(path)
+	socket.binaryType = 'arraybuffer'
 	socket.onopen = connSM.feeder(connEvent.open)
 	socket.onclose = connSM.feeder(connEvent.close)
 	socket.onerror = connSM.feeder(connEvent.close)
@@ -78,6 +80,17 @@ export function send(type: message, msg: any, encode = true) {
 	socket.send(str)
 }
 
+export function sendBinary(data: ArrayBuffer) {
+	if (socket.readyState !== 1) {
+		console.warn("Attempting to send while socket closed")
+		return
+	}
+	if (debug) {
+		console.log('<', data)
+	}
+	socket.send(data)
+}
+
 // Ensure message type is always a 2 characters long string
 function leftPad(type: message): string {
 	let str = type.toString()
@@ -88,8 +101,21 @@ function leftPad(type: message): string {
 }
 
 // Routes messages from the server to the respective handler
-function onMessage(data: string, extracted: boolean) {
+function onMessage(data: string | ArrayBuffer, extracted: boolean) {
+	//if data is an array buffer
+	if (data instanceof ArrayBuffer) {
+		if (debug) {
+			console.log('>', data)
+		}
+		let view = new Uint8Array(data)
+		let id = new BigUint64Array(data, 0, 1)[0]
+		let msg = decoder.decode(view.slice(8, view.length - 1))
+		let msgType = view[data.byteLength - 1]
+		handlers[msgType]([id,msg])
+		return
+	}
 	// First two characters of a message define its type
+	data = <string>data
 	const type = parseInt(data.slice(0, 2))
 
 	if (debug) {

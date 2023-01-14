@@ -1,4 +1,4 @@
-import { message, send, handlers } from "../../connection"
+import { message, send, sendBinary, handlers } from "../../connection"
 import { Post } from "../model"
 import { ImageData, PostData } from "../../common"
 import FormView from "./view"
@@ -14,6 +14,7 @@ export default class FormModel extends Post {
 	public inputBody = ""
 	public view: FormView
 	public allocatingImage: boolean = false;
+	private textEncoder = new TextEncoder();
 
 	// Pass and ID, if you wish to hijack an existing model. To create a new
 	// model pass zero.
@@ -53,6 +54,12 @@ export default class FormModel extends Post {
 		this.body += String.fromCodePoint(code)
 	}
 
+	// Append a string to the model's body and reparse the line, if it's a
+	// newline
+	public appendString(str : string) {
+		this.body += str
+	}
+
 	// Remove the last character from the model's body
 	public backspace() {
 		this.body = this.body.slice(0, -1)
@@ -88,7 +95,14 @@ export default class FormModel extends Post {
 			// Commit a character appendage to the end of the line to the server
 			const char = val.slice(-1);
 			this.inputBody += char
-			this.send(message.append, char, false)
+			let bytes = this.textEncoder.encode(char);
+			let newBytes = new Uint8Array(bytes.length + 1);
+			newBytes.set(bytes, 0);
+			newBytes[bytes.length] = message.append;
+			// newBytes.set(bytes.length, message.append);
+			this.sendBinary(newBytes);
+			// sendBinary(newBytes)
+
 		} else if (lenDiff === -1 && old.slice(0, -1) === val) {
 			// Send a message about removing the last character of the line to
 			// the server
@@ -120,6 +134,13 @@ export default class FormModel extends Post {
 		}
 
 		return val;
+	}
+
+
+	private sendBinary(msg : ArrayBuffer) {
+		if (postSM.state !== postState.halted) {
+			sendBinary(msg)
+		}
 	}
 
 	private send(type: message, msg: any,encode=true) {
