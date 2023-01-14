@@ -18,6 +18,8 @@ import assignHandlers from "./client"
 import initModeration from "./mod"
 import { persistMessages } from "./options"
 import { watchThread } from './page/thread_watcher';
+import initFlvPlayer from "./ui/flvplayer";
+
 
 // Load all stateful modules in dependency order
 async function start() {
@@ -77,6 +79,7 @@ async function start() {
 	initPosts()
 	initUI()
 	initModeration()
+	initFlvPlayer()
 }
 
 start().catch(err => {

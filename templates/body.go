@@ -547,11 +547,11 @@ func (c *bodyContext) parseURL(bit string) {
 			"type":          "button",
 			"class":         "live-button",
 			"data-live-url": bit,
-			"onclick":       "playLive('" + bit + "')",
+			"onclick":       "playButtonClicked('" + bit + "')",
 		}
 		c.string("<button ")
 		writeAttrs(attrs, c)
-		c.string(">PLAY</button>")
+		c.string(">􀊄</button>")
 	default:
 		c.newTabLink(s, s)
 	}

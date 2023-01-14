@@ -396,9 +396,56 @@ iframe[src^="https://www.youtube"] {
 
 .live-button {
 	margin-left: 5px;
+	font-family: "Symbols";
 }
 
-#flv-player {
-	max-width: calc(90vw - 1em);
-	max-height: calc(90vh - 1em);
+#moderation-panel {
+	z-index: -3;
+}
+#moderation-panel:hover {
+	z-index: -1;
+}
+
+#flv-player-cont:hover {
+  #flv-player-controls {
+    display:block;
+  }
+}
+#flv-player-cont {
+	display: block;
+	position: absolute;
+	right: 0.5em;
+	z-index: -2;
+	max-width: 90vw;
+	max-height: calc(100vh - 1em - 61px);
+	border: none;
+	padding: 0;
+	#flv-player-controls {
+        z-index: 1;
+		display:none;
+		position: absolute;
+		right: 10px;
+		top: 10px;
+		-webkit-transform: translate3d(0,0,0);
+		button {
+			font-family: "Symbols";
+			margin-right: 5px;
+		}
+		button:last-of-type {
+			margin-right: 0;
+		}
+
+	}
+	#flv-player {
+        z-index: 0;
+		display:block;
+		max-width: 90vw;
+		max-height: calc(100vh - 1em - 61px);
+	}
+}
+
+
+@font-face {
+	font-family: "Symbols";
+	src: url("/assets/css/TCSymbols.ttf") format("truetype");
 }
