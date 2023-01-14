@@ -39,16 +39,20 @@ func WriteImage(i common.ImageCommon) error {
 }
 
 func writeImageTx(tx *sql.Tx, i common.ImageCommon) (err error) {
+	var codec interface{} = i.Codec
+	if codec == "" {
+		codec = nil
+	}
 	_, err = sq.
 		Insert("images").
 		Columns(
 			"audio", "video", "file_type", "thumb_type", "dims", "length",
-			"size", "MD5", "SHA1", "Title", "Artist",
+			"size", "MD5", "SHA1", "Title", "Artist", "Codec",
 		).
 		Values(
 			i.Audio, i.Video, int(i.FileType), int(i.ThumbType),
 			pq.GenericArray{A: i.Dims}, i.Length, i.Size, i.MD5, i.SHA1,
-			i.Title, i.Artist,
+			i.Title, i.Artist, codec,
 		).
 		RunWith(tx).
 		Exec()

@@ -127,6 +127,7 @@ export interface ImageData {
 	md5: string
 	sha1: string
 	name: string
+	codec: string
 
 	// Added client-side
 	expanded: boolean           // Thumbnail is expanded
