@@ -511,9 +511,9 @@ function parseURL(bit: string): string {
                 type : "button",
                 class : "live-button",
                 "data-live-url" : bit,
-                onclick : "playLive('" + bit + "')"
+                onclick : "playButtonClicked('" + bit + "')"
             }
-            return `${link}<button ${makeAttrs(attrs)}>PLAY</button>`
+            return `${link}<button ${makeAttrs(attrs)}>􀊄</button>`
 
         }
         return newTabLink(bit, bit)

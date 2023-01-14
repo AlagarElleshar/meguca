@@ -3,14 +3,10 @@ import {setAttrs} from "../util";
 import {openFlvPlayer} from "./flvplayer";
 // import Mpegts from "mpegts.js";
 export default () => {
-	for (let id of ["options", "FAQ", "identity", "account", "watcher", "flv-player"]) {
+	for (let id of ["options", "FAQ", "identity", "account", "watcher" ]) {
 		highlightBanner(id)
 	}
 	new BannerModal(document.getElementById("FAQ"))
-	document.getElementById("banner-flv-player").addEventListener("click", function() {
-		openFlvPlayer();
-	});
-
 }
 
 // Highlight options button by fading out and in, if no options are set
