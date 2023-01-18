@@ -139,6 +139,7 @@ func (f *Feed) Start() (err error) {
 					for _, msg := range f.queuedAppends {
 						f.sendToAllBinary(msg)
 					}
+					f.queuedAppends = f.queuedAppends[:0]
 				}
 
 			// Insert a new post, cache and propagate
