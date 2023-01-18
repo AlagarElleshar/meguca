@@ -61,10 +61,16 @@ type Feed struct {
 	spoilerImage chan message
 	// Set body of an open post
 	setOpenBody chan postBodyModMessage
+	// Append body
+	appendBody chan message
 	// Send message about post moderation
 	moderatePost chan moderationMessage
 	// Let sent sync counter
 	lastSyncCount syncCount
+	// set of queued post IDs
+	queuedPosts map[uint64]struct{}
+	// queued append body messages
+	queuedAppends [][]byte
 }
 
 // Start read existing posts into cache and start main loop
@@ -113,17 +119,32 @@ func (f *Feed) Start() (err error) {
 			case msg := <-f.send:
 				f.bufferMessage(msg)
 
+			case appendBody := <-f.appendBody:
+				//check if msg.id is in queuedPosts
+				if _, ok := f.queuedPosts[appendBody.id]; ok {
+					f.queuedAppends = append(f.queuedAppends, appendBody.msg)
+				} else {
+					f.sendToAllBinary(appendBody.msg)
+				}
+
 			// Send any buffered messages to any listening clients
 			case <-f.C:
 				if buf := f.flush(); buf == nil {
 					f.pause()
 				} else {
 					f.sendToAll(buf)
+					//clear queued posts
+					f.queuedPosts = make(map[uint64]struct{})
+					//run sendToAllBinary on queuedAppends
+					for _, msg := range f.queuedAppends {
+						f.sendToAllBinary(msg)
+					}
 				}
 
 			// Insert a new post, cache and propagate
 			case msg := <-f.insertPost:
 				src := msg.post
+				f.queuedPosts[src.ID] = struct{}{}
 				f.modifyPost(msg.message, func(p *cachedPost) {
 					*p = cachedPost{
 						HasImage:  src.Image != nil,
@@ -294,7 +315,10 @@ func (f *Feed) SetOpenBody(id uint64, body string, msg []byte) {
 
 // AppendBody special hotpath for SetOpenBody
 func (f *Feed) AppendBody(id uint64, body string, msg []byte) {
-	f.sendToAllBinary(msg)
+	f.appendBody <- message{
+		id:  id,
+		msg: msg,
+	}
 	f.setOpenBody <- postBodyModMessage{
 		message: message{
 			id:  id,
