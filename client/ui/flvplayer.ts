@@ -2,13 +2,17 @@ import {importTemplate} from "../util";
 import Mpegts from "mpegts.js";
 
 // import mpegts from "mpegts.js";
-
+// This loads mpegts.js asynchronously
 let mpegtsjs = import("mpegts.js")
 
 
 let playerOpen = false;
 let currentURL = "";
 let player: Mpegts.Player;
+let playerConfig : Mpegts.Config = {
+    enableWorker: true,
+    liveBufferLatencyChasing: true,
+}
 
 export function openFlvPlayer() {
     let cont = document.getElementById("flv-player-cont")
@@ -53,9 +57,7 @@ export async function playLive(url: string) {
             type: 'flv',  // could also be mpegts, m2ts, flv
             isLive: true,
             url: url
-        }, {
-            liveBufferLatencyChasing: true
-        });
+        }, playerConfig);
         player.attachMediaElement(<HTMLMediaElement>videoElement);
         player.load();
         player.play();
