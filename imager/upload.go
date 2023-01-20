@@ -314,9 +314,16 @@ func getCodec(file io.Reader) (string, error) {
 	defer cancelFn()
 
 	data, err := ffprobe.ProbeReader(ctx, file)
-
 	if err != nil {
 		return "", err
+	}
+	if len(data.Streams) == 0 {
+		return "", errors.New("No streams found")
+	}
+	for _, stream := range data.Streams {
+		if stream.CodecType == "video" {
+			return stream.CodecName, nil
+		}
 	}
 	return data.Streams[0].CodecName, nil
 }
