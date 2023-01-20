@@ -1,7 +1,7 @@
 const path = require('path');
 
 const commonConfig = {
-    mode: "development",
+    devtool: 'inline-source-map',
     module: {
         rules: [
             {
