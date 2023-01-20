@@ -3,15 +3,14 @@
 	"compileOnSave": false,
 	"compilerOptions": {
 		"target": "es2018",
-//		"module": "amd",
-//		"outFile": "main.js",
+		"sourceMap": true,
 		"module": "ES2020",
 		"moduleResolution": "node",
 		"newLine": "LF",
 		"removeComments": true,
 		"noImplicitThis": true,
 		"suppressImplicitAnyIndexErrors": true,
-		"esModuleInterop" : true,
+		"esModuleInterop" : true
 	},
 	"skipLibCheck": true
 }
