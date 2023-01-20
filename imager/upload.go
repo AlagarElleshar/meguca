@@ -320,10 +320,13 @@ func getCodec(file io.Reader) (string, error) {
 	if len(data.Streams) == 0 {
 		return "", errors.New("No streams found")
 	}
-	for _, stream := range data.Streams {
-		if stream.CodecType == "video" {
-			return stream.CodecName, nil
-		}
+	stream := data.FirstVideoStream()
+	if stream != nil {
+		return stream.CodecName, nil
+	}
+	stream = data.FirstAudioStream()
+	if stream != nil {
+		return stream.CodecName, nil
 	}
 	return data.Streams[0].CodecName, nil
 }
