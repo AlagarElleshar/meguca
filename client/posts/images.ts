@@ -134,9 +134,17 @@ export default class ImageHandler extends View<Post> {
 		sourceButton.innerText = "􀉣";
 		sourceButton.target = "_blank";
 		sourceButton.rel = "noopener noreferrer";
-		console.log(el);
 		el.append(sourceButton);
 
+		let tikwmButton = document.createElement("a")
+		tikwmButton.href = `https://tikwm.com/video/${id}.html`;
+		tikwmButton.classList.add("tikwm-link");
+		tikwmButton.classList.add("symbol");
+		tikwmButton.innerText = "􀂺";
+		tikwmButton.target = "_blank";
+		tikwmButton.rel = "noopener noreferrer";
+		el.append(tikwmButton);
+		el.append(sourceButton);
 	}
 	// Render the information caption above the image
 	private renderFigcaption(reveal: boolean) {
@@ -148,6 +156,7 @@ export default class ImageHandler extends View<Post> {
 
 		const [hToggle, , info, ...tmp] = Array.from(el.children) as HTMLElement[]
 		let link = el.getElementsByClassName("filename-link")[0] as HTMLAnchorElement
+		let dlButton = el.getElementsByClassName("download-link")[0] as HTMLAnchorElement
 		if (!options.hideThumbs && !options.workModeToggle) {
 			hToggle.hidden = true
 		} else {
@@ -212,15 +221,12 @@ export default class ImageHandler extends View<Post> {
 		setAttrs(link, {
 			href: `/assets/images/src/${data.sha1}.${ext}`,
 		})
-		link.innerHTML = name
+		link.innerText = name;
+		setAttrs(dlButton, {
+			href: `/assets/images/src/${data.sha1}.${ext}`,
+			download: name,
+		})
 
-		// let downloadButton = el.lastElementChild.cloneNode();
-		// setAttrs(<Element>downloadButton, {
-		// 	download: name,
-		// 	class: "symbol",
-		// })
-		// downloadButton.textContent = "􀄩";
-		// el.append(downloadButton);
 
 		let tokID = this.getTokID(data.name);
 		console.log(tokID);
