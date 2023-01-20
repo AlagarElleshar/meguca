@@ -124,11 +124,14 @@ export default class ImageHandler extends View<Post> {
 		return null;
 	}
 	public renderSource(id: string, el : Element) {
-		console.log("rendering now")
+		let matches = el.getElementsByClassName("sourcelink")
+		if(matches.length > 0) {
+			return
+		}
 		let sourceButton = document.createElement("a")
 		sourceButton.href = `https://www.tiktok.com/share/video/${id}`;
 		sourceButton.className = "sourcelink";
-		sourceButton.innerText = "source";
+		sourceButton.innerText = "􀉣";
 		sourceButton.target = "_blank";
 		sourceButton.rel = "noopener noreferrer";
 		console.log(el);
@@ -144,7 +147,7 @@ export default class ImageHandler extends View<Post> {
 		}
 
 		const [hToggle, , info, ...tmp] = Array.from(el.children) as HTMLElement[]
-		let link = tmp[tmp.length - 1];
+		let link = el.getElementsByClassName("filename-link")[0] as HTMLAnchorElement
 		if (!options.hideThumbs && !options.workModeToggle) {
 			hToggle.hidden = true
 		} else {
@@ -206,11 +209,18 @@ export default class ImageHandler extends View<Post> {
 		// Render a name + download link of an image
 		const ext = fileTypes[data.file_type],
 			name = `${escape(data.name)}.${ext}`
-		setAttrs(el.lastElementChild, {
+		setAttrs(link, {
 			href: `/assets/images/src/${data.sha1}.${ext}`,
-			download: name,
 		})
 		link.innerHTML = name
+
+		// let downloadButton = el.lastElementChild.cloneNode();
+		// setAttrs(<Element>downloadButton, {
+		// 	download: name,
+		// 	class: "symbol",
+		// })
+		// downloadButton.textContent = "􀄩";
+		// el.append(downloadButton);
 
 		let tokID = this.getTokID(data.name);
 		console.log(tokID);

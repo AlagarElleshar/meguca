@@ -104,14 +104,19 @@ function leftPad(type: message): string {
 function onMessage(data: string | ArrayBuffer, extracted: boolean) {
 	//if data is an array buffer
 	if (data instanceof ArrayBuffer) {
-		if (debug) {
-			console.log('>', data)
-		}
 		let view = new Uint8Array(data)
-		let id = new BigUint64Array(data, 0, 1)[0]
+		let id = Number(new BigUint64Array(data, 0, 1)[0])
 		let msg = decoder.decode(view.slice(8, view.length - 1))
 		let msgType = view[data.byteLength - 1]
 		handlers[msgType]([id,msg])
+		if (debug) {
+			if(msgType == message.append){
+				console.log(`>binary append ${id} ${msg}`)
+			}
+			else {
+				console.log('>', data)
+			}
+		}
 		return
 	}
 	// First two characters of a message define its type
