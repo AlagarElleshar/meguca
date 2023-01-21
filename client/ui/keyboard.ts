@@ -15,6 +15,9 @@ function handleShortcut(event: KeyboardEvent) {
 	let anyModifier = event.altKey || event.metaKey || event.ctrlKey || event.shiftKey;
 	let inInput = 'selectionStart' in event.target
 	let altGr = event.getModifierState && event.getModifierState("AltGraph")
+	if (navigator.platform.includes("Mac")) {
+		altGr = false;
+	}
 
 	if (!anyModifier && !inInput) {
 		caught = true
@@ -26,6 +29,13 @@ function handleShortcut(event: KeyboardEvent) {
 			case "s":
 			case "ArrowRight":
 				navigatePost(false)
+				break
+			case "q":
+				if (page.thread) {
+					postSM.feed(postEvent.open)
+				} else {
+					expandThreadForm()
+				}
 				break
 			default:
 				caught = false
