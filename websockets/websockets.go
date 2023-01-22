@@ -48,6 +48,11 @@ func (e errInvalidFrame) Error() string {
 	return string(e)
 }
 
+type WSMessage struct {
+	data     []byte
+	isBinary bool
+}
+
 // Client stores and manages a websocket-connected remote client and its
 // interaction with the server and database
 type Client struct {
@@ -83,10 +88,7 @@ type Client struct {
 	receive chan receivedMessage
 
 	// Only used to pass messages from the Send method.
-	sendExternal chan []byte
-
-	// Only used to pass messages from the Send method.
-	sendBinaryExternal chan []byte
+	sendExternal chan WSMessage
 
 	// Redirect client to target board
 	redirect chan string
@@ -155,9 +157,8 @@ func newClient(
 		// Allows for ~60 seconds of messages, until the buffer overflows.
 		// A larger gap is more acceptable to shitty connections and mobile
 		// phones, especially while uploading.
-		sendExternal:       make(chan []byte, time.Second*60/feeds.TickerInterval),
-		sendBinaryExternal: make(chan []byte, time.Second*60/feeds.TickerInterval),
-		conn:               conn,
+		sendExternal: make(chan WSMessage, time.Second*60/feeds.TickerInterval),
+		conn:         conn,
 	}, nil
 }
 
@@ -184,12 +185,16 @@ func (c *Client) listenerLoop() error {
 		case err := <-c.close:
 			return err
 		case msg := <-c.sendExternal:
-			if err := c.send(msg); err != nil {
-				return err
-			}
-		case msg := <-c.sendBinaryExternal:
-			if err := c.sendBinary(msg); err != nil {
-				return err
+			if msg.isBinary {
+				err := c.sendBinary(msg.data)
+				if err != nil {
+					return err
+				}
+			} else {
+				err := c.send(msg.data)
+				if err != nil {
+					return err
+				}
 			}
 		case <-ping.C:
 			deadline := time.Now().Add(pingWriteTimeout)
@@ -256,14 +261,14 @@ func (c *Client) closeConnections(err error) error {
 // Send a message to the client. Can be used concurrently.
 func (c *Client) Send(msg []byte) {
 	select {
-	case c.sendExternal <- msg:
+	case c.sendExternal <- WSMessage{data: msg, isBinary: false}:
 	default:
 		c.Close(errors.New("send buffer overflow"))
 	}
 }
 func (c *Client) SendBinary(msg []byte) {
 	select {
-	case c.sendBinaryExternal <- msg:
+	case c.sendExternal <- WSMessage{data: msg, isBinary: true}:
 	default:
 		c.Close(errors.New("send buffer overflow"))
 	}
