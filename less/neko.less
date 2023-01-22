@@ -11,6 +11,7 @@
 @mod: purple;
 @red: @admin;
 @blue: #1048ff;
+@bgColor: #eeefef;
 
 a:hover, blockquote a {
   color: #d00;
@@ -47,9 +48,11 @@ article {
     }
   }
 }
-
+html {
+  background-color: @bgColor
+}
 body {
-  background-color: #eef2ff;
+  background-color: @bgColor;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 10pt;
   background-image: url('/assets/css/neko_bg.jpg');
