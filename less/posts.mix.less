@@ -141,6 +141,7 @@ header {
 
 	nav {
 		display: initial;
+		white-space: pre;
 	}
 
 	code {
@@ -204,6 +205,12 @@ header {
 	}
 }
 
+@supports (-moz-appearance:none) {
+  article.reply-form textarea {
+    overflow: auto !important;
+  }
+}
+
 #new-thread-form input[name=sage] {
 
 	&,
@@ -242,6 +249,9 @@ header {
 			max-width : 80vw;
 			display   : flex;
 			flex-wrap : nowrap;
+			blockquote, #text-input{
+				max-width: calc(80vw - 0.5em);
+			}
 		}
 
 		figure~blockquote {
