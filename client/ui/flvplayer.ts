@@ -12,6 +12,8 @@ let player: Mpegts.Player;
 let playerConfig : Mpegts.Config = {
     enableWorker: true,
     liveBufferLatencyChasing: true,
+    liveBufferLatencyMaxLatency: 2,
+    liveBufferLatencyMinRemain: 1,
 }
 
 export function openFlvPlayer() {
