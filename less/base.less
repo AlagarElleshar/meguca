@@ -44,6 +44,9 @@ aside {
 article {
 	min-width: 18em;
 }
+article.media {
+	min-width: calc(18em + 84px)
+}
 
 article time {
 	margin-left:2.5px;
@@ -98,6 +101,13 @@ textarea {
 
 iframe {
 	background: white;
+}
+
+@media only screen and (min-width : 600px) {
+	iframe[src^="https://www.youtube"] {
+		width: 480px;
+		height: 270px;
+	}
 }
 
 .full-width {
