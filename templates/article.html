@@ -163,14 +163,14 @@
 							{% default %}
 								{% code file = "file" %}
 							{% endswitch %}
-							<img src="/assets/{%s= file %}.png" width="150" height="150" loading="lazy">
+							<img src="/assets/{%s= file %}.png" width="150" height="150" loading="lazy" draggable="false">
 						{% case img.Spoiler %}
 							{% comment %}
 								TODO: board-specific server-side spoiler rendering
 							{% endcomment %}
-							<img src="/assets/spoil/default.jpg" width="150" height="150" loading="lazy">
+							<img src="/assets/spoil/default.jpg" width="150" height="150" loading="lazy" draggable="false">
 						{% default %}
-							<img src="{%s= assets.ThumbPath(img.ThumbType, img.SHA1) %}" width="{%d int(img.Dims[2]) %}" height="{%d int(img.Dims[3]) %}" loading="lazy">
+							<img src="{%s= assets.ThumbPath(img.ThumbType, img.SHA1) %}" width="{%d int(img.Dims[2]) %}" height="{%d int(img.Dims[3]) %}" loading="lazy" draggable="false">
 						{% endswitch %}
 					</a>
 				</figure>
