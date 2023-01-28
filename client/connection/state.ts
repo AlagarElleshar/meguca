@@ -3,7 +3,7 @@ import { debug, page } from "../state"
 import { message, handlers } from "./messages"
 import { renderStatus } from "./ui"
 import { synchronise } from "./synchronization"
-export {decoder}
+export { decoder }
 const path =
 	(location.protocol === 'https:' ? 'wss' : 'ws')
 	+ `://${location.host}/api/socket`

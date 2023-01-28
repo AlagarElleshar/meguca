@@ -170,10 +170,9 @@ func (c *Client) backspace() error {
 		return errEmptyPost
 	}
 
-	msg, err := common.EncodeMessage(common.MessageBackspace, c.post.id)
-	if err != nil {
-		return err
-	}
+	msg := make([]byte, 9)
+	binary.LittleEndian.PutUint64(msg, c.post.id)
+	msg[8] = byte(common.MessageBackspace)
 
 	r, lastRuneLen := utf8.DecodeLastRune(c.post.body)
 	c.post.body = c.post.body[:len(c.post.body)-lastRuneLen]
@@ -182,7 +181,7 @@ func (c *Client) backspace() error {
 	}
 	c.post.len--
 
-	return c.updateBody(msg, 1)
+	return c.updateBodyBinary(msg, 1)
 }
 
 // Close an open post and parse the last line, if needed.

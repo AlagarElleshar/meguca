@@ -123,9 +123,13 @@ export default () => {
 			m.appendString(append))
 	}
 
-	handlers[message.backspace] = (id: number) =>
+	handlers[message.backspace] = (message: ArrayBuffer) =>{
+		let id = Number(new BigUint64Array(message, 0, 1)[0])
+		if(debug)
+			console.log(`>binary backspace ${id}`)
 		handle(id, m =>
 			m.backspace())
+	}
 
 	handlers[message.splice] = (binaryMessage: ArrayBuffer) => {
 		//make a new SpliceMessage

@@ -107,7 +107,8 @@ export default class FormModel extends Post {
 			// Send a message about removing the last character of the line to
 			// the server
 			this.inputBody = this.inputBody.slice(0, -1)
-			this.send(message.backspace, null)
+			let backspaceMessage = new Uint8Array([message.backspace]);
+			this.sendBinary(backspaceMessage);
 		} else {
 			this.commitSplice(val)
 		}

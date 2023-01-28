@@ -319,7 +319,7 @@ func (c *Client) handleMessage(msgType int, msg []byte) (err error) {
 	if msgType != websocket.TextMessage && msgType != websocket.BinaryMessage {
 		return errInvalidFrame("only text frames allowed")
 	}
-	if len(msg) < 2 {
+	if len(msg) < 2 && msgType == websocket.TextMessage {
 		return errInvalidPayload(msg)
 	}
 

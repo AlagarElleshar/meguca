@@ -53,6 +53,8 @@ func (c *Client) runHandlerBinary(typ common.MessageType, msg []byte) error {
 		return c.appendRune(data)
 	case common.MessageSplice:
 		return c.spliceText(data)
+	case common.MessageBackspace:
+		return c.backspace()
 	default:
 		return errInvalidPayload(msg)
 	}
