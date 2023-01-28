@@ -8,7 +8,6 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"errors"
-	"fmt"
 	"gopkg.in/vansante/go-ffprobe.v2"
 	"image"
 	"image/jpeg"
@@ -309,7 +308,7 @@ func newThumbnail(f multipart.File, SHA1 string) (
 	return
 }
 
-func getCodec(file io.Reader) (string, error) {
+func getVideoCodec(file io.Reader) (string, error) {
 	ctx, cancelFn := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancelFn()
 
@@ -324,11 +323,25 @@ func getCodec(file io.Reader) (string, error) {
 	if stream != nil {
 		return stream.CodecName, nil
 	}
-	stream = data.FirstAudioStream()
+	return "", errors.New("no video stream found")
+}
+
+func getAudioCodec(file io.Reader) (string, error) {
+	ctx, cancelFn := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelFn()
+
+	data, err := ffprobe.ProbeReader(ctx, file)
+	if err != nil {
+		return "", err
+	}
+	if len(data.Streams) == 0 {
+		return "", errors.New("No streams found")
+	}
+	stream := data.FirstAudioStream()
 	if stream != nil {
 		return stream.CodecName, nil
 	}
-	return data.Streams[0].CodecName, nil
+	return "", errors.New("no audio stream found")
 }
 
 // Separate function for easier testability
@@ -372,9 +385,11 @@ func processFile(f multipart.File, img *common.ImageCommon,
 	img.Video = src.HasVideo
 	img.Length = uint32(src.Length / time.Second)
 	f.Seek(0, 0)
-	img.Codec, err = getCodec(f)
-	fmt.Println(img.Codec)
-
+	if img.Video {
+		img.Codec, err = getVideoCodec(f)
+	} else if img.Audio {
+		img.Codec, err = getAudioCodec(f)
+	}
 	// Some media has retardedly long meta strings. Just truncate them, instead
 	// of rejecting. Must ensure it's still valid unicode after trancation,
 	// incase a rune was split.
