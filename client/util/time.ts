@@ -38,49 +38,23 @@ export function timeDelta(e: number): number {
     return Math.floor((t - e) / 60)
 }
 
-export function relativeTimeAbbreviated(e: number): string {
-    const t = Math.floor(Date.now() / 1000);
-    let s = Math.floor(t - e),
+export function relativeTimeAbbreviated(t: number): string {
+    const currentTime = Math.floor(Date.now() / 1000);
+    let timeDelta = Math.floor(currentTime - t),
         o = false;
-    if (s < 1) {
-        if (s > -50) return "now";
-        o = true, s = -s
-    } else if (s < 5) return "now";
+    if (timeDelta < 1) {
+        if (timeDelta > -50) return "now";
+        o = true, timeDelta = -timeDelta
+    } else if (timeDelta < 5) return "now";
     let i = "";
-    const n = [60, 60, 24, 30, 12],
-        r = ["s", "m", "h", "d", "mo"];
-    for (let e = 0; e < n.length; e++) {
-        if (s < n[e]) {
-            i = `${s}${r[e]}`;
+    const divide = [60, 60, 24, 30, 12],
+        unit = ["s", "m", "h", "d", "mo"];
+    for (let e = 0; e < divide.length; e++) {
+        if (timeDelta < divide[e]) {
+            i = `${timeDelta}${unit[e]}`;
             break
         }
-        s = Math.floor(s / n[e])
+        timeDelta = Math.floor(timeDelta / divide[e])
     }
-    return "" === i && (i = `${s}y`), o && (i = "in " + i), i
+    return "" === i && (i = `${timeDelta}y`), o && (i = "in " + i), i
 }
-
-export function relativeSyncedTime(e: number, t: number): string {
-    let s = Math.floor(t - e);
-    if (s < 1) return "0s";
-    let o = "";
-    const i = [60, 60, 24, 30, 12],
-        n = ["s", "m", "h", "d", "mo"];
-    for (let e = 0; e < i.length; e++) {
-        if (s < i[e]) {
-            o = `${s}${n[e]}`;
-            break
-        }
-        s = Math.floor(s / i[e])
-    }
-    return "" === o && (o = `${s}y`), o
-}
-
-// const unhideTimeElement = document.getElementById("unhide-time");
-//
-// export function unhideTimestamps(): void {
-//     unhideTimeElement.innerHTML = ".hidden-time { visibility: visible; font-size: inherit; }"
-// }
-//
-// export function hideTimestamps(): void {
-//     unhideTimeElement.innerHTML = ""
-// }
