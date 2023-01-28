@@ -18,9 +18,7 @@ a:hover, blockquote a {
 }
 
 article, aside {
-  background-color: fade(@postBG, 60%);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background-color: @postBG;
   border-right: @border;
   border-bottom: @border;
   border-radius: 5px;
@@ -107,8 +105,6 @@ a.tab-sel {
 
 article.op {
   background-color: rgba(253,231,245,0.3)!important;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
 }
 
 #banner {

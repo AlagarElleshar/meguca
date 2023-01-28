@@ -44,16 +44,16 @@ func addToFeed(id uint64, board string, c common.Client) (
 		feed, ok = feeds.feeds[id]
 		if !ok {
 			feed = &Feed{
-				id:            id,
-				send:          make(chan []byte),
-				insertPost:    make(chan postCreationMessage),
-				closePost:     make(chan message),
-				spoilerImage:  make(chan message),
-				moderatePost:  make(chan moderationMessage),
-				setOpenBody:   make(chan postBodyModMessage),
-				insertImage:   make(chan imageInsertionMessage),
-				appendBody:    make(chan message),
-				messageBuffer: make([]string, 0, 64),
+				id:               id,
+				send:             make(chan []byte),
+				insertPost:       make(chan postCreationMessage),
+				closePost:        make(chan message),
+				spoilerImage:     make(chan message),
+				moderatePost:     make(chan moderationMessage),
+				setOpenBody:      make(chan postBodyModMessage),
+				insertImage:      make(chan imageInsertionMessage),
+				updateBodyBinary: make(chan message),
+				messageBuffer:    make([]string, 0, 64),
 			}
 
 			feed.baseFeed.init()

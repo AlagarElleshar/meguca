@@ -61,8 +61,8 @@ type Feed struct {
 	spoilerImage chan message
 	// Set body of an open post
 	setOpenBody chan postBodyModMessage
-	// Append body
-	appendBody chan message
+	// channel for updates to post body sent in binary
+	updateBodyBinary chan message
 	// Send message about post moderation
 	moderatePost chan moderationMessage
 	// Let sent sync counter
@@ -119,12 +119,12 @@ func (f *Feed) Start() (err error) {
 			case msg := <-f.send:
 				f.bufferMessage(msg)
 
-			case appendBody := <-f.appendBody:
+			case updateBodyBinaryMessage := <-f.updateBodyBinary:
 				//check if msg.id is in queuedPosts
-				if _, ok := f.queuedPosts[appendBody.id]; ok {
-					f.queuedAppends = append(f.queuedAppends, appendBody.msg)
+				if _, ok := f.queuedPosts[updateBodyBinaryMessage.id]; ok {
+					f.queuedAppends = append(f.queuedAppends, updateBodyBinaryMessage.msg)
 				} else {
-					f.sendToAllBinary(appendBody.msg)
+					f.sendToAllBinary(updateBodyBinaryMessage.msg)
 				}
 
 			// Send any buffered messages to any listening clients
@@ -314,9 +314,9 @@ func (f *Feed) SetOpenBody(id uint64, body string, msg []byte) {
 	}
 }
 
-// AppendBody special hotpath for SetOpenBody
-func (f *Feed) AppendBody(id uint64, body string, msg []byte) {
-	f.appendBody <- message{
+// UpdateBody special hotpath for SetOpenBody
+func (f *Feed) UpdateBody(id uint64, body string, msg []byte) {
+	f.updateBodyBinary <- message{
 		id:  id,
 		msg: msg,
 	}

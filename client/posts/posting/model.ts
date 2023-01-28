@@ -107,7 +107,8 @@ export default class FormModel extends Post {
 			// Send a message about removing the last character of the line to
 			// the server
 			this.inputBody = this.inputBody.slice(0, -1)
-			this.send(message.backspace, null)
+			let backspaceMessage = new Uint8Array([message.backspace]);
+			this.sendBinary(backspaceMessage);
 		} else {
 			this.commitSplice(val)
 		}
@@ -160,13 +161,15 @@ export default class FormModel extends Post {
 				val.slice(start).reverse(),
 			)
 
-		this.send(message.splice, {
-			start,
-			len: old.length - till - start,
-			// `|| undefined` ensures we never slice the string as [:0]
-			text: val.slice(start, -till || undefined).join(""),
-		})
-		this.inputBody = v
+		// create a new typed array
+		let offsets = new Uint16Array([start,old.length - till - start]);
+		let text = this.textEncoder.encode(val.slice(start, -till || undefined).join(""));
+		let newBytes = new Uint8Array(text.byteLength + 5);
+		newBytes.set(new Uint8Array(offsets.buffer), 0);
+		newBytes.set(text, offsets.byteLength);
+		newBytes[offsets.byteLength + text.byteLength] = message.splice;
+		this.sendBinary(newBytes);
+		this.inputBody = v;
 	}
 
 	// Close the form and revert to regular post. Cancel also erases all post

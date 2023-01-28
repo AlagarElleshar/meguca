@@ -45,8 +45,10 @@ type spliceRequestString struct {
 
 // Common part of a splice request and a splice response
 type spliceCoords struct {
-	Start uint `json:"start"`
-	Len   uint `json:"len"`
+	//Start uint `json:"start"`
+	//Len   uint `json:"len"`
+	Start uint16 `json:"start"`
+	Len   uint16 `json:"len"`
 }
 
 // Response to a spliceRequest. Sent to all listening clients.
@@ -131,7 +133,7 @@ func (c *Client) appendRune(data []byte) (err error) {
 
 	c.post.body = append(c.post.body, data...)
 	c.post.len++
-	return c.appendBody(msg, 1)
+	return c.updateBodyBinary(msg, 1)
 }
 
 // Send message to thread update feed and writes the open post's buffer to the
@@ -144,8 +146,8 @@ func (c *Client) updateBody(msg []byte, n int) error {
 }
 
 // Special case of UpdateBody for appending a single rune to a message
-func (c *Client) appendBody(msg []byte, n int) error {
-	c.feed.AppendBody(c.post.id, string(c.post.body), msg)
+func (c *Client) updateBodyBinary(msg []byte, n int) error {
+	c.feed.UpdateBody(c.post.id, string(c.post.body), msg)
 	c.incrementSpamScore(uint(n) * config.Get().CharScore)
 	return db.SetOpenBody(c.post.id, c.post.body)
 }
@@ -168,10 +170,9 @@ func (c *Client) backspace() error {
 		return errEmptyPost
 	}
 
-	msg, err := common.EncodeMessage(common.MessageBackspace, c.post.id)
-	if err != nil {
-		return err
-	}
+	msg := make([]byte, 9)
+	binary.LittleEndian.PutUint64(msg, c.post.id)
+	msg[8] = byte(common.MessageBackspace)
 
 	r, lastRuneLen := utf8.DecodeLastRune(c.post.body)
 	c.post.body = c.post.body[:len(c.post.body)-lastRuneLen]
@@ -180,7 +181,7 @@ func (c *Client) backspace() error {
 	}
 	c.post.len--
 
-	return c.updateBody(msg, 1)
+	return c.updateBodyBinary(msg, 1)
 }
 
 // Close an open post and parse the last line, if needed.
@@ -255,11 +256,12 @@ func (c *Client) spliceText(data []byte) error {
 	}
 
 	var req spliceRequest
-	err := decodeMessage(data, &req)
-	if err != nil {
-		return err
-	}
-	err = parser.IsPrintableRunes(req.Text, true)
+	//err := decodeMessage(data, &req)
+	//if err != nil {
+	//	return err
+	//}
+	decodeSpliceMessage(data, &req)
+	err := parser.IsPrintableRunes(req.Text, true)
 	if err != nil {
 		return err
 	}
@@ -310,12 +312,13 @@ func (c *Client) spliceText(data []byte) error {
 	exceeding := c.post.len - common.MaxLenBody
 	if exceeding > 0 {
 		end = end[:len(end)-exceeding]
-		res.Len = uint(len(old[int(req.Start):]))
+		res.Len = uint16(len(old[int(req.Start):]))
 		res.Text = string(end)
 		c.post.len = common.MaxLenBody
 	}
 
-	msg, err := common.EncodeMessage(common.MessageSplice, res)
+	//msg, err := common.EncodeMessage(common.MessageSplice, res)
+	msg, err := encodeSpliceMessage(res)
 	if err != nil {
 		return err
 	}
@@ -336,7 +339,27 @@ func (c *Client) spliceText(data []byte) error {
 	}
 
 	// +1, so you can't spam zero insert splices to infinity
-	return c.updateBody(msg, len(res.Text)+1)
+	return c.updateBodyBinary(msg, len(res.Text)+1)
+}
+
+func encodeSpliceMessage(res spliceMessage) (msg []byte, err error) {
+	//encode res.text to []byte
+	msg = make([]byte, 12)
+	binary.LittleEndian.PutUint64(msg, res.ID)
+	binary.LittleEndian.PutUint16(msg[8:], res.Start)
+	binary.LittleEndian.PutUint16(msg[10:], res.Len)
+	msg = append(msg, res.Text...)
+	msg = append(msg, uint8(common.MessageSplice))
+	return msg, nil
+}
+
+func decodeSpliceMessage(data []byte, s *spliceRequest) {
+	//Read two uints, then read the rest of the message as a string
+
+	//Read the first uint
+	s.Start = binary.LittleEndian.Uint16(data[:2])
+	s.Len = binary.LittleEndian.Uint16(data[2:4])
+	s.Text = []rune(string(data[4:]))
 }
 
 // Insert and image into an existing open post

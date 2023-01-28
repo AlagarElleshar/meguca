@@ -1,6 +1,6 @@
 // Core websocket message handlers
 
-import { handlers, message, connSM, connEvent } from './connection'
+import {handlers, message, connSM, connEvent, decoder} from './connection'
 import { posts, page } from './state'
 import { Post, FormModel, PostView, lightenThread } from './posts'
 import { PostLink, Command, PostData, ImageData, ModerationEntry } from "./common"
@@ -8,7 +8,8 @@ import { postAdded } from "./ui"
 import { decrementImageCount, incrementPostCount } from "./page"
 import { getPostName } from "./options"
 import { OverlayNotification } from "./ui"
-import { setCookie } from './util';
+import { setCookie }  from './util';
+import { debug } from "./state"
 
 // Message for splicing the contents of the current line
 export type SpliceResponse = {
@@ -113,17 +114,37 @@ export default () => {
 		handle(id, m =>
 			m.spoilerImage())
 
-	handlers[message.append] = ([id, char]: [number, string]) =>
+	handlers[message.append] = (message: ArrayBuffer) =>{
+		let id = Number(new BigUint64Array(message, 0, 1)[0])
+		let append = decoder.decode(message.slice(8))
+		if(debug)
+			console.log(`>binary append ${id} ${append}`)
 		handle(id, m =>
-			m.appendString(char))
+			m.appendString(append))
+	}
 
-	handlers[message.backspace] = (id: number) =>
+	handlers[message.backspace] = (message: ArrayBuffer) =>{
+		let id = Number(new BigUint64Array(message, 0, 1)[0])
+		if(debug)
+			console.log(`>binary backspace ${id}`)
 		handle(id, m =>
 			m.backspace())
+	}
 
-	handlers[message.splice] = (msg: SpliceResponse) =>
+	handlers[message.splice] = (binaryMessage: ArrayBuffer) => {
+		//make a new SpliceMessage
+		let u16View = new Uint16Array(binaryMessage, 8, 2)
+		let msg: SpliceResponse = {
+			id: Number(new BigUint64Array(binaryMessage, 0, 1)[0]),
+			start: u16View[0],
+			len: u16View[1],
+			text: decoder.decode(binaryMessage.slice(12))
+		}
+		if(debug)
+			console.log(`>binary splice ${msg}`)
 		handle(msg.id, m =>
 			m.splice(msg))
+	}
 
 	handlers[message.closePost] = ({ id, links, commands }: CloseMessage) =>
 		handle(id, m => {
