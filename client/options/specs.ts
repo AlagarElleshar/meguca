@@ -313,8 +313,11 @@ export const specs: { [id: string]: OptionSpec } = {
 			.fileinfo,
 			blockquote,
 			.backlinks,
+			header > :not(nav) {
+				display: none!important;
+			}
 			header {
-				display: none;
+				text-align: center;
 			}
 			#thread-container, article:not(.reply-form) {
 				display: inline-table;
@@ -332,7 +335,7 @@ export const specs: { [id: string]: OptionSpec } = {
 				text-align: center;
 			}
 			article {
-				padding: 0.5em;
+				padding: 0;
 				width: fit-content;
 			}
 			article.media {
