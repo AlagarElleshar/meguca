@@ -106,20 +106,31 @@ export default class ImageHandler extends View<Post> {
 	}
 
 	private getTokID(filename: string): string | null {
-		console.log("getting tokid")
+		const now = new Date();
+		// 7 days in the future
+		const maxTokID = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).getTime() / 1000 * Math.pow(2, 32);
+		// 2016-08-01 in tiktok timestamp
+		const minTokID = 6313705004335104000;
+
+		function isValidTokID(digits) {
+			const numDigits = digits.length
+			if(numDigits < 19 || numDigits > 20){
+				return false
+			}
+			const tokID = parseInt(digits, 10);
+			return tokID > minTokID && tokID < maxTokID;
+		}
+
 		let digits = '';
 		for (const c of filename) {
 			if (c >= '0' && c <= '9') {
 				digits += c;
 			} else {
-				if (digits.length === 19) {
-					return digits;
+				if(isValidTokID(digits)){
+					return digits
 				}
 				digits = '';
 			}
-		}
-		if (digits.length === 19) {
-			return digits;
 		}
 		return null;
 	}
