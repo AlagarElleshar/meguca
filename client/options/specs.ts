@@ -313,13 +313,8 @@ export const specs: { [id: string]: OptionSpec } = {
 			.fileinfo,
 			blockquote,
 			.backlinks,
-			header > :not(nav),
-			header .quote,
-			header .mod-checkbox {
+			header {
 				display: none;
-			}
-			header, figcaption {
-				display: inline-block;
 			}
 			#thread-container, article:not(.reply-form) {
 				display: inline-table;
@@ -340,16 +335,17 @@ export const specs: { [id: string]: OptionSpec } = {
 				padding: 0.5em;
 				width: fit-content;
 			}
-			a[download], header nav {
-				font-size: 0;
+			article.media {
+				min-width: 0;
 			}
-			header nav a:first-child::before {
-				content: "# ";
-				font-size: 15px;
+			.post-moderation {
+				display: none;
 			}
-			a[download]::before {
-				content: " 🡇";
-				font-size: 15px;
+			.filename-link {
+				display: none;
+			}
+			header .control {
+				display: none;
 			}`,
 		)
 	},
