@@ -33,11 +33,6 @@ export function secondsToTime(s: number): string {
 }
 
 
-export function timeDelta(e: number): number {
-    const t = Math.floor(Date.now() / 1000);
-    return Math.floor((t - e) / 60)
-}
-
 export function relativeTimeAbbreviated(t: number): string {
     const currentTime = Math.floor(Date.now() / 1000);
     let timeDelta = Math.floor(currentTime - t),

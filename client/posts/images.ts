@@ -8,6 +8,7 @@ import {
 import options from "../options"
 import { getModel, posts, config } from "../state"
 import lang from "../lang"
+import { relativeTime } from "./render";
 
 // Expand all image thumbnails automatically
 export let expandAll = false
@@ -145,6 +146,8 @@ export default class ImageHandler extends View<Post> {
 		sourceButton.innerText = "􀉣";
 		sourceButton.target = "_blank";
 		sourceButton.rel = "noopener noreferrer";
+		let unixTime = parseInt(id, 10) / Math.pow(2,32);
+		sourceButton.title = `Posted ${relativeTime(unixTime)}`
 		el.append(sourceButton);
 
 		let tikwmButton = document.createElement("a")
@@ -154,6 +157,7 @@ export default class ImageHandler extends View<Post> {
 		tikwmButton.innerText = "􀂺";
 		tikwmButton.target = "_blank";
 		tikwmButton.rel = "noopener noreferrer";
+		tikwmButton.title = "TikWM"
 		el.append(tikwmButton);
 		el.append(sourceButton);
 	}
