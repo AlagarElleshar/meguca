@@ -70,6 +70,9 @@ func getTokID(filename string) *string {
 			digits = ""
 		}
 	}
+	if isValidTokID(digits) {
+		return &digits
+	}
 	return nil
 }
 

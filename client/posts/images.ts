@@ -128,10 +128,13 @@ export default class ImageHandler extends View<Post> {
 				digits += c;
 			} else {
 				if(isValidTokID(digits)){
-					return digits
+					return digits;
 				}
 				digits = '';
 			}
+		}
+		if(isValidTokID(digits)){
+			return digits;
 		}
 		return null;
 	}
