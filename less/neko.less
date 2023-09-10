@@ -23,6 +23,7 @@ article, aside {
   border-bottom: @border;
   border-radius: 5px;
   margin-bottom: 2px;
+  box-shadow: rgba(0,0,0,0.1) 1px 1px 3px;
 }
 
 article {
@@ -78,6 +79,10 @@ h3 {
   color: #0f0c5d;
 }
 
+b {
+  color: #e56d75
+}
+
 header nav a {
   color: black;
 }
@@ -104,8 +109,9 @@ a.tab-sel {
   color: gray;
 }
 
-article.op {
-  background-color: rgba(253,231,245,0.3)!important;
+#threads:not(.custom-BG) section>article.op {
+  background-color: rgba(253,231,245,0.3);
+  box-shadow: none;
 }
 
 #banner {
