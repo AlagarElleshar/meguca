@@ -101,6 +101,15 @@ func CreateThread(req ThreadCreationRequest, ip string) (
 	if err != nil {
 		return
 	}
+	//Check if user has posted before allowing him to create a new thread
+	count, err := db.CheckIpPostCount(ip)
+	if err != nil {
+		return
+	}
+	if count == 0 {
+		println("IP address " + ip + " tried to create a thread but has NOT posted before")
+		return
+	}
 
 	// Must ensure image token usage is done atomically, as not to cause
 	// possible data races with unused image cleanup

@@ -215,6 +215,15 @@ func CheckThreadLocked(id uint64) (locked bool, err error) {
 	return
 }
 
+func CheckIpPostCount(ip string) (count int, err error) {
+	err = sq.Select("count(*)").
+		From("posts").
+		Where("ip = ?", ip).
+		QueryRow().
+		Scan(&count)
+	return
+}
+
 func Read() {
 
 }
