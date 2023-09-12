@@ -37,7 +37,10 @@ func GetIP(r *http.Request) (string, error) {
 func getIP(req *http.Request) string {
 	var ip string
 	if config.Server.Server.ReverseProxied {
-		h := req.Header.Get("X-Forwarded-For")
+		h := req.Header.Get("CF-Connecting-IP")
+		if h == "" {
+			h = req.Header.Get("X-Forwarded-For")
+		}
 		if h != "" {
 			if i := strings.LastIndexByte(h, ','); i != -1 {
 				h = h[i+1:]
