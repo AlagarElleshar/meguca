@@ -9,7 +9,7 @@
       "version": "1.1.8",
       "license": "AGPL-3.0",
       "dependencies": {
-        "mpegts.js": "^1.7.2"
+        "mpegts.js": "^1.7.3"
       },
       "devDependencies": {
         "@types/node": "^16.11.7",
@@ -3969,9 +3969,9 @@
       }
     },
     "node_modules/mpegts.js": {
-      "version": "1.7.2",
-      "resolved": "https://registry.npmjs.org/mpegts.js/-/mpegts.js-1.7.2.tgz",
-      "integrity": "sha512-qQ1ELBDC4IAqpULFuFzp3hoQeKwD5BCR3UM9Lk2+kj9jCWcXl19spF7PdzX0ZljghPHAj/VL2ajBbGyMWk2fgA==",
+      "version": "1.7.3",
+      "resolved": "https://registry.npmjs.org/mpegts.js/-/mpegts.js-1.7.3.tgz",
+      "integrity": "sha512-kqZ1C1IsbAQN72cK8vMrzKeM7hwrwSBbFAwVAc7PPweOeoZxCANrc7fAVDKMfYUzxdNkMTnec9tVmlxmKZB0TQ==",
       "dependencies": {
         "es6-promise": "^4.2.5",
         "webworkify-webpack": "^2.1.5"
@@ -9912,9 +9912,9 @@
       }
     },
     "mpegts.js": {
-      "version": "1.7.2",
-      "resolved": "https://registry.npmjs.org/mpegts.js/-/mpegts.js-1.7.2.tgz",
-      "integrity": "sha512-qQ1ELBDC4IAqpULFuFzp3hoQeKwD5BCR3UM9Lk2+kj9jCWcXl19spF7PdzX0ZljghPHAj/VL2ajBbGyMWk2fgA==",
+      "version": "1.7.3",
+      "resolved": "https://registry.npmjs.org/mpegts.js/-/mpegts.js-1.7.3.tgz",
+      "integrity": "sha512-kqZ1C1IsbAQN72cK8vMrzKeM7hwrwSBbFAwVAc7PPweOeoZxCANrc7fAVDKMfYUzxdNkMTnec9tVmlxmKZB0TQ==",
       "requires": {
         "es6-promise": "^4.2.5",
         "webworkify-webpack": "^2.1.5"
