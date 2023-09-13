@@ -185,14 +185,14 @@ export default class UploadForm extends View<Post> {
 
         let uploadName = file.name;
         let token: string;
+        if (this.inputElement("mask").checked && file["pasted"] != true) {
+            uploadName = Date.now().toString();
+        }
         // First send an sha1 hash to the server, in case it already has
         // the file thumbnailed and we don't need to upload.
         const sha1 = await getSHA(file);
         if (sha1 !== "") {
             // Don't mask pasted files
-            if (this.inputElement("mask").checked && file["pasted"] != true) {
-                uploadName = sha1;
-            }
 
             const headers = {};
             const bypass = localStorage.getItem("upload_bypass");
@@ -405,10 +405,7 @@ async function maskFile(input: HTMLInputElement) {
     // File.name is immutable, replace contents of input element
     // with cloned+renamed file
     const blob = input.files[0];
-    const name = await getSHA(blob);
-    if (name === "") {
-        return;
-    }
+    const name = Date.now().toString();
     const newfile = new File([blob], name, { type: blob.type });
     const data = new DataTransfer();
     data.items.add(newfile);
