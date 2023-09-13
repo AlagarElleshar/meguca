@@ -23,6 +23,6 @@
     "webpack-cli": "^5.0.1"
   },
   "dependencies": {
-    "mpegts.js": "^1.7.2"
+    "mpegts.js": "^1.7.3"
   }
 }
