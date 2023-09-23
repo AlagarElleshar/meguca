@@ -93,7 +93,18 @@
 				<span class="spaced image-search-container">
 					{%= imageSearch(c.root, img) %}
 				</span>
-				<span class="fileinfo">
+				{% code name := imageName(img.FileType, img.Name) %}
+				<a class="filename-link" href="{%s= assets.RelativeSourcePath(img.FileType, img.SHA1) %}" target="_blank">
+					{%s= name %}
+				</a>
+				{% code tokid := getTokID(name) %}
+				<a class="download-link symbol" href="{%s= assets.RelativeSourcePath(img.FileType, img.SHA1) %}" download="{%s= name %}" >􀄩</a>
+				{% if tokid != nil %}
+				{% code timeago := "Posted " + relativeTime(*tokid) %}
+				<a class="tikwm-link symbol" href="https://tikwm.com/video/{%s= *tokid %}.html" title="TikWM" target="_blank" rel="noopener noreferrer">􀂺</a>
+				<a class="sourcelink symbol" href="https://www.tiktok.com/share/video/{%s= *tokid %}" title="{%s= timeago %}" target="_blank" rel="noopener noreferrer">􀉣</a>
+				{% endif %}
+				<div class="fileinfo">
 					{% if img.Audio %}
 						<span>
 							♫
@@ -135,18 +146,7 @@
 							{%s= strings.ToUpper(img.Codec) %}
 						</span>
 					{% endif %}
-				</span>
-				{% code name := imageName(img.FileType, img.Name) %}
-				<a class="filename-link" href="{%s= assets.RelativeSourcePath(img.FileType, img.SHA1) %}" target="_blank">
-					{%s= name %}
-				</a>
-				{% code tokid := getTokID(name) %}
-				<a class="download-link symbol" href="{%s= assets.RelativeSourcePath(img.FileType, img.SHA1) %}" download="{%s= name %}" >􀄩</a>
-				{% if tokid != nil %}
-				{% code timeago := "Posted " + relativeTime(*tokid) %}
-				<a class="tikwm-link symbol" href="https://tikwm.com/video/{%s= *tokid %}.html" title="TikWM" target="_blank" rel="noopener noreferrer">􀂺</a>
-				<a class="sourcelink symbol" href="https://www.tiktok.com/share/video/{%s= *tokid %}" title="{%s= timeago %}" target="_blank" rel="noopener noreferrer">􀉣</a>
-				{% endif %}
+				</div>
 			</figcaption>
 		{% endif %}
 		<div class="post-container">
