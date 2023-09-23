@@ -214,7 +214,7 @@ export default class ImageHandler extends View<Post> {
 
 		const [w, h] = data.dims;
 		if (w || h) {
-			arr.push(`${w}x${h}`);
+			arr.push(`${w}×${h}`);
 		}
 
 		if (data.artist) {
