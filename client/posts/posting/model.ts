@@ -14,7 +14,7 @@ export default class FormModel extends Post {
 	public inputBody = ""
 	public view: FormView
 	public allocatingImage: boolean = false;
-	private textEncoder = new TextEncoder();
+	private static textEncoder = new TextEncoder();
 
 	// Pass and ID, if you wish to hijack an existing model. To create a new
 	// model pass zero.
@@ -95,7 +95,7 @@ export default class FormModel extends Post {
 			// Commit a character appendage to the end of the line to the server
 			const char = val.slice(-1);
 			this.inputBody += char
-			let bytes = this.textEncoder.encode(char);
+			let bytes = FormModel.textEncoder.encode(char);
 			let newBytes = new Uint8Array(bytes.length + 1);
 			newBytes.set(bytes, 0);
 			newBytes[bytes.length] = message.append;
@@ -163,7 +163,7 @@ export default class FormModel extends Post {
 
 		// create a new typed array
 		let offsets = new Uint16Array([start,old.length - till - start]);
-		let text = this.textEncoder.encode(val.slice(start, -till || undefined).join(""));
+		let text = FormModel.textEncoder.encode(val.slice(start, -till || undefined).join(""));
 		let newBytes = new Uint8Array(text.byteLength + 5);
 		newBytes.set(new Uint8Array(offsets.buffer), 0);
 		newBytes.set(text, offsets.byteLength);
