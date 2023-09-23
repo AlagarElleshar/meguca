@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 	"unicode/utf8"
 
 	"github.com/bakape/meguca/common"
@@ -85,6 +86,12 @@ func (s spliceRequest) MarshalJSON() ([]byte, error) {
 	})
 }
 
+// putPostIDToMsg embeds the postID into the provided byte array, representing it as a float64.
+// Using float64 improves decoding performance in JavaScript clients
+func putPostIDToMsg(msg []byte, postID uint64) {
+	binary.LittleEndian.PutUint64(msg, math.Float64bits(float64(postID)))
+}
+
 // Append a rune to the body of the open post
 func (c *Client) appendRune(data []byte) (err error) {
 	has, err := c.hasPost()
@@ -119,7 +126,7 @@ func (c *Client) appendRune(data []byte) (err error) {
 	//var msg = [len(data) + 16]byte
 	msg := make([]byte, len(data)+9)
 	//write c.post.id into msg
-	binary.LittleEndian.PutUint64(msg, c.post.id)
+	putPostIDToMsg(msg, c.post.id)
 	copy(msg[8:], data)
 	msg[8+len(data)] = byte(common.MessageAppend)
 	//msg, err := common.EncodeMessage(
@@ -171,7 +178,7 @@ func (c *Client) backspace() error {
 	}
 
 	msg := make([]byte, 9)
-	binary.LittleEndian.PutUint64(msg, c.post.id)
+	putPostIDToMsg(msg, c.post.id)
 	msg[8] = byte(common.MessageBackspace)
 
 	r, lastRuneLen := utf8.DecodeLastRune(c.post.body)
@@ -345,7 +352,7 @@ func (c *Client) spliceText(data []byte) error {
 func encodeSpliceMessage(res spliceMessage) (msg []byte, err error) {
 	//encode res.text to []byte
 	msg = make([]byte, 12)
-	binary.LittleEndian.PutUint64(msg, res.ID)
+	putPostIDToMsg(msg, res.ID)
 	binary.LittleEndian.PutUint16(msg[8:], res.Start)
 	binary.LittleEndian.PutUint16(msg[10:], res.Len)
 	msg = append(msg, res.Text...)

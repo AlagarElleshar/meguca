@@ -115,7 +115,7 @@ export default () => {
 			m.spoilerImage())
 
 	handlers[message.append] = (message: ArrayBuffer) =>{
-		let id = Number(new BigUint64Array(message, 0, 1)[0])
+		let id = new Float64Array(message, 0, 1)[0]
 		let append = decoder.decode(message.slice(8))
 		if(debug)
 			console.log(`>binary append ${id} ${append}`)
@@ -124,7 +124,7 @@ export default () => {
 	}
 
 	handlers[message.backspace] = (message: ArrayBuffer) =>{
-		let id = Number(new BigUint64Array(message, 0, 1)[0])
+		let id = new Float64Array(message, 0, 1)[0]
 		if(debug)
 			console.log(`>binary backspace ${id}`)
 		handle(id, m =>
@@ -135,7 +135,7 @@ export default () => {
 		//make a new SpliceMessage
 		let u16View = new Uint16Array(binaryMessage, 8, 2)
 		let msg: SpliceResponse = {
-			id: Number(new BigUint64Array(binaryMessage, 0, 1)[0]),
+			id: new Float64Array(binaryMessage, 0, 1)[0],
 			start: u16View[0],
 			len: u16View[1],
 			text: decoder.decode(binaryMessage.slice(12))
