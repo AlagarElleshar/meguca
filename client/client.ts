@@ -114,17 +114,19 @@ export default () => {
 		handle(id, m =>
 			m.spoilerImage())
 
-	handlers[message.append] = (message: ArrayBuffer) =>{
-		let id = new Float64Array(message, 0, 1)[0]
-		let append = decoder.decode(message.slice(8))
+	handlers[message.append] = (message: ArrayBuffer) => {
+		const view = new DataView(message);
+		let id = view.getFloat64(0, true);
+		let append = decoder.decode(message.slice(8));
 		if(debug)
 			console.log(`>binary append ${id} ${append}`)
 		handle(id, m =>
 			m.appendString(append))
 	}
 
-	handlers[message.backspace] = (message: ArrayBuffer) =>{
-		let id = new Float64Array(message, 0, 1)[0]
+	handlers[message.backspace] = (message: ArrayBuffer) => {
+		const view = new DataView(message);
+		let id = view.getFloat64(0, true);
 		if(debug)
 			console.log(`>binary backspace ${id}`)
 		handle(id, m =>
@@ -132,12 +134,11 @@ export default () => {
 	}
 
 	handlers[message.splice] = (binaryMessage: ArrayBuffer) => {
-		//make a new SpliceMessage
-		let u16View = new Uint16Array(binaryMessage, 8, 2)
+		const view = new DataView(binaryMessage);
 		let msg: SpliceResponse = {
-			id: new Float64Array(binaryMessage, 0, 1)[0],
-			start: u16View[0],
-			len: u16View[1],
+			id: view.getFloat64(0, true),
+			start: view.getUint16(8, true),
+			len: view.getUint16(10, true),
 			text: decoder.decode(binaryMessage.slice(12))
 		}
 		if(debug)
