@@ -138,20 +138,23 @@ export default class ImageHandler extends View<Post> {
 		}
 		return null;
 	}
-	public renderSource(id: string, el : Element) {
+	public renderSource(id: string, el : Element, postingTime: Element){
 		let matches = el.getElementsByClassName("sourcelink")
 		if(matches.length > 0) {
 			return
 		}
 		let sourceButton = document.createElement("a")
+		let downloadButton = el.getElementsByClassName("download-link")[0] as HTMLAnchorElement
 		sourceButton.href = `https://www.tiktok.com/share/video/${id}`;
 		sourceButton.className = "sourcelink";
 		sourceButton.innerText = "􀉣";
 		sourceButton.target = "_blank";
 		sourceButton.rel = "noopener noreferrer";
 		let unixTime = parseInt(id, 10) / Math.pow(2,32);
-		sourceButton.title = `Posted ${relativeTime(unixTime)}`
-		el.append(sourceButton);
+		let postingTimeText = relativeTime(unixTime);
+		sourceButton.title = `Posted ${postingTimeText}`
+		postingTime.insertAdjacentText('beforeend', postingTimeText);
+		el.insertBefore(sourceButton, downloadButton.nextSibling)
 
 		let tikwmButton = document.createElement("a")
 		tikwmButton.href = `https://tikwm.com/video/${id}.html`;
@@ -161,8 +164,7 @@ export default class ImageHandler extends View<Post> {
 		tikwmButton.target = "_blank";
 		tikwmButton.rel = "noopener noreferrer";
 		tikwmButton.title = "TikWM"
-		el.append(tikwmButton);
-		el.append(sourceButton);
+		el.insertBefore(tikwmButton, downloadButton.nextSibling)
 	}
 	// Render the information caption above the image
 	private renderFigcaption(reveal: boolean) {
@@ -172,7 +174,8 @@ export default class ImageHandler extends View<Post> {
 			this.el.querySelector("header").after(el)
 		}
 
-		const [hToggle, , info, ...tmp] = Array.from(el.children) as HTMLElement[]
+		// const [hToggle, , , , info] = Array.from(el.children) as HTMLElement[]
+		const hToggle = el.getElementsByClassName("image-toggle")[0] as HTMLElement
 		let link = el.getElementsByClassName("filename-link")[0] as HTMLAnchorElement
 		let dlButton = el.getElementsByClassName("download-link")[0] as HTMLAnchorElement
 		if (!options.hideThumbs && !options.workModeToggle) {
@@ -183,10 +186,10 @@ export default class ImageHandler extends View<Post> {
 		}
 
 		const data = this.model.image;
-		const arr = [];
+		const [hasAudio, duration, fileSize, dimensions, codec, postingTime] = Array.from(el.querySelector(".fileinfo").children) as HTMLElement[]
 
-		if (data.audio) {
-			arr.push("♫");
+		if (!data.audio) {
+			hasAudio.hidden = true
 		}
 
 		if (data.length) {
@@ -197,7 +200,10 @@ export default class ImageHandler extends View<Post> {
 				const min = Math.floor(data.length / 60);
 				s = `${pad(min)}:${pad(data.length - min * 60)}`;
 			}
-			arr.push(s);
+			duration.insertAdjacentText('beforeend', s);
+		}
+		else{
+			duration.hidden = true
 		}
 
 		const { size } = data;
@@ -210,28 +216,38 @@ export default class ImageHandler extends View<Post> {
 			const text = Math.round(size / (1 << 20) * 10).toString();
 			s = `${text.slice(0, -1)}.${text.slice(-1)} MB`;
 		}
-		arr.push(s);
+		fileSize.insertAdjacentText('beforeend', s);
 
 		const [w, h] = data.dims;
 		if (w || h) {
-			arr.push(`${w}×${h}`);
+			dimensions.insertAdjacentText('beforeend', `${w}×${h}`);
+		}
+		else{
+			dimensions.hidden = true
 		}
 
-		if (data.artist) {
-			arr.push(data.artist);
-		}
-		if (data.title) {
-			arr.push(data.title);
-		}
 		if (data.codec) {
-			arr.push(data.codec.toUpperCase());
+			codec.insertAdjacentText('beforeend', data.codec.toUpperCase());
+		}
+		else{
+			codec.hidden = true
 		}
 
-		let html = "";
-		for (let s of arr) {
-			html += `<span>${escape(s)}</span>`;
+		let mediaMetadataString = "";
+		if (data.artist) {
+			mediaMetadataString += `[${data.artist}`;
+			if (data.title) {
+				mediaMetadataString += ` - ${data.title}]`;
+			}
+			else{
+				mediaMetadataString += ']';
+			}
 		}
-		info.innerHTML = html;
+		else if (data.title) {
+			mediaMetadataString += `[${data.title}]`;
+		}
+		el.querySelector(".media-metadata").textContent = mediaMetadataString;
+
 
 		// Render a name + download link of an image
 		const ext = fileTypes[data.file_type],
@@ -249,7 +265,7 @@ export default class ImageHandler extends View<Post> {
 		let tokID = this.getTokID(data.name);
 		console.log(tokID);
 		if(tokID != null){
-			this.renderSource(tokID,el)
+			this.renderSource(tokID,el,postingTime)
 		}
 
 

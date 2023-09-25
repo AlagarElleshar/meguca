@@ -94,6 +94,21 @@
 					{%= imageSearch(c.root, img) %}
 				</span>
 				{% code name := imageName(img.FileType, img.Name) %}
+                {% if img.Artist != "" %}
+                    <span class="media-metadata">
+                        [
+                        {%s img.Artist %}
+                        {% if img.Title != "" %}
+                            {% space %}-{% space %}{%s img.Title %}
+                        {% endif %}
+                        ]
+                    </span>
+                {% elseif img.Title != "" %}
+                    <span class="media-metadata">
+                        {%s img.Title %}
+                        ]
+                    </span>
+                {% endif %}
 				<a class="filename-link" href="{%s= assets.RelativeSourcePath(img.FileType, img.SHA1) %}" target="_blank">
 					{%s= name %}
 				</a>
@@ -131,18 +146,6 @@
 							{%s= strconv.FormatUint(uint64(img.Dims[0]), 10) %}
 							×
 							{%s= strconv.FormatUint(uint64(img.Dims[1]), 10) %}
-						</span>
-					{% endif %}
-					{% if img.Artist != "" %}
-						<span>
-						<span class="symbol">􀉩 </span>
-							{%s img.Artist %}
-						</span>
-					{% endif %}
-					{% if img.Title != "" %}
-						<span>
-						<span class="symbol">􀅫 </span>
-							{%s img.Title %}
 						</span>
 					{% endif %}
 					{% if img.Codec != "" %}

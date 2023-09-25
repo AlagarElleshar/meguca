@@ -280,23 +280,32 @@ td {
 	border     : 1px solid black;
 }
 
+.filename-link {
+	font-weight: 500;
+	//font-size: 14px;
+}
+.preformat {
+	white-space: pre;
+}
 .fileinfo {
-	margin-left: 1ex;
+	font-size: 12px;
+	padding-top: 3px;
+	user-select: none;
 
-	&::before {
-		content: "(";
+	& > span {
+		padding: 0 4px;
 	}
 
-	&::after {
-		content: ")";
+	& > span:first-child {
+		padding-left: 0;
+	}
+
+	& > span:last-child {
+		padding-right: 0;
 	}
 
 	&>span::empty {
 		display: none;
-	}
-
-	&>span:not(:empty):not([hidden])~span::before {
-		content: ", ";
 	}
 
 	&>span.media-artist:not(:empty)+span.media-title::before {
@@ -418,6 +427,7 @@ iframe[src^="https://www.youtube"] {
 
 .symbol {
 	font-family: Symbols;
+	user-select: none;
 }
 
 .live-button {
