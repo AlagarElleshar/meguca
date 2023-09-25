@@ -267,6 +267,9 @@ export default class ImageHandler extends View<Post> {
 		if(tokID != null){
 			this.renderSource(tokID,el,postingTime)
 		}
+		else{
+			postingTime.hidden = true;
+		}
 
 
 		this.renderImageSearch(el)
