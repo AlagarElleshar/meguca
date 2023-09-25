@@ -1,8 +1,8 @@
 package templates
 
 import (
+	"fmt"
 	"github.com/bakape/meguca/common"
-	"github.com/xeonx/timeago"
 	"html"
 	"strconv"
 	"time"
@@ -76,17 +76,54 @@ func getTokID(filename string) *string {
 	return nil
 }
 
-const scale int64 = 4294967296
+func relativeTime(id string) string {
+	//convert id to int
+	then, _ := strconv.ParseInt(id, 10, 64)
+	then = then >> 32
+	now := time.Now().Unix()
+	timeElapsed := (now - then) / 60
+	isFuture := false
 
-func relativeTime(tokID string) string {
-	then, err := strconv.ParseInt(tokID, 10, 64)
-	if err != nil {
-		// handle error
+	if timeElapsed < 1 {
+		if timeElapsed > -5 { // Assume to be client clock imprecision
+			return "just now"
+		}
+		isFuture = true
+		timeElapsed = -timeElapsed
 	}
-	then = then / scale
-	thenTime := time.Unix(then, 0)
-	config := timeago.English
-	config.Max = 1<<63 - 1
-	config.Periods = config.Periods[:len(config.Periods)-1]
-	return config.Format(thenTime)
+
+	divide := []int64{60, 24, 30, 12}
+	threshold := []int64{120, 48, 90, 24}
+	units := [][]string{
+		{"minute", "minutes"},
+		{"hour", "hours"},
+		{"day", "days"},
+		{"month", "months"},
+		{"year", "years"},
+	}
+
+	for i, d := range divide {
+		if timeElapsed < threshold[i] {
+			return ago(timeElapsed, units[i][0], units[i][1], isFuture)
+		}
+		timeElapsed = timeElapsed / d
+	}
+
+	return ago(timeElapsed, units[4][0], units[4][1], isFuture)
+}
+
+// Renders "56 minutes ago" or "in 56 minutes" like relative time text
+func ago(timeElapsed int64, singular, plural string, isFuture bool) string {
+	count := pluralizeTime(timeElapsed, singular, plural)
+	if isFuture {
+		return fmt.Sprintf("in %s", count)
+	}
+	return fmt.Sprintf("%s ago", count)
+}
+
+func pluralizeTime(num int64, singular, plural string) string {
+	if num == 1 || num == -1 {
+		return fmt.Sprintf("%d %s", num, singular)
+	}
+	return fmt.Sprintf("%d %s", num, plural)
 }

@@ -49,9 +49,10 @@ export function relativeTime(then: number): string {
     }
 
     const divide = [60, 24, 30, 12],
+        threshold = [120, 48, 90, 24],
         unit = ['minute', 'hour', 'day', 'month']
     for (let i = 0; i < divide.length; i++) {
-        if (time < divide[i]) {
+        if (time < threshold[i]) {
             return ago(time, lang.plurals[unit[i]], isFuture)
         }
         time = Math.floor(time / divide[i])
