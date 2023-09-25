@@ -169,8 +169,10 @@ export default class ImageHandler extends View<Post> {
 	// Render the information caption above the image
 	private renderFigcaption(reveal: boolean) {
 		let el = this.getFigcaption()
+		let firstRender = false;
 		if (!el) {
 			el = importTemplate("figcaption").firstChild as HTMLElement
+			firstRender = true;
 			this.el.querySelector("header").after(el)
 		}
 
@@ -187,66 +189,71 @@ export default class ImageHandler extends View<Post> {
 
 		const data = this.model.image;
 		const [hasAudio, duration, fileSize, dimensions, codec, postingTime] = Array.from(el.querySelector(".fileinfo").children) as HTMLElement[]
+		if(firstRender) {
 
-		if (!data.audio) {
-			hasAudio.hidden = true
-		}
-
-		if (data.length) {
-			let s: string;
-			if (data.length < 60) {
-				s = `0:${pad(data.length)}`;
-			} else {
-				const min = Math.floor(data.length / 60);
-				s = `${pad(min)}:${pad(data.length - min * 60)}`;
+			if (!data.audio) {
+				hasAudio.hidden = true
 			}
-			duration.insertAdjacentText('beforeend', s);
-		}
-		else{
-			duration.hidden = true
-		}
 
-		const { size } = data;
-		let s: string;
-		if (size < (1 << 10)) {
-			s = size + ' B';
-		} else if (size < (1 << 20)) {
-			s = Math.round(size / (1 << 10)) + ' KB';
-		} else {
-			const text = Math.round(size / (1 << 20) * 10).toString();
-			s = `${text.slice(0, -1)}.${text.slice(-1)} MB`;
-		}
-		fileSize.insertAdjacentText('beforeend', s);
+			if (data.length) {
+				let s: string;
+				if (data.length < 60) {
+					s = `0:${pad(data.length)}`;
+				} else {
+					const min = Math.floor(data.length / 60);
+					s = `${pad(min)}:${pad(data.length - min * 60)}`;
+				}
+				duration.insertAdjacentText('beforeend', s);
+			} else {
+				duration.hidden = true
+			}
 
-		const [w, h] = data.dims;
-		if (w || h) {
-			dimensions.insertAdjacentText('beforeend', `${w}×${h}`);
-		}
-		else{
-			dimensions.hidden = true
-		}
+			const {size} = data;
+			let s: string;
+			if (size < (1 << 10)) {
+				s = size + ' B';
+			} else if (size < (1 << 20)) {
+				s = Math.round(size / (1 << 10)) + ' KB';
+			} else {
+				const text = Math.round(size / (1 << 20) * 10).toString();
+				s = `${text.slice(0, -1)}.${text.slice(-1)} MB`;
+			}
+			fileSize.insertAdjacentText('beforeend', s);
 
-		if (data.codec) {
-			codec.insertAdjacentText('beforeend', data.codec.toUpperCase());
-		}
-		else{
-			codec.hidden = true
-		}
+			const [w, h] = data.dims;
+			if (w || h) {
+				dimensions.insertAdjacentText('beforeend', `${w}×${h}`);
+			} else {
+				dimensions.hidden = true
+			}
 
-		let mediaMetadataString = "";
-		if (data.artist) {
-			mediaMetadataString += `[${data.artist}`;
-			if (data.title) {
-				mediaMetadataString += ` - ${data.title}]`;
+			if (data.codec) {
+				codec.insertAdjacentText('beforeend', data.codec.toUpperCase());
+			} else {
+				codec.hidden = true
+			}
+
+			let mediaMetadataString = "";
+			if (data.artist) {
+				mediaMetadataString += `[${data.artist}`;
+				if (data.title) {
+					mediaMetadataString += ` - ${data.title}]`;
+				} else {
+					mediaMetadataString += ']';
+				}
+			} else if (data.title) {
+				mediaMetadataString += `[${data.title}]`;
+			}
+			el.querySelector(".media-metadata").textContent = mediaMetadataString;
+			let tokID = this.getTokID(data.name);
+			console.log(tokID);
+			if(tokID != null){
+				this.renderSource(tokID,el,postingTime)
 			}
 			else{
-				mediaMetadataString += ']';
+				postingTime.hidden = true;
 			}
 		}
-		else if (data.title) {
-			mediaMetadataString += `[${data.title}]`;
-		}
-		el.querySelector(".media-metadata").textContent = mediaMetadataString;
 
 
 		// Render a name + download link of an image
@@ -260,17 +267,6 @@ export default class ImageHandler extends View<Post> {
 			href: `/assets/images/src/${data.sha1}.${ext}`,
 			download: name,
 		})
-
-
-		let tokID = this.getTokID(data.name);
-		console.log(tokID);
-		if(tokID != null){
-			this.renderSource(tokID,el,postingTime)
-		}
-		else{
-			postingTime.hidden = true;
-		}
-
 
 		this.renderImageSearch(el)
 
