@@ -94,21 +94,20 @@
 					{%= imageSearch(c.root, img) %}
 				</span>
 				{% code name := imageName(img.FileType, img.Name) %}
+                <span class="media-metadata">
                 {% if img.Artist != "" %}
-                    <span class="media-metadata">
                         [
                         {%s img.Artist %}
                         {% if img.Title != "" %}
                             {% space %}-{% space %}{%s img.Title %}
                         {% endif %}
                         ]
-                    </span>
                 {% elseif img.Title != "" %}
                     <span class="media-metadata">
                         {%s img.Title %}
                         ]
-                    </span>
                 {% endif %}
+                </span>
 				<a class="filename-link" href="{%s= assets.RelativeSourcePath(img.FileType, img.SHA1) %}" target="_blank">
 					{%s= name %}
 				</a>
@@ -123,6 +122,8 @@
 				<div class="fileinfo">
 					{% if img.Audio %}
 						<span class="symbol">􀑪</span>
+					{% else %}
+						<span class="symbol" hidden>􀑪</span>
 					{% endif %}
 					{% if img.Length != 0 %}
 						<span>
@@ -135,6 +136,8 @@
 								{%s= fmt.Sprintf("%02d:%02d", min, l - min * 60) %}
 							{% endif %}
 						</span>
+					{% else %}
+					    <span hidden></span>
 					{% endif %}
 					<span>
 						<span class="symbol">􀈷 </span>
@@ -147,18 +150,24 @@
 							×
 							{%s= strconv.FormatUint(uint64(img.Dims[1]), 10) %}
 						</span>
+					{% else %}
+					    <span hidden></span>
 					{% endif %}
 					{% if img.Codec != "" %}
 						<span>
 						<span class="symbol">􀣋 </span>
 							{%s= strings.ToUpper(img.Codec) %}
 						</span>
+					{% else %}
+					    <span hidden></span>
 					{% endif %}
                     {% if tokid != nil %}
 						<span>
 						<span class="symbol">􀐫 </span>
 							{%s= timeago %}
 						</span>
+					{% else %}
+					    <span hidden></span>
                     {% endif %}
 				</div>
 			</figcaption>
