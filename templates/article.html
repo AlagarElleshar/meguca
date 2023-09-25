@@ -99,19 +99,19 @@
 				</a>
 				{% code tokid := getTokID(name) %}
 				<a class="download-link symbol" href="{%s= assets.RelativeSourcePath(img.FileType, img.SHA1) %}" download="{%s= name %}" >􀄩</a>
+				{% code timeago := "" %}
 				{% if tokid != nil %}
-				{% code timeago := "Posted " + relativeTime(*tokid) %}
+				{% code timeago = relativeTime(*tokid) %}
 				<a class="tikwm-link symbol" href="https://tikwm.com/video/{%s= *tokid %}.html" title="TikWM" target="_blank" rel="noopener noreferrer">􀂺</a>
-				<a class="sourcelink symbol" href="https://www.tiktok.com/share/video/{%s= *tokid %}" title="{%s= timeago %}" target="_blank" rel="noopener noreferrer">􀉣</a>
+				<a class="sourcelink symbol" href="https://www.tiktok.com/share/video/{%s= *tokid %}" title="Posted {%s= timeago %}" target="_blank" rel="noopener noreferrer">􀉣</a>
 				{% endif %}
 				<div class="fileinfo">
 					{% if img.Audio %}
-						<span>
-							♫
-						</span>
+						<span class="symbol">􀑪</span>
 					{% endif %}
 					{% if img.Length != 0 %}
 						<span>
+						    <span class="symbol">􀎶 </span>
 							{% code l := img.Length %}
 							{% if l < 60 %}
 								{%s= fmt.Sprintf("0:%02d", l) %}
@@ -122,10 +122,12 @@
 						</span>
 					{% endif %}
 					<span>
+						<span class="symbol">􀈷 </span>
 						{%s= readableFileSize(img.Size) %}
 					</span>
 					{% if img.Dims != [4]uint16{} %}
 						<span>
+						<span class="symbol">􀅊 </span>
 							{%s= strconv.FormatUint(uint64(img.Dims[0]), 10) %}
 							×
 							{%s= strconv.FormatUint(uint64(img.Dims[1]), 10) %}
@@ -133,19 +135,28 @@
 					{% endif %}
 					{% if img.Artist != "" %}
 						<span>
+						<span class="symbol">􀉩 </span>
 							{%s img.Artist %}
 						</span>
 					{% endif %}
 					{% if img.Title != "" %}
 						<span>
+						<span class="symbol">􀅫 </span>
 							{%s img.Title %}
 						</span>
 					{% endif %}
 					{% if img.Codec != "" %}
 						<span>
+						<span class="symbol">􀣋 </span>
 							{%s= strings.ToUpper(img.Codec) %}
 						</span>
 					{% endif %}
+                    {% if tokid != nil %}
+						<span>
+						<span class="symbol">􀐫 </span>
+							{%s= timeago %}
+						</span>
+                    {% endif %}
 				</div>
 			</figcaption>
 		{% endif %}
