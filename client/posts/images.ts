@@ -145,7 +145,7 @@ export default class ImageHandler extends View<Post> {
 		}
 		let sourceButton = document.createElement("a")
 		let downloadButton = el.getElementsByClassName("download-link")[0] as HTMLAnchorElement
-		sourceButton.href = `https://www.tiktok.com/share/video/${id}`;
+		sourceButton.href = `https://www.tiktok.com/@/video/${id}`;
 		sourceButton.className = "sourcelink";
 		sourceButton.innerText = "􀉣";
 		sourceButton.target = "_blank";
