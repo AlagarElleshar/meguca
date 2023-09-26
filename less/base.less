@@ -291,18 +291,16 @@ td {
 	font-size: 12px;
 	padding-top: 3px;
 	user-select: none;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0 8px;
+
+	&:before{
+		content: none;
+	}
 
 	& > span {
-		padding: 0 4px;
 		display: inline-block;
-	}
-
-	& > span:first-child {
-		padding-left: 0;
-	}
-
-	& > span:last-child {
-		padding-right: 0;
 	}
 
 	&>span::empty {
