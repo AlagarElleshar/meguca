@@ -188,11 +188,13 @@ export default class ImageHandler extends View<Post> {
 		}
 
 		const data = this.model.image;
-		const [hasAudio, duration, fileSize, dimensions, codec, postingTime] = Array.from(el.querySelector(".fileinfo").children) as HTMLElement[]
+
 		if(firstRender) {
 
+			const [hasAudio, duration, fileSize, dimensions, codec, postingTime] = Array.from(el.querySelector(".fileinfo").children) as HTMLElement[]
+
 			if (!data.audio) {
-				hasAudio.hidden = true
+				hasAudio.remove()
 			}
 
 			if (data.length) {
@@ -205,7 +207,7 @@ export default class ImageHandler extends View<Post> {
 				}
 				duration.insertAdjacentText('beforeend', s);
 			} else {
-				duration.hidden = true
+				duration.remove()
 			}
 
 			const {size} = data;
@@ -224,13 +226,13 @@ export default class ImageHandler extends View<Post> {
 			if (w || h) {
 				dimensions.insertAdjacentText('beforeend', `${w}×${h}`);
 			} else {
-				dimensions.hidden = true
+				dimensions.remove()
 			}
 
 			if (data.codec) {
 				codec.insertAdjacentText('beforeend', data.codec.toUpperCase());
 			} else {
-				codec.hidden = true
+				codec.remove()
 			}
 
 			let mediaMetadataString = "";
@@ -251,7 +253,7 @@ export default class ImageHandler extends View<Post> {
 				this.renderSource(tokID,el,postingTime)
 			}
 			else{
-				postingTime.hidden = true;
+				postingTime.remove();
 			}
 		}
 

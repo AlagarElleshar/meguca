@@ -121,12 +121,10 @@
 				{% endif %}
 				<div class="fileinfo">
 					{% if img.Audio %}
-						<span class="symbol">􀑪</span>
-					{% else %}
-						<span class="symbol" hidden>􀑪</span>
+						<span class="symbol fileinfo-has-audio">􀑪</span>
 					{% endif %}
 					{% if img.Length != 0 %}
-						<span>
+						<span class="fileinfo-duration">
 						    <span class="symbol">􀎶 </span>
 							{% code l := img.Length %}
 							{% if l < 60 %}
@@ -136,38 +134,30 @@
 								{%s= fmt.Sprintf("%02d:%02d", min, l - min * 60) %}
 							{% endif %}
 						</span>
-					{% else %}
-					    <span hidden></span>
 					{% endif %}
-					<span>
+					<span class="fileinfo-filesize">
 						<span class="symbol">􀈷 </span>
 						{%s= readableFileSize(img.Size) %}
 					</span>
 					{% if img.Dims != [4]uint16{} %}
-						<span>
+						<span class="fileinfo-dimensions">
 						<span class="symbol">􀅊 </span>
 							{%s= strconv.FormatUint(uint64(img.Dims[0]), 10) %}
 							×
 							{%s= strconv.FormatUint(uint64(img.Dims[1]), 10) %}
 						</span>
-					{% else %}
-					    <span hidden></span>
 					{% endif %}
 					{% if img.Codec != "" %}
-						<span>
+						<span class="fileinfo-codec">
 						<span class="symbol">􀣋 </span>
 							{%s= strings.ToUpper(img.Codec) %}
 						</span>
-					{% else %}
-					    <span hidden></span>
 					{% endif %}
                     {% if tokid != nil %}
-						<span>
+						<span class="fileinfo-postingtime">
 						<span class="symbol">􀐫 </span>
 							{%s= timeago %}
 						</span>
-					{% else %}
-					    <span hidden></span>
                     {% endif %}
 				</div>
 			</figcaption>
