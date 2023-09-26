@@ -26,9 +26,10 @@ var (
 )
 
 type jobRequest struct {
-	file multipart.File
-	size int
-	res  chan<- thumbnailingResponse
+	file     multipart.File
+	filename string
+	size     int
+	res      chan<- thumbnailingResponse
 }
 
 type thumbnailingResponse struct {
@@ -37,13 +38,12 @@ type thumbnailingResponse struct {
 }
 
 // Queues upload processing to prevent resource overuse
-func requestThumbnailing(file multipart.File, size int,
-) <-chan thumbnailingResponse {
+func requestThumbnailing(file multipart.File, filename string, size int) <-chan thumbnailingResponse {
 	// 2 separate queues - one for small and one for bigger files.
 	// Allows for some degree of concurrent thumbnailing without exhausting
 	// server resources.
 	ch := make(chan thumbnailingResponse)
-	req := jobRequest{file, size, ch}
+	req := jobRequest{file, filename, size, ch}
 	if size <= 4<<20 {
 		scheduleSmallJob <- req
 	} else {
@@ -59,7 +59,7 @@ func init() {
 			runtime.LockOSThread()
 			for {
 				req := <-queue
-				id, err := processRequest(req.file, req.size)
+				id, err := processRequest(req.file, req.filename, req.size)
 				req.res <- thumbnailingResponse{id, err}
 			}
 		}(ch)
@@ -99,7 +99,7 @@ func hashFile(rs io.ReadSeeker, h hash.Hash, encode func([]byte) string,
 	}
 }
 
-func processRequest(file multipart.File, size int) (token string, err error) {
+func processRequest(file multipart.File, filename string, size int) (token string, err error) {
 	SHA1, _, err := hashFile(file, sha1.New(), hex.EncodeToString)
 	if err != nil {
 		return
@@ -119,7 +119,7 @@ func processRequest(file multipart.File, size int) (token string, err error) {
 		return
 	}
 	if !exists {
-		token, err = newThumbnail(file, SHA1)
+		token, err = newThumbnail(file, filename, SHA1)
 	}
 	return
 }

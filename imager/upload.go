@@ -8,12 +8,14 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"gopkg.in/vansante/go-ffprobe.v2"
 	"image"
 	"image/jpeg"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
+	"net"
 	"net/http"
 	"strconv"
 	"strings"
@@ -259,20 +261,20 @@ func ParseUpload(req *http.Request) (string, error) {
 		return "", common.StatusError{errTooLarge, 413}
 	}
 
-	res := <-requestThumbnailing(file, int(head.Size))
+	res := <-requestThumbnailing(file, head.Filename, int(head.Size))
 	return res.imageID, res.err
 }
 
 // Create a new thumbnail, commit its resources to the DB and filesystem, and
 // pass the image data to the client.
-func newThumbnail(f multipart.File, SHA1 string) (
+func newThumbnail(f multipart.File, filename string, SHA1 string) (
 	token string, err error,
 ) {
 	var img common.ImageCommon
 	img.SHA1 = SHA1
 
 	conf := config.Get()
-	thumb, err := processFile(f, &img, thumbnailer.Options{
+	thumb, err := processFile(f, filename, &img, thumbnailer.Options{
 		MaxSourceDims: thumbnailer.Dims{
 			Width:  uint(conf.MaxWidth),
 			Height: uint(conf.MaxHeight),
@@ -345,13 +347,108 @@ func getAudioCodec(file io.Reader) (string, error) {
 	return "", errors.New("no audio stream found")
 }
 
+// This function validates tok IDs
+func isValidTokID(digits string) bool {
+	//Max TokID is a week from now
+	//Min TokID is 2016-08-01
+	now := time.Now()
+	maxTokID := now.Add(time.Hour*24*7).Unix() << 32
+	var minTokID int64 = 6313705004335104000
+	numDigits := len(digits)
+	if numDigits > 20 || numDigits < 19 {
+		return false
+	}
+	tokID, _ := strconv.ParseInt(digits, 10, 64)
+	return tokID > minTokID && tokID < maxTokID
+}
+
+func getTokID(filename string) *string {
+	digits := ""
+	for _, c := range filename {
+		if c >= '0' && c <= '9' {
+			digits += string(c)
+		} else {
+			if isValidTokID(digits) {
+				return &digits
+			}
+			digits = ""
+		}
+	}
+	if isValidTokID(digits) {
+		return &digits
+	}
+	return nil
+}
+
+func extractUsername(s string) string {
+	start := strings.Index(s, "/@")
+	if start == -1 {
+		return ""
+	}
+	start += 1
+
+	end := start
+	for end < len(s) && s[end] != '/' {
+		end++
+	}
+
+	if end == len(s) || start == end {
+		return ""
+	}
+
+	return s[start:end]
+}
+
+var tiktokRedirectClient = &http.Client{
+	CheckRedirect: func(req *http.Request, via []*http.Request) error {
+		return http.ErrUseLastResponse // This prevents the client from following redirects
+	},
+	Timeout: time.Second * 2,
+}
+
+// getTiktokUsername takes a filename as input and scans it for a tok ID
+// Using the tok ID, it constructs a URL to access the TikTok video
+// When tiktok redirects this url, it will insert an @[USERNAME] which we detect
+
+func getTiktokUsername(filename string) (string, error) {
+	tokID := getTokID(filename)
+	if tokID == nil {
+		return "", errors.New("No TokID found")
+	}
+	url := "https://www.tiktok.com/@/video/" + *tokID
+
+	resp, err := tiktokRedirectClient.Get(url)
+
+	if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
+		fmt.Println("Checking for tiktok @ timed out")
+		return "", netErr
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 300 && resp.StatusCode < 400 {
+		redirectURL := resp.Header.Get("Location")
+		username := extractUsername(redirectURL)
+		return username, nil
+	}
+	return "", errors.New("no redirect found")
+}
+
 // Separate function for easier testability
-func processFile(f multipart.File, img *common.ImageCommon,
+func processFile(f multipart.File, filename string, img *common.ImageCommon,
 	opts thumbnailer.Options,
 ) (
 	thumb []byte, err error,
 ) {
 	jpegThumb := config.Get().JPEGThumbnails
+
+	resultCh := make(chan string, 1)
+	errCh := make(chan error, 1)
+
+	go func() {
+		username, usernameErr := getTiktokUsername(filename)
+		resultCh <- username
+		errCh <- usernameErr
+	}()
 
 	src, thumbImage, err := thumbnailer.Process(f, opts)
 
@@ -420,6 +517,14 @@ func processFile(f multipart.File, img *common.ImageCommon,
 	img.Title = src.Title
 	util.TrimString(&img.Artist, 100)
 	util.TrimString(&img.Title, 200)
+	//Detect tiktok @ if Artist tag isn't present
+	if src.Artist == "" {
+		tiktokUsername := <-resultCh
+		err := <-errCh
+		if err == nil {
+			img.Artist = tiktokUsername
+		}
+	}
 
 	img.Dims = [4]uint16{uint16(src.Width), uint16(src.Height), 0, 0}
 	if thumbImage != nil {
