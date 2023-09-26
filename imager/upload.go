@@ -16,6 +16,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -385,7 +386,10 @@ func processFile(f multipart.File, img *common.ImageCommon,
 	img.Video = src.HasVideo
 	img.Length = uint32(src.Length / time.Second)
 	f.Seek(0, 0)
-	if img.Video {
+
+	// check if src.mime starts with "image"
+	isImage := strings.HasPrefix(src.Mime, "image")
+	if img.Video || isImage {
 		img.Codec, err = getVideoCodec(f)
 	} else if img.Audio {
 		img.Codec, err = getAudioCodec(f)
