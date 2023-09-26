@@ -389,10 +389,29 @@ func processFile(f multipart.File, img *common.ImageCommon,
 
 	// check if src.mime starts with "image"
 	isImage := strings.HasPrefix(src.Mime, "image")
-	if img.Video || isImage {
-		img.Codec, err = getVideoCodec(f)
-	} else if img.Audio {
-		img.Codec, err = getAudioCodec(f)
+
+	//Certain common codecs are returned by the thumbnailer
+	//If one of these codecs are returned, we skip the call to ffprobe
+	codecs := []string{"h264", "hevc", "mjpeg", "gif", "png"}
+	codecSet := false
+	for _, codec := range codecs {
+		if src.Codec == codec {
+			img.Codec = src.Codec
+			codecSet = true
+			break
+		}
+	}
+
+	if !codecSet {
+		if img.Video || isImage {
+			img.Codec, err = getVideoCodec(f)
+		} else if img.Audio {
+			img.Codec, err = getAudioCodec(f)
+		}
+	}
+
+	if isImage && img.Codec == "mjpeg" {
+		img.Codec = "jpeg"
 	}
 	// Some media has retardedly long meta strings. Just truncate them, instead
 	// of rejecting. Must ensure it's still valid unicode after trancation,
