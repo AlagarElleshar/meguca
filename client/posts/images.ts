@@ -264,7 +264,7 @@ export default class ImageHandler extends View<Post> {
 		setAttrs(link, {
 			href: `/assets/images/src/${data.sha1}.${ext}`,
 		})
-		link.innerText = name;
+		link.innerText = `${data.name}.${ext}`;
 		setAttrs(dlButton, {
 			href: `/assets/images/src/${data.sha1}.${ext}`,
 			download: name,
@@ -367,7 +367,7 @@ export default class ImageHandler extends View<Post> {
 		}
 
 		if (isExpandable(img.file_type)) {
-			this.el.querySelector(".fileinfo").after(
+			this.el.querySelector(".fileinfo-has-audio").before(
 				makeEl(HTML
 					`<span class="act contract-button">
 						<a>Contract</a>
