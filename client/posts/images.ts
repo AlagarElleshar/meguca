@@ -367,7 +367,7 @@ export default class ImageHandler extends View<Post> {
 		}
 
 		if (isExpandable(img.file_type)) {
-			this.el.querySelector(".fileinfo-has-audio").before(
+			this.el.querySelector(".fileinfo").after(
 				makeEl(HTML
 					`<span class="act contract-button">
 						<a>Contract</a>
