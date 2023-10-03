@@ -53,7 +53,7 @@ var migrations = []func(tx *sql.Tx) error{
 				length int not null,
 				size int not null,
 				md5 char(22) not null,
-				sha1 char(40) primary key
+				sha1 char(40) primary key,
 			)`,
 			`create table image_tokens (
 				token char(86) not null primary key,
@@ -184,7 +184,8 @@ var migrations = []func(tx *sql.Tx) error{
 		_, err = tx.Exec(
 			`ALTER TABLE images
 				ADD COLUMN Title varchar(100) not null default '',
-				ADD COLUMN Artist varchar(100) not null default ''`,
+				ADD COLUMN Artist varchar(100) not null default ''
+				ADD COLUMN codec codec varchar(16)`,
 		)
 		return
 	},
@@ -1562,8 +1563,8 @@ var migrations = []func(tx *sql.Tx) error{
 			return
 		}
 		return registerTriggers(tx, map[string][]triggerDescriptor{
-			"bans":{{after, tableInsert}},
-		})		
+			"bans": {{after, tableInsert}},
+		})
 	},
 }
 
