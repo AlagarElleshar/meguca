@@ -5,6 +5,8 @@
 anonymous realtime imageboard with user-created boards focused on high
 performance, free speech and transparent moderation
 
+This meguca fork adds additional UI elements for tiktoks.
+
 Platforms: Linux, Docker
 
 License: GNU GPLv3
