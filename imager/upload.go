@@ -411,49 +411,26 @@ var tiktokRedirectClient = &http.Client{
 // When tiktok redirects this url, it will insert an @[USERNAME] which we detect
 
 func getTiktokUsername(filename string) (string, error) {
-	timeStart := time.Now()
 	tokID := getTokID(filename)
 	if tokID == nil {
 		return "", errors.New("No TokID found")
 	}
-	fmt.Println("Starting getTiktokUsername for filename:", filename)
 	url := "https://www.tiktok.com/@/video/" + *tokID
 
 	resp, err := tiktokRedirectClient.Get(url)
 
 	if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
 		fmt.Println("Checking for tiktok @ timed out")
-		timeElapsed := time.Since(timeStart)
-		fmt.Println("Fetching  ", timeElapsed)
 		return "", netErr
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode >= 300 && resp.StatusCode < 400 {
 		redirectURL := resp.Header.Get("Location")
-		fmt.Println("Redirected URL:", redirectURL) // Print the URL after redirection
 		username := extractUsername(redirectURL)
-		if username == "" {
-			fmt.Println("No username extracted from redirected URL")
-		} else {
-			fmt.Println("Extracted username:", username)
-		}
 		return username, nil
-	} else {
-		fmt.Println("Unexpected status code:", resp.StatusCode) // Print the unexpected status code
-		bodyBytes, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			fmt.Println("Error reading response body:", err)
-		} else {
-			// Limiting to the first 500 characters for brevity
-			bodyStr := string(bodyBytes)
-			if len(bodyStr) > 500 {
-				bodyStr = bodyStr[:500] + "..."
-			}
-			fmt.Println("Response body:", bodyStr) // Print the beginning of the response body
-		}
-		return "", errors.New("no redirect found")
 	}
+	return "", errors.New("no redirect found")
 }
 
 // Separate function for easier testability
