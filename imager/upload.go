@@ -8,7 +8,6 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"errors"
-	"fmt"
 	"gopkg.in/vansante/go-ffprobe.v2"
 	"image"
 	"image/jpeg"
@@ -406,6 +405,9 @@ var tiktokRedirectClient = &http.Client{
 	Timeout: time.Second * 2,
 }
 
+const maxRetries = 2
+const retryDelay = time.Second
+
 // getTiktokUsername takes a filename as input and scans it for a tok ID
 // Using the tok ID, it constructs a URL to access the TikTok video
 // When tiktok redirects this url, it will insert an @[USERNAME] which we detect
@@ -416,20 +418,32 @@ func getTiktokUsername(filename string) (string, error) {
 		return "", errors.New("No TokID found")
 	}
 	url := "https://www.tiktok.com/@/video/" + *tokID
+	for i := 0; i < maxRetries; i++ {
+		resp, err := tiktokRedirectClient.Get(url)
 
-	resp, err := tiktokRedirectClient.Get(url)
+		if err != nil {
+			if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
+				log.Errorf("Timeout error while accessing URL %s: %s", url, netErr.Error())
+			} else {
+				log.Error("Error accessing URL: ", err)
+			}
+			time.Sleep(retryDelay) // Wait before retrying
+			continue
+		}
+		defer resp.Body.Close()
 
-	if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
-		fmt.Println("Checking for tiktok @ timed out")
-		return "", netErr
+		if resp.StatusCode == 404 {
+			return "", errors.New("tiktok video not found")
+		}
+
+		if resp.StatusCode >= 300 && resp.StatusCode < 400 {
+			redirectURL := resp.Header.Get("Location")
+			username := extractUsername(redirectURL)
+			return username, nil
+		}
 	}
-	defer resp.Body.Close()
 
-	if resp.StatusCode >= 300 && resp.StatusCode < 400 {
-		redirectURL := resp.Header.Get("Location")
-		username := extractUsername(redirectURL)
-		return username, nil
-	}
+	log.Error("No redirect found for URL: ", url)
 	return "", errors.New("no redirect found")
 }
 
