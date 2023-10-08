@@ -405,12 +405,11 @@ var tiktokRedirectClient = &http.Client{
 	Timeout: time.Second * 2,
 }
 
-const maxRetries = 2
-const retryDelay = time.Second
-
 // getTiktokUsername takes a filename as input and scans it for a tok ID
 // Using the tok ID, it constructs a URL to access the TikTok video
 // When tiktok redirects this url, it will insert an @[USERNAME] which we detect
+const maxRetries = 2
+const retryDelay = time.Second
 
 func getTiktokUsername(filename string) (string, error) {
 	tokID := getTokID(filename)
@@ -427,20 +426,26 @@ func getTiktokUsername(filename string) (string, error) {
 			} else {
 				log.Error("Error accessing URL: ", err)
 			}
+			if resp != nil {
+				resp.Body.Close()
+			}
 			time.Sleep(retryDelay) // Wait before retrying
 			continue
 		}
-		defer resp.Body.Close()
 
 		if resp.StatusCode == 404 {
+			resp.Body.Close()
 			return "", errors.New("tiktok video not found")
 		}
 
 		if resp.StatusCode >= 300 && resp.StatusCode < 400 {
 			redirectURL := resp.Header.Get("Location")
 			username := extractUsername(redirectURL)
+			resp.Body.Close()
 			return username, nil
 		}
+
+		resp.Body.Close()
 	}
 
 	log.Error("No redirect found for URL: ", url)
