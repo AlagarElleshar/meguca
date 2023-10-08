@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/go-playground/log"
 	"math/rand"
 	"strings"
 	"sync"
@@ -107,7 +108,7 @@ func CreateThread(req ThreadCreationRequest, ip string) (
 		return
 	}
 	if count == 0 {
-		println("IP address " + ip + " tried to create a thread but has NOT posted before")
+		log.Warnf("IP address %s tried to create a thread but has NOT posted before", ip)
 		return
 	}
 
