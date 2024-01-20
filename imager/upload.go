@@ -449,7 +449,7 @@ func processFile(f multipart.File, filename string, img *common.ImageCommon,
 		tiktokUsername := <-resultCh
 		err := <-errCh
 		if err == nil {
-			img.Artist = tiktokUsername
+			img.Artist = "@" + tiktokUsername
 		}
 	}
 

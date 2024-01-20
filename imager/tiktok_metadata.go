@@ -93,7 +93,7 @@ func getTiktokUsername(filename string) (string, error) {
 			return "", err
 		}
 		resp.Body.Close()
-		return data.AuthorName, nil
+		return data.AuthorUniqueID, nil
 	}
 
 	log.Error("No redirect found for URL: ", url)
