@@ -341,15 +341,10 @@ export const specs: { [id: string]: OptionSpec } = {
 			article.media {
 				min-width: 0;
 			}
-			.post-moderation {
+			.post-moderation, .filename-link, header .control, .media-metadata {
 				display: none;
 			}
-			.filename-link {
-				display: none;
-			}
-			header .control {
-				display: none;
-			}`,
+			`,
 		)
 	},
 	galleryMode: {
