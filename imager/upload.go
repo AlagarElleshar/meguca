@@ -14,7 +14,6 @@ import (
 	"io"
 	"io/ioutil"
 	"mime/multipart"
-	"net"
 	"net/http"
 	"strconv"
 	"strings"
@@ -359,97 +358,6 @@ func isValidTokID(digits string) bool {
 	}
 	tokID, _ := strconv.ParseInt(digits, 10, 64)
 	return tokID > minTokID && tokID < maxTokID
-}
-
-func getTokID(filename string) *string {
-	digits := ""
-	for _, c := range filename {
-		if c >= '0' && c <= '9' {
-			digits += string(c)
-		} else {
-			if isValidTokID(digits) {
-				return &digits
-			}
-			digits = ""
-		}
-	}
-	if isValidTokID(digits) {
-		return &digits
-	}
-	return nil
-}
-
-func extractUsername(s string) string {
-	start := strings.Index(s, "/@")
-	if start == -1 {
-		return ""
-	}
-	start += 1
-
-	end := start
-	for end < len(s) && s[end] != '/' {
-		end++
-	}
-
-	if end == len(s) || start == end {
-		return ""
-	}
-
-	return s[start:end]
-}
-
-var tiktokRedirectClient = &http.Client{
-	CheckRedirect: func(req *http.Request, via []*http.Request) error {
-		return http.ErrUseLastResponse // This prevents the client from following redirects
-	},
-	Timeout: time.Second * 2,
-}
-
-// getTiktokUsername takes a filename as input and scans it for a tok ID
-// Using the tok ID, it constructs a URL to access the TikTok video
-// When tiktok redirects this url, it will insert an @[USERNAME] which we detect
-const maxRetries = 2
-const retryDelay = time.Second
-
-func getTiktokUsername(filename string) (string, error) {
-	tokID := getTokID(filename)
-	if tokID == nil {
-		return "", errors.New("No TokID found")
-	}
-	url := "https://www.tiktok.com/@/video/" + *tokID
-	for i := 0; i < maxRetries; i++ {
-		resp, err := tiktokRedirectClient.Get(url)
-
-		if err != nil {
-			if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
-				log.Errorf("Timeout error while accessing URL %s: %s", url, netErr.Error())
-			} else {
-				log.Error("Error accessing URL: ", err)
-			}
-			if resp != nil {
-				resp.Body.Close()
-			}
-			time.Sleep(retryDelay) // Wait before retrying
-			continue
-		}
-
-		if resp.StatusCode == 404 {
-			resp.Body.Close()
-			return "", errors.New("tiktok video not found")
-		}
-
-		if resp.StatusCode >= 300 && resp.StatusCode < 400 {
-			redirectURL := resp.Header.Get("Location")
-			username := extractUsername(redirectURL)
-			resp.Body.Close()
-			return username, nil
-		}
-
-		resp.Body.Close()
-	}
-
-	log.Error("No redirect found for URL: ", url)
-	return "", errors.New("no redirect found")
 }
 
 // Separate function for easier testability
