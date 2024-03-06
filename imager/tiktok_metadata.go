@@ -26,6 +26,8 @@ type TiktokData struct {
 	AuthorUniqueID  string `json:"author_unique_id"`
 	EmbedProductID  string `json:"embed_product_id"`
 	EmbedType       string `json:"embed_type"`
+	Message         string `json:"message,omitempty"`
+	Code            int    `json:"code,omitempty"`
 }
 
 var client = &http.Client{
@@ -91,6 +93,10 @@ func getTiktokUsername(filename string) (string, error) {
 			log.Error("Cannot decode json: ")
 			resp.Body.Close()
 			return "", err
+		}
+		if data.Code != 0 {
+			resp.Body.Close()
+			return "", errors.New("tiktok video not found")
 		}
 		resp.Body.Close()
 		return data.AuthorUniqueID, nil
