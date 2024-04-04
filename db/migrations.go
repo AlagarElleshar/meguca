@@ -185,7 +185,7 @@ var migrations = []func(tx *sql.Tx) error{
 			`ALTER TABLE images
 				ADD COLUMN Title varchar(100) not null default '',
 				ADD COLUMN Artist varchar(100) not null default ''
-				ADD COLUMN codec codec varchar(16)`,
+				ADD COLUMN codec varchar(16)`,
 		)
 		return
 	},
