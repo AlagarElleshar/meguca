@@ -43,7 +43,7 @@ func parseCommand(
 	isSlut *bool,
 	isDead *bool,
 ) (
-	com common.Command, err error,
+	com common.Command, prompt *string, err error,
 ) {
 	boardConfig := config.GetBoardConfigs(board)
 
@@ -164,6 +164,12 @@ func parseCommand(
 	default:
 		matchStr := string(match)
 
+		if strings.HasPrefix(matchStr, "claude ") {
+			prompt_substring := matchStr[7:]
+			prompt = &prompt_substring
+			return
+		}
+
 		// Synchronized time counter
 		if strings.HasPrefix(matchStr, "sw") {
 			com.Type = common.SyncWatch
@@ -177,6 +183,10 @@ func parseCommand(
 	}
 
 	return
+}
+
+func handleClaude(prompt []byte) {
+
 }
 
 func isNumError(err error) bool {

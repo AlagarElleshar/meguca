@@ -201,7 +201,8 @@ func (c *Client) closePost() (err error) {
 		com   []common.Command
 	)
 	if c.post.len != 0 {
-		links, com, err = parser.ParseBody(c.post.body, c.post.board, c.post.op,
+		var prompt *string
+		links, com, prompt, err = parser.ParseBody(c.post.body, c.post.board, c.post.op,
 			c.post.id, c.ip, false)
 		if err != nil {
 			return
@@ -359,6 +360,8 @@ func encodeSpliceMessage(res spliceMessage) (msg []byte, err error) {
 	msg = append(msg, uint8(common.MessageSplice))
 	return msg, nil
 }
+
+func encodeClaudeAppend(id uint64)
 
 func decodeSpliceMessage(data []byte, s *spliceRequest) {
 	//Read two uints, then read the rest of the message as a string

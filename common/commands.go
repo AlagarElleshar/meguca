@@ -3,6 +3,7 @@ package common
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/bakape/meguca/websockets"
 	"strconv"
 )
 
@@ -32,6 +33,8 @@ const (
 
 	// Autobahn - self ban. brum brum
 	Autobahn
+
+	Claude
 )
 
 // Command contains the type and value array of hash commands, such as dice
@@ -42,6 +45,7 @@ const (
 // SyncWatch: [5]uint64
 // Pyu: uint64
 // Pcount: uint64
+// Claude: [2]string
 type Command struct {
 	Type      CommandType
 	Flip      bool
@@ -49,6 +53,7 @@ type Command struct {
 	SyncWatch [5]uint64
 	Eightball string
 	Dice      []uint16
+	Claude    websockets.ClaudeStatus
 }
 
 // MarshalJSON implements json.Marshaler
@@ -93,6 +98,9 @@ func (c Command) MarshalJSON() ([]byte, error) {
 			appendUint(uint64(v))
 		}
 		appendByte(']')
+	case Claude:
+		claudeArr, _ := json.Marshal(c.Claude)
+		b = append(b, claudeArr...)
 	}
 
 	b = append(b, '}')
