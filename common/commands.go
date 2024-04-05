@@ -1,9 +1,9 @@
 package common
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/bakape/meguca/websockets"
 	"strconv"
 )
 
@@ -33,7 +33,92 @@ const (
 
 	// Autobahn - self ban. brum brum
 	Autobahn
+
+	// Claude
+	Claude
 )
+
+type ClaudeStatus uint8
+
+const (
+	// Dice is the dice roll command type
+	Waiting ClaudeStatus = iota
+	Generating
+	Done
+	Error
+
+	// Flip is the coin flip command type
+)
+
+type ClaudeState struct {
+	Status   ClaudeStatus
+	Prompt   string
+	Response bytes.Buffer
+}
+
+func (s ClaudeState) MarshalJSON() ([]byte, error) {
+	var b bytes.Buffer
+	b.WriteString(`{"Status":"`)
+	b.WriteString(s.getStatusString())
+	b.WriteString(`","Prompt":`)
+	b.Write(jsonEscape(s.Prompt))
+	b.WriteString(`,"Response":`)
+	b.Write(jsonEscape(s.Response.String()))
+	b.WriteByte('}')
+	return b.Bytes(), nil
+}
+
+func (s *ClaudeState) UnmarshalJSON(data []byte) error {
+	var temp struct {
+		Status   string `json:"Status"`
+		Prompt   string `json:"Prompt"`
+		Response string `json:"Response"`
+	}
+
+	err := json.Unmarshal(data, &temp)
+	if err != nil {
+		return err
+	}
+
+	switch temp.Status {
+	case "waiting":
+		s.Status = Waiting
+	case "generating":
+		s.Status = Generating
+	case "done":
+		s.Status = Done
+	case "error":
+		s.Status = Error
+	default:
+		s.Status = Waiting
+	}
+
+	s.Prompt = temp.Prompt
+	s.Response.Reset()
+	s.Response.WriteString(temp.Response)
+
+	return nil
+}
+
+func (s ClaudeState) getStatusString() string {
+	switch s.Status {
+	case Waiting:
+		return "waiting"
+	case Generating:
+		return "generating"
+	case Done:
+		return "done"
+	case Error:
+		return "error"
+	default:
+		return "unknown"
+	}
+}
+
+func jsonEscape(str string) []byte {
+	b, _ := json.Marshal(str)
+	return b
+}
 
 // Command contains the type and value array of hash commands, such as dice
 // rolls, #flip, #8ball, etc. The Val field depends on the Type field.
@@ -50,7 +135,7 @@ type Command struct {
 	SyncWatch [5]uint64
 	Eightball string
 	Dice      []uint16
-	Claude    *websockets.ClaudeState
+	Claude    *ClaudeState
 }
 
 // MarshalJSON implements json.Marshaler
