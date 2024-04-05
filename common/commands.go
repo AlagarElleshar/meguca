@@ -181,7 +181,7 @@ func (c Command) MarshalJSON() ([]byte, error) {
 		}
 		appendByte(']')
 	case Claude:
-		claudeData, _ := json.Marshal(Claude)
+		claudeData, _ := json.Marshal(*c.Claude)
 		b = append(b, claudeData...)
 	}
 
@@ -224,6 +224,9 @@ func (c *Command) UnmarshalJSON(data []byte) error {
 		err = json.Unmarshal(data, &c.Dice)
 	case Autobahn:
 		c.Type = Autobahn
+	case Claude:
+		c.Type = Claude
+		err = json.Unmarshal(data, &c.Claude)
 	default:
 		return fmt.Errorf("unknown command type: %d", typ)
 	}
