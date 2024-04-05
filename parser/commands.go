@@ -6,15 +6,14 @@ import (
 	"bytes"
 	"crypto/rand"
 	"database/sql"
+	"github.com/bakape/meguca/common"
+	"github.com/bakape/meguca/config"
+	"github.com/bakape/meguca/db"
 	"math/big"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/bakape/meguca/common"
-	"github.com/bakape/meguca/config"
-	"github.com/bakape/meguca/db"
 )
 
 var (
@@ -163,6 +162,18 @@ func parseCommand(
 
 	default:
 		matchStr := string(match)
+
+		if strings.HasPrefix(matchStr, "claude ") {
+			prompt_substring := matchStr[7:]
+			claudeState := common.ClaudeState{
+				common.Waiting,
+				prompt_substring,
+				bytes.Buffer{},
+			}
+			com.Type = common.Claude
+			com.Claude = &claudeState
+			return
+		}
 
 		// Synchronized time counter
 		if strings.HasPrefix(matchStr, "sw") {
