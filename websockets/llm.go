@@ -4,27 +4,32 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
-	"fmt"
+	"github.com/bakape/meguca/common"
 	"github.com/bakape/meguca/config"
 	"io"
 	"net/http"
 )
 
-func streamMessages(model string, systemPrompt string, maxTokens int, message string, callback func(string)) error {
+const (
+	Claude3Opus   = "claude-3-opus-20240229"
+	Claude3Sonnet = "claude-3-sonnet-20240229"
+	Claude3Haiku  = "claude-3-haiku-20240307"
+)
+
+func StreamMessages(model string, systemPrompt string, maxTokens int, claudeState *common.ClaudeState, start func(), token func(), done func()) error {
 	apiKey := config.Server.AnthropicApiKey
 
 	url := "https://api.anthropic.com/v1/messages"
 
 	body := requestData{
 		model,
-		[]messageParam{messageParam{"user", message}},
+		[]messageParam{messageParam{"user", claudeState.Prompt}},
 		maxTokens,
 		true,
 		systemPrompt,
 	}
 
 	jsonBody, err := json.Marshal(body)
-	fmt.Println(string(jsonBody))
 	if err != nil {
 		return err
 	}
@@ -67,17 +72,26 @@ func streamMessages(model string, systemPrompt string, maxTokens int, message st
 		}
 
 		eventType := parts[0]
-		if !bytes.Equal(eventType, []byte("data")) {
+		if bytes.Equal(eventType, []byte("event")) {
+			eventVal := parts[1]
+			if bytes.Equal(eventVal, []byte("content_block_start")) {
+				start()
+			} else if bytes.Equal(eventVal, []byte("content_block_stop")) {
+				done()
+			}
 			continue
 		}
-
-		var event contentBlockDeltaEvent
-		err = json.Unmarshal(parts[1], &event)
-		if err != nil {
-			return err
+		if bytes.Equal(eventType, []byte("data")) {
+			var event contentBlockDeltaEvent
+			err = json.Unmarshal(parts[1], &event)
+			if event.Type == "content_block_delta" {
+				claudeState.Response.WriteString(event.Delta.Text)
+			}
+			if err != nil {
+				return err
+			}
 		}
 
-		callback(event.Delta.Text)
 	}
 
 	return nil
