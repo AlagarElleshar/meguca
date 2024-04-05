@@ -25,8 +25,6 @@ const (
 	MessageModeratePost
 	MessageStoleImageFrom
 	MessageStoleImageTo
-	MessageClaudeSet
-	MessageClaudeAppend
 )
 
 // >= 30 are miscellaneous and do not write to post models

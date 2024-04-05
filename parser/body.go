@@ -29,7 +29,7 @@ func ParseBody(
 	ip string,
 	internal bool,
 ) (
-	links []common.Link, com []common.Command, prompt *string, err error,
+	links []common.Link, com []common.Command, err error,
 ) {
 	err = IsPrintableString(string(body), true)
 	if err != nil {
@@ -104,7 +104,7 @@ func ParseBody(
 				goto next
 			}
 			var c common.Command
-			c, prompt, err = parseCommand(m[1], board, thread, id, ip, &isSlut, &isDead)
+			c, err = parseCommand(m[1], board, thread, id, ip, &isSlut, &isDead)
 			switch err {
 			case nil:
 				com = append(com, c)
