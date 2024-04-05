@@ -1,5 +1,5 @@
 import { Post } from "./model"
-import { fileTypes, isExpandable } from "../common"
+import {fileTypes, ImageData, isCuck, isExpandable} from "../common"
 import { View } from "../base"
 import {
 	setAttrs, on, trigger, firstChild, importTemplate, escape, pad, makeEl,
@@ -106,38 +106,6 @@ export default class ImageHandler extends View<Post> {
 		})
 	}
 
-	private getTokID(filename: string): string | null {
-		const now = new Date();
-		// 7 days in the future
-		const maxTokID = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).getTime() / 1000 * Math.pow(2, 32);
-		// 2016-08-01 in tiktok timestamp
-		const minTokID = 6313705004335104000;
-
-		function isValidTokID(digits) {
-			const numDigits = digits.length
-			if(numDigits < 19 || numDigits > 20){
-				return false
-			}
-			const tokID = parseInt(digits, 10);
-			return tokID > minTokID && tokID < maxTokID;
-		}
-
-		let digits = '';
-		for (const c of filename) {
-			if (c >= '0' && c <= '9') {
-				digits += c;
-			} else {
-				if(isValidTokID(digits)){
-					return digits;
-				}
-				digits = '';
-			}
-		}
-		if(isValidTokID(digits)){
-			return digits;
-		}
-		return null;
-	}
 	public renderSource(id: string, el : Element, postingTime: Element){
 		let matches = el.getElementsByClassName("sourcelink")
 		if(matches.length > 0) {
@@ -247,8 +215,7 @@ export default class ImageHandler extends View<Post> {
 				mediaMetadataString += `[${data.title}]`;
 			}
 			el.querySelector(".media-metadata").textContent = mediaMetadataString;
-			let tokID = this.getTokID(data.name);
-			console.log(tokID);
+			let tokID = getTokID(data.name);
 			if(tokID != null){
 				this.renderSource(tokID,el,postingTime)
 			}
@@ -492,7 +459,7 @@ export default class ImageHandler extends View<Post> {
 			case fileTypes.webm:
 				const video = document.createElement("video")
 				setAttrs(video, {
-					src,
+					src: getPlayableImageSrc(img),
 					class: cls,
 					autoplay: "",
 					controls: "",
@@ -602,6 +569,48 @@ export function toggleExpandAll() {
 		} else {
 			post.view.contractImage(null, false)
 		}
+	}
+}
+
+export function getTokID(filename: string): string | null {
+    const now = new Date();
+    // 7 days in the future
+    const maxTokID = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).getTime() / 1000 * Math.pow(2, 32);
+    // 2016-08-01 in tiktok timestamp
+    const minTokID = 6313705004335104000;
+
+    function isValidTokID(digits) {
+        const numDigits = digits.length
+        if (numDigits < 19 || numDigits > 20) {
+            return false
+        }
+        const tokID = parseInt(digits, 10);
+        return tokID > minTokID && tokID < maxTokID;
+    }
+
+    let digits = '';
+    for (const c of filename) {
+        if (c >= '0' && c <= '9') {
+            digits += c;
+        } else {
+            if (isValidTokID(digits)) {
+                return digits;
+            }
+            digits = '';
+        }
+    }
+    if (isValidTokID(digits)) {
+        return digits;
+    }
+    return null;
+}
+
+export function getPlayableImageSrc(image: ImageData): string {
+	const tokID = getTokID(image.name)
+	if (isCuck && image.codec === "hevc" && tokID != null) {
+		return `https://tikwm.com/video/media/play/${tokID}.mp4`
+	} else {
+		return sourcePath(image.sha1, image.file_type)
 	}
 }
 
