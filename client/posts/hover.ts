@@ -6,9 +6,9 @@ import {
 	setAttrs, getClosestID, fetchJSON, hook, emitChanges, ChangeEmitter
 } from "../util"
 import { Post } from "./model"
-import ImageHandler, { sourcePath } from "./images"
+import ImageHandler, {getPlayableImageSrc} from "./images"
 import PostView from "./view"
-import { PostData, fileTypes, isExpandable } from "../common"
+import {PostData, fileTypes, isExpandable} from "../common"
 
 interface MouseMove extends ChangeEmitter {
 	event: MouseEvent
@@ -215,7 +215,7 @@ function renderImagePreview(event: MouseEvent) {
 
 	const el = document.createElement(tag)
 	setAttrs(el, {
-		src: sourcePath(post.image.sha1, post.image.file_type),
+		src: getPlayableImageSrc(post.image),
 	});
 	if (tag === 'video') {
 		setAttrs(el, {
