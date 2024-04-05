@@ -88,9 +88,10 @@ var (
 // Common Regex expressions
 var (
 	CommandRegexp = regexp.MustCompile(
-		`^#(flip|\d*d\d+|8ball|pyu|claude .+?|pcount|sw(?:\d+:)?\d+:\d+(?:[+-]\d+)?|autobahn)$`,
+		`^#(flip|\d*d\d+|8ball|pyu|pcount|sw(?:\d+:)?\d+:\d+(?:[+-]\d+)?|autobahn)$`,
 	)
-	DiceRegexp = regexp.MustCompile(`(\d*)d(\d+)`)
+	DiceRegexp   = regexp.MustCompile(`(\d*)d(\d+)`)
+	ClaudeRegexp = regexp.MustCompile(`^#claude (.+?)$`)
 )
 
 func init() {
