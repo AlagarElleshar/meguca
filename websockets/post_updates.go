@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/go-playground/log"
 	"math"
 	"unicode/utf8"
 
@@ -247,6 +248,27 @@ func (c *Client) closePost() (err error) {
 		}
 	}
 	err = db.ClosePost(c.post.id, c.post.op, string(c.post.body), links, com)
+	log.Info("Close Post!")
+	var claude *common.ClaudeState = nil
+	for i, _ := range com {
+		if com[i].Type == common.Claude {
+			claude = com[i].Claude
+		}
+	}
+	if claude != nil {
+		txt, _ := json.Marshal(*claude)
+		log.Info("Claude called with data: %s", string(txt))
+		go StreamMessages(Claude3Haiku, "", 255, claude,
+			func() {
+				log.Info("Starting!")
+			},
+			func() {
+				log.Info("New token!")
+			},
+			func() {
+				log.Info("Done with prompt: %s", claude.Response.String())
+			})
+	}
 	if err != nil {
 		return
 	}

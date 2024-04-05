@@ -9,6 +9,7 @@ import (
 	"github.com/bakape/meguca/common"
 	"github.com/bakape/meguca/config"
 	"github.com/bakape/meguca/db"
+	"github.com/go-playground/log"
 	"math/big"
 	"regexp"
 	"strconv"
@@ -45,6 +46,7 @@ func parseCommand(
 	com common.Command, err error,
 ) {
 	boardConfig := config.GetBoardConfigs(board)
+	log.Info("match: ", string(match))
 
 	switch {
 
@@ -162,18 +164,6 @@ func parseCommand(
 
 	default:
 		matchStr := string(match)
-
-		if strings.HasPrefix(matchStr, "claude ") {
-			prompt_substring := matchStr[7:]
-			claudeState := common.ClaudeState{
-				common.Waiting,
-				prompt_substring,
-				bytes.Buffer{},
-			}
-			com.Type = common.Claude
-			com.Claude = &claudeState
-			return
-		}
 
 		// Synchronized time counter
 		if strings.HasPrefix(matchStr, "sw") {

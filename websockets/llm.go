@@ -86,6 +86,7 @@ func StreamMessages(model string, systemPrompt string, maxTokens int, claudeStat
 			err = json.Unmarshal(parts[1], &event)
 			if event.Type == "content_block_delta" {
 				claudeState.Response.WriteString(event.Delta.Text)
+				token()
 			}
 			if err != nil {
 				return err
