@@ -180,6 +180,9 @@ func (c Command) MarshalJSON() ([]byte, error) {
 			appendUint(uint64(v))
 		}
 		appendByte(']')
+	case Claude:
+		claudeData, _ := json.Marshal(Claude)
+		b = append(b, claudeData...)
 	}
 
 	b = append(b, '}')
