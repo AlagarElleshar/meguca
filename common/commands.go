@@ -3,6 +3,7 @@ package common
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/bakape/meguca/websockets"
 	"strconv"
 )
 
@@ -49,6 +50,7 @@ type Command struct {
 	SyncWatch [5]uint64
 	Eightball string
 	Dice      []uint16
+	Claude    *websockets.ClaudeState
 }
 
 // MarshalJSON implements json.Marshaler

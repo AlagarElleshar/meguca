@@ -9,5 +9,6 @@
 	},
 	"test": {
 		"database": "postgres://meguca:meguca@localhost:5432/meguca_test?sslmode=disable"
-	}
+	},
+	"anthropic_api_key" : "PLACEHOLDER"
 }

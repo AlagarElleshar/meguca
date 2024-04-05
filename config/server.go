@@ -37,6 +37,7 @@ type ServerConfigs struct {
 	Test struct {
 		Database string
 	}
+	AnthropicApiKey string `json:"anthropic_api_key"`
 }
 
 // Load configs from JSON or defaults, if none present
