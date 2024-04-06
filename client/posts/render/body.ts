@@ -505,7 +505,7 @@ function parseURL(bit: string): string {
             bit = escape(bit)
             return bit.link(bit)
         }
-        if(bit.endsWith("_or4.flv")){
+        if(bit.endsWith(".flv")){
             let link = newTabLink(bit, bit)
             let attrs = {
                 type : "button",

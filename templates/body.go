@@ -541,7 +541,7 @@ func (c *bodyContext) parseURL(bit string) {
 		c.string(`">`)
 		c.string(s)
 		c.string(`</a>`)
-	case strings.HasSuffix(s, "_or4.flv"):
+	case strings.HasSuffix(s, ".flv"):
 		c.newTabLink(s, s)
 		attrs := map[string]string{
 			"type":          "button",
