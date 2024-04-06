@@ -206,7 +206,7 @@ func (c *Client) closePost() (err error) {
 		if err != nil {
 			return
 		}
-		if c.post.board == "a" && len(links) != 0 &&
+		if len(links) != 0 &&
 			bytes.Contains(c.post.body, []byte("#steal")) {
 			var (
 				from = links[len(links)-1].ID
