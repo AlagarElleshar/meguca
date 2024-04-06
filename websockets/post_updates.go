@@ -376,12 +376,13 @@ func (c *Client) spliceText(data []byte) error {
 
 func encodeSpliceMessage(res spliceMessage) (msg []byte, err error) {
 	//encode res.text to []byte
-	msg = make([]byte, 12)
+	size := 13 + len(res.Text)
+	msg = make([]byte, size)
 	putPostIDToMsg(msg, res.ID)
 	binary.LittleEndian.PutUint16(msg[8:], res.Start)
 	binary.LittleEndian.PutUint16(msg[10:], res.Len)
-	msg = append(msg, res.Text...)
-	msg = append(msg, uint8(common.MessageSplice))
+	copy(msg[12:], res.Text)
+	msg[size-1] = uint8(common.MessageSplice)
 	return msg, nil
 }
 
