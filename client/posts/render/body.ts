@@ -44,10 +44,12 @@ export default function renderBody(data: PostData): string {
         }
 
         state.successive_newlines = 0
-        if (l.matchAll(RegExp(`^#claude \\S(.*?)$`)) && !claudeAdded) {
+        if(data.id == 67){
+            console.log("break")
+        }
+        if (/#claude\s\S.*/.test(l) && !claudeAdded) {
             html += "<b>#claude </b>"
             html += l.substring(8)
-            // let com = data.commands.find((c) => c.type == commandType.claude)
             let com = data.commands?.find(
                 (command) => command.type === commandType.claude
             )

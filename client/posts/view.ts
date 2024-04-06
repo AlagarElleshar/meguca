@@ -221,9 +221,7 @@ export default class PostView extends ImageHandler {
     // Close an open post and clean up
     public closePost() {
         // Check for Claude messages
-        const claudeExists = this.model.body.match("^#claude \\S.*?$")
-        console.log(claudeExists)
-        console.log(this.model.commands)
+        const claudeExists = this.model.body.match(/^#claude \S.*?$/)
         if (!claudeExists) {
             this.setEditing(false);
         }
