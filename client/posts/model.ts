@@ -237,10 +237,14 @@ export class Post extends Model implements PostData {
 		this.view.claudeAppend(s)
 	}
 
-	public claudeDone() {
+	public claudeDone(response: string) {
 		let com = this.commands.find((c) => c.type == commandType.claude)
 		com.val.Status = "done"
-		this.view.claudeDone()
+		if(com.val.response !== response) {
+			com.val.response = response
+			this.view.claudeDone(response)
+		}
+		this.view.claudeDone(null)
 	}
 
 	public applyModeration(entry: ModerationEntry) {

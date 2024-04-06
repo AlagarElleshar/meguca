@@ -343,10 +343,11 @@ func (f *Feed) SendClaudeToken(id uint64, token string) {
 	message[messageSize-1] = uint8(common.MessageClaudeAppend)
 	f.claudeMessage <- message
 }
-func (f *Feed) SendClaudeComplete(id uint64) {
-	messageSize := 9
+func (f *Feed) SendClaudeComplete(id uint64, response string) {
+	messageSize := 9 + len(response)
 	message := make([]byte, messageSize)
 	binary.LittleEndian.PutUint64(message, math.Float64bits(float64(id)))
+	copy(message[8:], response)
 	message[messageSize-1] = uint8(common.MessageClaudeDone)
 	f.claudeMessage <- message
 }

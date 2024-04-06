@@ -268,7 +268,7 @@ func (c *Client) closePost() (err error) {
 				feed.SendClaudeToken(id, token)
 			},
 			func() {
-				feed.SendClaudeComplete(id)
+				feed.SendClaudeComplete(id, claude.Response.String())
 				_ = db.UpdateCommands(id, com)
 			})
 	}

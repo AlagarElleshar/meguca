@@ -85,8 +85,6 @@ func StreamMessages(model string, systemPrompt string, maxTokens int, claudeStat
 				start()
 			} else if bytes.Equal(eventVal, []byte("content_block_stop")) {
 				claudeState.Status = common.Done
-				txt, _ := json.Marshal(claudeState)
-				log.Info("Claude state llm: ", string(txt))
 				done()
 			}
 			continue

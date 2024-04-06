@@ -420,7 +420,10 @@ export default class PostView extends ImageHandler {
         this.#claudeResponse.append(s)
     }
 
-    claudeDone() {
+    claudeDone(response: string|null) {
+        if(response != null){
+            this.#claudeResponse.innerText = response
+        }
         this.setEditing(false)
     }
 }

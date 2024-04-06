@@ -190,9 +190,10 @@ export default () => {
 	handlers[message.claudeDone] = (message: ArrayBuffer) => {
 		const view = new DataView(message);
 		let id = view.getFloat64(0, true);
+		let response = decoder.decode(message.slice(8));
 		if(debug)
 			console.log(`>binary claude done: ${id}`)
-		handle(id,(m) => m.claudeDone())
+		handle(id,(m) => m.claudeDone(response))
 	}
 
 	interface StolenImage {
