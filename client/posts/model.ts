@@ -1,15 +1,22 @@
-import { Model } from '../base'
-import { extend } from '../util'
+import {Model} from '../base'
+import {extend} from '../util'
 import Collection from './collection'
 import PostView from './view'
-import { SpliceResponse } from '../client'
-import { mine, seenPosts, storeSeenPost, posts, hidden } from "../state"
-import { notifyAboutReply } from "../ui"
+import {SpliceResponse} from '../client'
+import {hidden, mine, posts, seenPosts, storeSeenPost} from "../state"
+import {notifyAboutReply} from "../ui"
 import {
-	PostData, TextState, PostLink, Command, ImageData,
-	ModerationEntry, ModerationAction, ModerationLevel,
+	Command,
+	commandType,
+	ImageData,
+	ModerationAction,
+	ModerationEntry,
+	ModerationLevel,
+	PostData,
+	PostLink,
+	TextState,
 } from "../common"
-import { hideRecursively } from "./hide"
+import {hideRecursively} from "./hide"
 import options from "../options"
 
 // Generic post model
@@ -222,6 +229,18 @@ export class Post extends Model implements PostData {
 	public closePost() {
 		this.editing = false
 		this.view.closePost()
+	}
+
+	public claudeAppend(s: string) {
+		let com = this.commands.find((c) => c.type == commandType.claude)
+		com.val.response += s
+		this.view.claudeAppend(s)
+	}
+
+	public claudeDone() {
+		let com = this.commands.find((c) => c.type == commandType.claude)
+		com.val.Status = "done"
+		this.view.claudeDone()
 	}
 
 	public applyModeration(entry: ModerationEntry) {

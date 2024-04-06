@@ -179,6 +179,21 @@ export default () => {
 				decrementImageCount();
 			}
 		})
+	handlers[message.claudeAppend] = (message: ArrayBuffer) => {
+		const view = new DataView(message);
+		let id = view.getFloat64(0, true);
+		let append = decoder.decode(message.slice(8));
+		if(debug)
+			console.log(`>binary claude append: ${id} ${append}`)
+		handle(id,(m) => m.claudeAppend(append))
+	}
+	handlers[message.claudeDone] = (message: ArrayBuffer) => {
+		const view = new DataView(message);
+		let id = view.getFloat64(0, true);
+		if(debug)
+			console.log(`>binary claude done: ${id}`)
+		handle(id,(m) => m.claudeDone())
+	}
 
 	interface StolenImage {
 		id: number;

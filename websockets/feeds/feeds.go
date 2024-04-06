@@ -54,6 +54,7 @@ func addToFeed(id uint64, board string, c common.Client) (
 				insertImage:      make(chan imageInsertionMessage),
 				updateBodyBinary: make(chan message),
 				messageBuffer:    make([]string, 0, 64),
+				claudeMessage:    make(chan []byte),
 			}
 
 			feed.baseFeed.init()

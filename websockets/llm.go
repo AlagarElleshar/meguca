@@ -6,17 +6,21 @@ import (
 	"encoding/json"
 	"github.com/bakape/meguca/common"
 	"github.com/bakape/meguca/config"
+	"github.com/go-playground/log"
 	"io"
 	"net/http"
 )
 
 const (
-	Claude3Opus   = "claude-3-opus-20240229"
-	Claude3Sonnet = "claude-3-sonnet-20240229"
-	Claude3Haiku  = "claude-3-haiku-20240307"
+	Claude3Opus         = "claude-3-opus-20240229"
+	Claude3Sonnet       = "claude-3-sonnet-20240229"
+	Claude3Haiku        = "claude-3-haiku-20240307"
+	DefaultSystemPrompt = `You are an AI assistant designed to provide concise and helpful responses to user questions on an online chatroom. 
+Your role is to assist users by answering their queries directly and succinctly, keeping in mind the fast-paced nature of the platform.
+You will keep your responses extremely concise. The shorter the better.`
 )
 
-func StreamMessages(model string, systemPrompt string, maxTokens int, claudeState *common.ClaudeState, start func(), token func(), done func()) error {
+func StreamMessages(model string, systemPrompt string, maxTokens int, claudeState *common.ClaudeState, start func(), token func(string), done func()) error {
 	apiKey := config.Server.AnthropicApiKey
 
 	url := "https://api.anthropic.com/v1/messages"
@@ -33,6 +37,7 @@ func StreamMessages(model string, systemPrompt string, maxTokens int, claudeStat
 	if err != nil {
 		return err
 	}
+	log.Info("Json body: ", string(jsonBody))
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonBody))
 	if err != nil {
@@ -54,6 +59,7 @@ func StreamMessages(model string, systemPrompt string, maxTokens int, claudeStat
 
 	for {
 		line, err := reader.ReadBytes('\n')
+		log.Info("Line: ", string(line))
 		if err != nil {
 			if err == io.EOF {
 				break
@@ -75,8 +81,12 @@ func StreamMessages(model string, systemPrompt string, maxTokens int, claudeStat
 		if bytes.Equal(eventType, []byte("event")) {
 			eventVal := parts[1]
 			if bytes.Equal(eventVal, []byte("content_block_start")) {
+				claudeState.Status = common.Generating
 				start()
 			} else if bytes.Equal(eventVal, []byte("content_block_stop")) {
+				claudeState.Status = common.Done
+				txt, _ := json.Marshal(claudeState)
+				log.Info("Claude state llm: ", string(txt))
 				done()
 			}
 			continue
@@ -86,7 +96,7 @@ func StreamMessages(model string, systemPrompt string, maxTokens int, claudeStat
 			err = json.Unmarshal(parts[1], &event)
 			if event.Type == "content_block_delta" {
 				claudeState.Response.WriteString(event.Delta.Text)
-				token()
+				token(event.Delta.Text)
 			}
 			if err != nil {
 				return err
@@ -103,7 +113,7 @@ type requestData struct {
 	Messages     []messageParam `json:"messages"`
 	MaxTokens    int            `json:"max_tokens"`
 	Stream       bool           `json:"stream"`
-	SystemPrompt string         `json:"system_prompt,omitempty"`
+	SystemPrompt string         `json:"system,omitempty"`
 }
 
 type contentBlock struct {

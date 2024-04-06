@@ -258,15 +258,18 @@ func (c *Client) closePost() (err error) {
 	if claude != nil {
 		txt, _ := json.Marshal(*claude)
 		log.Info("Claude called with data: %s", string(txt))
-		go StreamMessages(Claude3Haiku, "", 255, claude,
+		id := c.post.id
+		feed := c.feed
+		go StreamMessages(Claude3Haiku, DefaultSystemPrompt, 255, claude,
 			func() {
-				log.Info("Starting!")
+			},
+			func(token string) {
+				log.Info("Token: ", token)
+				feed.SendClaudeToken(id, token)
 			},
 			func() {
-				log.Info("New token!")
-			},
-			func() {
-				log.Info("Done with prompt: %s", claude.Response.String())
+				feed.SendClaudeComplete(id)
+				_ = db.UpdateCommands(id, com)
 			})
 	}
 	if err != nil {

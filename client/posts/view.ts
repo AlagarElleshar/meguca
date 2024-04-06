@@ -1,23 +1,22 @@
-import { Post } from './model'
-import {
-    makeFrag, importTemplate, getID, escape, firstChild, pad, on
-} from '../util'
-import { parseBody, relativeTime, renderPostLink } from './render'
+import {Post} from './model'
+import {escape, firstChild, getID, importTemplate, makeFrag, on, pad} from '../util'
+import {parseBody, renderPostLink} from './render'
 import ImageHandler from "./images"
-import { ViewAttrs } from "../base"
-import { findSyncwatches } from "./syncwatch"
+import {ViewAttrs} from "../base"
+import {findSyncwatches} from "./syncwatch"
 import lang from "../lang"
-import { page, mine, posts } from "../state"
+import {mine, page, posts} from "../state"
 import options from "../options"
 import countries from "./countries"
 import {relativeTimeAbbreviated, secondsToTime} from "../util/time"
-import { ModerationAction } from '../common';
+import {commandType, ModerationAction} from '../common';
 
 
 const modLevelStrings = ["", "janitors", "moderators", "owners", "admin"];
 
 // Base post view class
 export default class PostView extends ImageHandler {
+    #claudeResponse: HTMLElement | null;
     constructor(model: Post, el: HTMLElement | null) {
         const attrs: ViewAttrs = { model }
         if (el) {
@@ -54,6 +53,7 @@ export default class PostView extends ImageHandler {
             // Localize moderation log
             this.renderModerationLog();
         }
+        this.#claudeResponse = null
     }
 
     // Render the element contents, but don't insert it into the DOM
@@ -220,9 +220,17 @@ export default class PostView extends ImageHandler {
 
     // Close an open post and clean up
     public closePost() {
-        this.setEditing(false)
-        this.reparseBody()
+        // Check for Claude messages
+        const claudeExists = this.model.body.match("^#claude \\S.*?$")
+        console.log(claudeExists)
+        console.log(this.model.commands)
+        if (!claudeExists) {
+            this.setEditing(false);
+        }
+
+        this.reparseBody();
     }
+
 
     // Stop post from displaying
     public hide() {
@@ -402,6 +410,20 @@ export default class PostView extends ImageHandler {
 
         // This post should be last or no posts in thread
         sec.append(this.el)
+    }
+
+    claudeAppend(s: string) {
+        if(this.#claudeResponse == null){
+            this.#claudeResponse = this.el.querySelector(".claude-response")
+        }
+        if(this.#claudeResponse.hidden){
+            this.#claudeResponse.hidden = false
+        }
+        this.#claudeResponse.append(s)
+    }
+
+    claudeDone() {
+        this.setEditing(false)
     }
 }
 

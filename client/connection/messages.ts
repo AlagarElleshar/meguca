@@ -13,6 +13,8 @@ export const enum message {
 	moderatePost,
 	stoleImageFrom,
 	stoleImageTo,
+	claudeAppend,
+	claudeDone,
 
 	// >= 30 are miscellaneous and do not write to post models
 	synchronise = 30,

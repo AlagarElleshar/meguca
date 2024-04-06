@@ -1,6 +1,8 @@
 package feeds
 
 import (
+	"encoding/binary"
+	"math"
 	"time"
 
 	"github.com/bakape/meguca/common"
@@ -67,6 +69,8 @@ type Feed struct {
 	moderatePost chan moderationMessage
 	// Let sent sync counter
 	lastSyncCount syncCount
+	// Let sent sync counter
+	claudeMessage chan []byte
 	// set of queued post IDs
 	queuedPosts map[uint64]struct{}
 	// queued append body messages
@@ -182,6 +186,8 @@ func (f *Feed) Start() (err error) {
 				f.modifyPost(msg, func(p *cachedPost) {
 					p.Closed = true
 				})
+			case msg := <-f.claudeMessage:
+				f.sendToAllBinary(msg)
 
 			// Posts being moderated
 			case msg := <-f.moderatePost:
@@ -327,4 +333,20 @@ func (f *Feed) UpdateBody(id uint64, body string, msg []byte) {
 		},
 		body: body,
 	}
+}
+
+func (f *Feed) SendClaudeToken(id uint64, token string) {
+	messageSize := 9 + len(token)
+	message := make([]byte, messageSize)
+	binary.LittleEndian.PutUint64(message, math.Float64bits(float64(id)))
+	copy(message[8:], token)
+	message[messageSize-1] = uint8(common.MessageClaudeAppend)
+	f.claudeMessage <- message
+}
+func (f *Feed) SendClaudeComplete(id uint64) {
+	messageSize := 9
+	message := make([]byte, messageSize)
+	binary.LittleEndian.PutUint64(message, math.Float64bits(float64(id)))
+	message[messageSize-1] = uint8(common.MessageClaudeDone)
+	f.claudeMessage <- message
 }

@@ -41,3 +41,17 @@ func ClosePost(id, op uint64, body string, links []common.Link,
 
 	return deleteOpenPostBody(id)
 }
+
+func UpdateCommands(id uint64, com []common.Command) (err error) {
+	err = InTransaction(false, func(tx *sql.Tx) (err error) {
+		_, err = sq.Update("posts").
+			SetMap(map[string]interface{}{
+				"commands": commandRow(com),
+			}).
+			Where("id = ?", id).
+			RunWith(tx).
+			Exec()
+		return
+	})
+	return
+}

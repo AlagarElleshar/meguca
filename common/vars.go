@@ -91,7 +91,7 @@ var (
 		`^#(flip|\d*d\d+|8ball|pyu|pcount|sw(?:\d+:)?\d+:\d+(?:[+-]\d+)?|autobahn)$`,
 	)
 	DiceRegexp   = regexp.MustCompile(`(\d*)d(\d+)`)
-	ClaudeRegexp = regexp.MustCompile(`^#claude (.+?)$`)
+	ClaudeRegexp = regexp.MustCompile(`^#claude \S(.*?)$`)
 )
 
 func init() {
