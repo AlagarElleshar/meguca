@@ -24,8 +24,7 @@ var version = len(migrations)
 var migrations = []func(tx *sql.Tx) error{
 	func(tx *sql.Tx) (err error) {
 		// Initialize DB
-
-		queries := []string{
+		err = execAll(tx,
 			`create table accounts (
 				id varchar(20) primary key,
 				password bytea not null
@@ -122,14 +121,9 @@ var migrations = []func(tx *sql.Tx) error{
 			`create index image on posts (sha1)`,
 			`create index editing on posts (editing)`,
 			`create index ip on posts (ip)`,
-		}
-		for i, query := range queries {
-			_, err := tx.Exec(query)
-			if err != nil {
-				fmt.Printf("Error executing query %d: %v\n", i+1, err)
-				println(query)
-				return err
-			}
+		)
+		if err != nil {
+			return
 		}
 
 		data, err := json.Marshal(config.Defaults)
