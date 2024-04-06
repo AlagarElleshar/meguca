@@ -309,39 +309,39 @@ export const specs: { [id: string]: OptionSpec } = {
 		type: optionType.none,
 		exec: toggleHeadStyle(
 			"gallery",
-			`#threads article:not(.media),
-			.fileinfo,
-			blockquote,
-			.backlinks,
-			header > :not(nav) {
+			`#threads article:not(.reply-form):not(.media),
+			article:not(.reply-form) .fileinfo,
+			article:not(.reply-form) blockquote,
+			article:not(.reply-form) .backlinks,
+			article:not(.reply-form) header > :not(nav) {
 				display: none!important;
 			}
-			header {
+			article:not(.reply-form) header {
 				text-align: center;
 			}
 			#thread-container, article:not(.reply-form) {
 				display: inline-table;
 			}
-			.post-container {
+			article:not(.reply-form) .post-container {
 				display: flex;
 				min-width: initial;
 			}
-			figure {
+			article:not(.reply-form) figure {
 				margin: 0;
 				margin-left: auto;
 				margin-right: auto;
 			}
-			figcaption {
+			article:not(.reply-form) figcaption {
 				text-align: center;
 			}
-			article {
+			article:not(.reply-form) {
 				padding: 0;
 				width: fit-content;
 			}
-			article.media {
+			article:not(.reply-form).media {
 				min-width: 0;
 			}
-			.post-moderation, .filename-link, header .control, .media-metadata {
+			article:not(.reply-form) .post-moderation, article:not(.reply-form) .filename-link, article:not(.reply-form) header .control, article:not(.reply-form) .media-metadata {
 				display: none;
 			}
 			`,
