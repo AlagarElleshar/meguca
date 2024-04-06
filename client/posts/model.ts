@@ -6,6 +6,7 @@ import {SpliceResponse} from '../client'
 import {hidden, mine, posts, seenPosts, storeSeenPost} from "../state"
 import {notifyAboutReply} from "../ui"
 import {
+	ClaudeState,
 	Command,
 	commandType,
 	ImageData,
@@ -50,6 +51,7 @@ export class Post extends Model implements PostData {
 	}
 	public links: PostLink[]
 	public moderation: ModerationEntry[]
+	public claude_state: ClaudeState
 
 	constructor(attrs: PostData) {
 		super()
@@ -232,16 +234,13 @@ export class Post extends Model implements PostData {
 	}
 
 	public claudeAppend(s: string) {
-		let com = this.commands.find((c) => c.type == commandType.claude)
-		com.val.response += s
+		this.claude_state.response += s
 		this.view.claudeAppend(s)
 	}
 
 	public claudeDone(response: string) {
-		let com = this.commands.find((c) => c.type == commandType.claude)
-		com.val.Status = "done"
-		if(com.val.response !== response) {
-			com.val.response = response
+		if(this.claude_state.response !== response){
+			this.claude_state.response = response
 			this.view.claudeDone(response)
 		}
 		this.view.claudeDone(null)

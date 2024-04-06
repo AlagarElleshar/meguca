@@ -3,8 +3,6 @@ package parser
 
 import (
 	"bytes"
-	"encoding/json"
-	"github.com/go-playground/log"
 	"regexp"
 	"unicode"
 
@@ -32,7 +30,7 @@ func ParseBody(
 	ip string,
 	internal bool,
 ) (
-	links []common.Link, com []common.Command, err error,
+	links []common.Link, com []common.Command, claude *common.ClaudeState, err error,
 ) {
 	err = IsPrintableString(string(body), true)
 	if err != nil {
@@ -127,17 +125,11 @@ func ParseBody(
 	// Handles claude commands
 	m := common.ClaudeRegexp.FindSubmatch(body)
 	if m != nil {
-		claudCom := common.Command{
-			Type: common.Claude,
-			Claude: &common.ClaudeState{
-				common.Waiting,
-				string(m[1]),
-				bytes.Buffer{},
-			},
+		claude = &common.ClaudeState{
+			common.Waiting,
+			string(m[1]),
+			bytes.Buffer{},
 		}
-		txt, _ := json.Marshal(*claudCom.Claude)
-		log.Info("Claude command: ", string(txt))
-		com = append(com, claudCom)
 		return
 	}
 

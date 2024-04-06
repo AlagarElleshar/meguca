@@ -4,7 +4,7 @@ package common
 
 // ParseBody forwards parser.ParseBody to avoid cyclic imports in db/upkeep
 // TODO: Clean up this function signature
-var ParseBody func([]byte, string, uint64, uint64, string, bool) ([]Link, []Command, error)
+var ParseBody func([]byte, string, uint64, uint64, string, bool) ([]Link, []Command, *ClaudeState, error)
 
 // Board is defined to enable marshalling optimizations and sorting by sticky
 // threads
@@ -60,6 +60,7 @@ type Post struct {
 	Links      []Link            `json:"links"`
 	Commands   []Command         `json:"commands"`
 	Moderation []ModerationEntry `json:"moderation"`
+	Claude     *ClaudeState      `json:"claude_state"`
 }
 
 // Return if post has been deleted by staff

@@ -1,8 +1,10 @@
 package db
 
 import (
+	"bytes"
 	"database/sql"
 	"fmt"
+	"github.com/go-playground/log"
 	"strconv"
 
 	"github.com/Masterminds/squirrel"
@@ -21,7 +23,7 @@ const (
 		where l.source = p.id
 	),
 	p.commands, p.imageName,
-	i.*`
+	i.*,c.id as claude_id,c.state,c.prompt,c.response`
 
 	threadSelectsSQL = `t.sticky, t.board,
 	(
@@ -42,6 +44,7 @@ const (
 	from threads as t
 	inner join posts as p on t.id = p.id
 	left outer join images as i on p.SHA1 = i.SHA1
+	left outer join claude as c on p.claude_id = c.id
 	where t.id = $1`
 
 	getThreadPostsSQL = `
@@ -49,6 +52,7 @@ const (
 		select ` + postSelectsSQL + `
 		from posts as p
 		left outer join images as i on p.SHA1 = i.SHA1
+		left outer join claude as c on p.claude_id = c.id
 		where p.op = $1 and p.id != $1
 		order by p.id desc
 		limit $2
@@ -132,6 +136,47 @@ func (p postScanner) Image() (bool, string) {
 	return p.spoiler, p.imageName
 }
 
+type claudeScanner struct {
+	ID       sql.NullInt64
+	State    sql.NullString
+	Prompt   sql.NullString
+	Response sql.NullString
+}
+
+// Returns an array of pointers to the struct fields for passing to
+// sql.Scanner.Scan()
+func (c *claudeScanner) ScanArgs() []interface{} {
+	return []interface{}{
+		&c.ID,
+		&c.State,
+		&c.Prompt,
+		&c.Response,
+	}
+}
+
+// Returns the scanned *common.ClaudeState or nil, if none
+func (c *claudeScanner) Val() *common.ClaudeState {
+	if !c.ID.Valid {
+		return nil
+	}
+
+	status := common.Waiting
+	switch c.State.String {
+	case "generating":
+		status = common.Generating
+	case "done":
+		status = common.Done
+	case "error":
+		status = common.Error
+	}
+
+	return &common.ClaudeState{
+		Status:   status,
+		Prompt:   c.Prompt.String,
+		Response: *bytes.NewBufferString(c.Response.String),
+	}
+}
+
 // PostStats contains post open status, body and creation time
 type PostStats struct {
 	Editing, HasImage, Spoilered bool
@@ -171,8 +216,9 @@ func GetThread(id uint64, lastN int) (t common.Thread, err error) {
 		var (
 			post postScanner
 			img  imageScanner
+			cl   claudeScanner
 			p    common.Post
-			args = append(post.ScanArgs(), img.ScanArgs()...)
+			args = append(append(post.ScanArgs(), img.ScanArgs()...), cl.ScanArgs()...)
 		)
 		t.Posts = make([]common.Post, 0, cap)
 		for r.Next() {
@@ -180,7 +226,7 @@ func GetThread(id uint64, lastN int) (t common.Thread, err error) {
 			if err != nil {
 				return
 			}
-			p, err = extractPost(post, img)
+			p, err = extractPost(post, img, cl)
 			if err != nil {
 				return
 			}
@@ -210,16 +256,21 @@ func GetThread(id uint64, lastN int) (t common.Thread, err error) {
 		filterOpen(&open, &t.Posts[i])
 	}
 	err = injectOpenBodies(open)
+	if err != nil {
+		err = injectClaudeMessages(open)
+	}
 	return
 }
 
 func scanOP(r rowScanner) (t common.Thread, err error) {
 	var (
-		post  postScanner
-		img   imageScanner
-		pArgs = post.ScanArgs()
-		iArgs = img.ScanArgs()
-		args  = make([]interface{}, 0, 8+len(pArgs)+len(iArgs))
+		post   postScanner
+		img    imageScanner
+		claude claudeScanner
+		pArgs  = post.ScanArgs()
+		iArgs  = img.ScanArgs()
+		cArgs  = claude.ScanArgs()
+		args   = make([]interface{}, 0, 8+len(pArgs)+len(iArgs))
 	)
 	args = append(args,
 		&t.Sticky, &t.Board, &t.PostCount, &t.ImageCount, &t.UpdateTime,
@@ -227,18 +278,22 @@ func scanOP(r rowScanner) (t common.Thread, err error) {
 	)
 	args = append(args, pArgs...)
 	args = append(args, iArgs...)
+	args = append(args, cArgs...)
 
 	err = r.Scan(args...)
 	if err != nil {
 		return
 	}
 
-	t.Post, err = extractPost(post, img)
+	t.Post, err = extractPost(post, img, claude)
 	return
 }
 
-func extractPost(ps postScanner, is imageScanner) (p common.Post, err error) {
+func extractPost(ps postScanner, is imageScanner, cs claudeScanner) (p common.Post, err error) {
 	p, err = ps.Val()
+	if p.ID > 108 {
+		log.Info("Debug")
+	}
 	if err != nil {
 		return
 	}
@@ -246,26 +301,34 @@ func extractPost(ps postScanner, is imageScanner) (p common.Post, err error) {
 	if p.Image != nil {
 		p.Image.Spoiler, p.Image.Name = ps.Image()
 	}
+	p.Claude = cs.Val()
+	if p.ID > 108 {
+
+	}
 	return
 }
 
 // GetPost reads a single post from the database
 func GetPost(id uint64) (res common.StandalonePost, err error) {
 	var (
-		post  postScanner
-		img   imageScanner
-		pArgs = post.ScanArgs()
-		iArgs = img.ScanArgs()
-		args  = make([]interface{}, 2, 2+len(pArgs)+len(iArgs))
+		post   postScanner
+		img    imageScanner
+		claude claudeScanner
+		pArgs  = post.ScanArgs()
+		iArgs  = img.ScanArgs()
+		cArgs  = claude.ScanArgs()
+		args   = make([]interface{}, 2, 2+len(pArgs)+len(iArgs))
 	)
 	args[0] = &res.OP
 	args[1] = &res.Board
 	args = append(args, pArgs...)
 	args = append(args, iArgs...)
+	args = append(args, cArgs...)
 
 	err = sq.Select("p.op, p.board, "+postSelectsSQL).
 		From("posts as p").
 		LeftJoin("images as i on p.SHA1 = i.SHA1").
+		LeftJoin("claude as c on p.claude_id = c.id").
 		Where("id = ?", id).
 		QueryRow().
 		Scan(args...)
@@ -280,11 +343,21 @@ func GetPost(id uint64) (res common.StandalonePost, err error) {
 	if res.Image != nil {
 		res.Image.Spoiler, res.Image.Name = post.Image()
 	}
+	res.Claude = claude.Val()
 
 	if res.Editing {
 		res.Body, err = GetOpenBody(res.ID)
 		if err != nil {
 			return
+		}
+	}
+	if res.Claude != nil {
+		if res.Claude.Status == common.Generating {
+			resp, err := getClaude(res.ID)
+			log.Info("Claude gotten from boltdb: ", resp)
+			if err == nil {
+				res.Claude.Response.WriteString(resp)
+			}
 		}
 	}
 	if res.Moderated {
@@ -301,7 +374,8 @@ func getOPs() squirrel.SelectBuilder {
 	return sq.Select(threadSelectsSQL).
 		From("threads as t").
 		Join("posts as p on t.id = p.id").
-		LeftJoin("images as i on p.SHA1 = i.SHA1")
+		LeftJoin("images as i on p.SHA1 = i.SHA1").
+		LeftJoin("claude as c on p.claude_id = c.id")
 }
 
 // GetBoardCatalog retrieves all OPs of a single board

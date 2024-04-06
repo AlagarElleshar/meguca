@@ -56,13 +56,13 @@ type ClaudeState struct {
 	Response bytes.Buffer
 }
 
-func (s ClaudeState) MarshalJSON() ([]byte, error) {
+func (s *ClaudeState) MarshalJSON() ([]byte, error) {
 	var b bytes.Buffer
-	b.WriteString(`{"Status":"`)
-	b.WriteString(s.getStatusString())
-	b.WriteString(`","Prompt":`)
+	b.WriteString(`{"status":"`)
+	b.WriteString(s.GetStatusString())
+	b.WriteString(`","prompt":`)
 	b.Write(jsonEscape(s.Prompt))
-	b.WriteString(`,"Response":`)
+	b.WriteString(`,"response":`)
 	b.Write(jsonEscape(s.Response.String()))
 	b.WriteByte('}')
 	return b.Bytes(), nil
@@ -70,9 +70,9 @@ func (s ClaudeState) MarshalJSON() ([]byte, error) {
 
 func (s *ClaudeState) UnmarshalJSON(data []byte) error {
 	var temp struct {
-		Status   string `json:"Status"`
-		Prompt   string `json:"Prompt"`
-		Response string `json:"Response"`
+		Status   string `json:"status"`
+		Prompt   string `json:"prompt"`
+		Response string `json:"response"`
 	}
 
 	err := json.Unmarshal(data, &temp)
@@ -100,7 +100,7 @@ func (s *ClaudeState) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (s ClaudeState) getStatusString() string {
+func (s *ClaudeState) GetStatusString() string {
 	switch s.Status {
 	case Waiting:
 		return "waiting"
@@ -108,10 +108,8 @@ func (s ClaudeState) getStatusString() string {
 		return "generating"
 	case Done:
 		return "done"
-	case Error:
-		return "error"
 	default:
-		return "unknown"
+		return "error"
 	}
 }
 
@@ -135,7 +133,6 @@ type Command struct {
 	SyncWatch [5]uint64
 	Eightball string
 	Dice      []uint16
-	Claude    *ClaudeState
 }
 
 // MarshalJSON implements json.Marshaler
@@ -180,9 +177,6 @@ func (c Command) MarshalJSON() ([]byte, error) {
 			appendUint(uint64(v))
 		}
 		appendByte(']')
-	case Claude:
-		claudeData, _ := json.Marshal(*c.Claude)
-		b = append(b, claudeData...)
 	}
 
 	b = append(b, '}')
@@ -224,9 +218,6 @@ func (c *Command) UnmarshalJSON(data []byte) error {
 		err = json.Unmarshal(data, &c.Dice)
 	case Autobahn:
 		c.Type = Autobahn
-	case Claude:
-		c.Type = Claude
-		err = json.Unmarshal(data, &c.Claude)
 	default:
 		return fmt.Errorf("unknown command type: %d", typ)
 	}

@@ -351,3 +351,17 @@ func expireLastSolvedCaptchas() (err error) {
 		Exec()
 	return
 }
+
+func CheckIfClaudeAllowed(ip string) bool {
+	now := time.Now()
+	oneMinuteAgo := now.Add(-time.Minute)
+	unixTimestamp := oneMinuteAgo.Unix()
+	var count int
+	st, _, _ := sq.Select("count(*)").From("posts").InnerJoin("claude on posts.claude_id = claude.id").Where("posts.ip = ? and posts.time > ?", ip, unixTimestamp).ToSql()
+	log.Info("ClaudeAllowed: ", st)
+	err := sq.Select("count(*)").From("posts").InnerJoin("claude on posts.claude_id = claude.id").Where("posts.ip = ? and posts.time > ?", ip, unixTimestamp).QueryRow().Scan(&count)
+	if err != nil {
+		return false
+	}
+	return count < 4
+}

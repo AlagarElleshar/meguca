@@ -201,13 +201,14 @@ func (c *Client) closePost() (err error) {
 		links []common.Link
 		com   []common.Command
 	)
+	var claude *common.ClaudeState = nil
 	if c.post.len != 0 {
-		links, com, err = parser.ParseBody(c.post.body, c.post.board, c.post.op,
+		links, com, claude, err = parser.ParseBody(c.post.body, c.post.board, c.post.op,
 			c.post.id, c.ip, false)
 		if err != nil {
 			return
 		}
-		if c.post.board == "a" && len(links) != 0 &&
+		if len(links) != 0 &&
 			bytes.Contains(c.post.body, []byte("#steal")) {
 			var (
 				from = links[len(links)-1].ID
@@ -247,33 +248,31 @@ func (c *Client) closePost() (err error) {
 			}
 		}
 	}
-	err = db.ClosePost(c.post.id, c.post.op, string(c.post.body), links, com)
-	log.Info("Close Post!")
-	var claude *common.ClaudeState = nil
-	for i, _ := range com {
-		if com[i].Type == common.Claude {
-			claude = com[i].Claude
-		}
+	claudeOk := db.CheckIfClaudeAllowed(c.ip)
+	if !claudeOk {
+		claude = nil
+	}
+	cid, err := db.ClosePost(c.post.id, c.post.op, string(c.post.body), links, com, claude)
+	if err != nil {
+		return
 	}
 	if claude != nil {
-		txt, _ := json.Marshal(*claude)
-		log.Info("Claude called with data: %s", string(txt))
 		id := c.post.id
 		feed := c.feed
-		go StreamMessages(Claude3Haiku, DefaultSystemPrompt, 255, claude,
+		go StreamMessages(Claude3Haiku, "", 255, claude,
 			func() {
+				claude.Status = common.Generating
+				db.UpdateClaude(cid, claude)
 			},
 			func(token string) {
 				log.Info("Token: ", token)
 				feed.SendClaudeToken(id, token)
+				db.SetClaude(id, claude.Response.Bytes())
 			},
 			func() {
 				feed.SendClaudeComplete(id, claude.Response.String())
-				_ = db.UpdateCommands(id, com)
+				db.UpdateClaude(cid, claude)
 			})
-	}
-	if err != nil {
-		return
 	}
 	c.post = openPost{}
 	return

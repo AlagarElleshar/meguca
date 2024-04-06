@@ -145,16 +145,17 @@ func InsertPostInto(post common.StandalonePost, msg []byte) {
 }
 
 // ClosePost closes a post in a feed, if it exists
-func ClosePost(id, op uint64, links []common.Link, commands []common.Command,
-) (err error) {
+func ClosePost(id, op uint64, links []common.Link, commands []common.Command, claude *common.ClaudeState) (err error) {
 	msg, err := common.EncodeMessage(common.MessageClosePost, struct {
-		ID       uint64           `json:"id"`
-		Links    []common.Link    `json:"links"`
-		Commands []common.Command `json:"commands"`
+		ID       uint64              `json:"id"`
+		Links    []common.Link       `json:"links"`
+		Commands []common.Command    `json:"commands"`
+		Claude   *common.ClaudeState `json:"claude"`
 	}{
 		ID:       id,
 		Links:    links,
 		Commands: commands,
+		Claude:   claude,
 	})
 	if err != nil {
 		return

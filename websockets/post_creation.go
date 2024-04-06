@@ -390,7 +390,7 @@ func constructPost(
 		// TODO: Move DB checks out of the parser. The parser should just parse.
 		// Return slices of pointers to links and commands that need to be
 		// validated.
-		post.Links, post.Commands, err = parser.ParseBody(
+		post.Links, post.Commands, _, err = parser.ParseBody(
 			[]byte(req.Body),
 			conf.ID,
 			post.OP,

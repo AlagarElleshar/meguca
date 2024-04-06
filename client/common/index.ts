@@ -66,7 +66,15 @@ export interface PostData {
 	links?: PostLink[]
 	commands?: Command[]
 	moderation?: ModerationEntry[]
+	claude_state?: ClaudeState
 }
+
+export interface ClaudeState {
+	status: string
+	prompt: string
+	response: string
+}
+
 
 // State of a post's text. Used for adding enclosing tags to the HTML while
 // parsing.
@@ -85,7 +93,7 @@ export type TextState = {
 
 // Types of hash command entries
 export const enum commandType {
-	dice, flip, eightBall, syncWatch, pyu, pcount, autobahn,claude
+	dice, flip, eightBall, syncWatch, pyu, pcount, autobahn,
 }
 
 // Single hash command result delivered from the server

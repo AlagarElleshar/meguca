@@ -146,7 +146,7 @@ func closeDanglingPosts() error {
 			return err
 		}
 
-		links, com, err := common.ParseBody(
+		links, com, _, err := common.ParseBody(
 			[]byte(body),
 			p.board,
 			p.op,
@@ -165,7 +165,7 @@ func closeDanglingPosts() error {
 		default:
 			return err
 		}
-		err = ClosePost(p.id, p.op, body, links, com)
+		_, err = ClosePost(p.id, p.op, body, links, com, nil)
 		if err != nil {
 			return err
 		}

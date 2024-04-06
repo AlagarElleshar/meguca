@@ -83,7 +83,7 @@ var (
 	SendTo func(id uint64, msg []byte)
 
 	// ClosePost closes a post in a feed, if it exists
-	ClosePost func(id, op uint64, links []Link, commands []Command) error
+	ClosePost func(id, op uint64, links []Link, commands []Command, claude *ClaudeState) error
 )
 
 // Client exposes some globally accessible websocket client functionality

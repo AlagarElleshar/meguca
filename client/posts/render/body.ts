@@ -50,13 +50,11 @@ export default function renderBody(data: PostData): string {
         if (/#claude\s\S.*/.test(l) && !claudeAdded) {
             html += "<b>#claude </b>"
             html += l.substring(8)
-            let com = data.commands?.find(
-                (command) => command.type === commandType.claude
-            )
-            if (com != null && com.val.Response !== "") {
+            let response = data.claude_state?.response
+            if (response != null && response !== "") {
                 html += "<div class=\"claude-container\">\n" +
                     "<div class=\"blockquote-divider\"></div>\n" +
-                    "<blockquote class=\"claude-response\">" + escape(com.val.Response) + "</blockquote>\n" +
+                    "<blockquote class=\"claude-response\">" + escape(response) + "</blockquote>\n" +
                     "</div>"
             } else {
                 html += "<div class=\"claude-container\" hidden>\n" +
@@ -326,7 +324,7 @@ function parseBlues(
 }
 
 // Parse a line that is still being edited
-function parseOpenLine(line: string, {state}: PostData): string {
+function parseOpenLine(line: string, { state }: PostData): string {
     return parseCode(line, state, parseOpenLinks)
 }
 
@@ -529,13 +527,13 @@ function parseURL(bit: string): string {
             bit = escape(bit)
             return bit.link(bit)
         }
-        if (bit.endsWith("_or4.flv")) {
+        if(bit.endsWith("_or4.flv")){
             let link = newTabLink(bit, bit)
             let attrs = {
-                type: "button",
-                class: "live-button",
-                "data-live-url": bit,
-                onclick: "playButtonClicked('" + bit + "')"
+                type : "button",
+                class : "live-button",
+                "data-live-url" : bit,
+                onclick : "playButtonClicked('" + bit + "')"
             }
             return `${link}<button ${makeAttrs(attrs)}>􀊄</button>`
 
@@ -547,7 +545,7 @@ function parseURL(bit: string): string {
 }
 
 // Parse a hash command
-function parseCommand(bit: string, {commands, state}: PostData): string {
+function parseCommand(bit: string, { commands, state }: PostData): string {
     // Guard against invalid dice rolls
     if (!commands || !commands[state.iDice]) {
         return "#" + bit

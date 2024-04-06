@@ -40,6 +40,7 @@ type Public struct {
 	DefaultCSS        string            `json:"defaultCSS"`
 	ImageRootOverride string            `json:"imageRootOverride"`
 	Links             map[string]string `json:"links"`
+	ClaudeEnabled     bool              `json:"claude_enabled"`
 }
 
 // BoardConfigs stores board-specific configuration

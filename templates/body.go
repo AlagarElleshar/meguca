@@ -115,7 +115,7 @@ func streambody(
 	} else {
 		fn = c.parseTerminatedLine
 	}
-
+	claudeFound := false
 	for i, l := range strings.Split(c.Body, "\n") {
 		c.state.quote = false
 
@@ -129,32 +129,28 @@ func streambody(
 		}
 
 		c.state.successiveNewlines = 0
-		matched, err := regexp.MatchString(`#claude\s\S.*`, l)
-		if err == nil && matched {
-			c.string("<b>#claude</b> ")
-			c.escape(l[8:])
-			var claudeResp string
-			found := false
-			for i, _ := range p.Commands {
-				if p.Commands[i].Type == common.Claude {
-					claudeResp = p.Commands[i].Claude.Response.String()
-					found = true
-					break
+		if p.Claude != nil && !claudeFound {
+
+			matched, err := regexp.MatchString(`#claude\s\S.*`, l)
+			if err == nil && matched {
+				claudeFound = true
+				c.string("<b>#claude</b> ")
+				c.escape(l[8:])
+				resp := p.Claude.Response.String()
+				if len(resp) > 0 {
+					//c.string("<blockquote class='claude-response'>")
+					c.string(`<div class="claude-container">
+					<div class="blockquote-divider"></div>
+					<blockquote class="claude-response">`)
+					c.escape(resp)
+				} else {
+					c.string(`<div class="claude-container" hidden>
+					<div class="blockquote-divider"></div>
+					<blockquote class="claude-response">`)
 				}
+				c.string(`</blockquote></div>`)
+				continue
 			}
-			if found && len(claudeResp) != 0 {
-				//c.string("<blockquote class='claude-response'>")
-				c.string(`<div class="claude-container">
-					<div class="blockquote-divider"></div>
-					<blockquote class="claude-response">`)
-			} else {
-				c.string(`<div class="claude-container" hidden>
-					<div class="blockquote-divider"></div>
-					<blockquote class="claude-response">`)
-			}
-			c.escape(claudeResp)
-			c.string(`</blockquote></div>`)
-			continue
 		}
 		if l[0] == '>' {
 			c.string("<em>")

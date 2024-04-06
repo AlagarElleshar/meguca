@@ -9,6 +9,7 @@ import (
 	"github.com/go-playground/log"
 	"io"
 	"net/http"
+	"strings"
 )
 
 const (
@@ -59,7 +60,18 @@ func StreamMessages(model string, systemPrompt string, maxTokens int, claudeStat
 
 	for {
 		line, err := reader.ReadBytes('\n')
-		log.Info("Line: ", string(line))
+		if strings.HasPrefix(string(line), `{"type":"error"`) {
+			var errData errorResponse
+			err = json.Unmarshal(line, &errData)
+			if err != nil {
+				return err
+			}
+			claudeState.Status = common.Error
+			claudeState.Response.Reset()
+			claudeState.Response.WriteString(errData.ErrorMessage)
+			done()
+			return nil
+		}
 		if err != nil {
 			if err == io.EOF {
 				break
@@ -106,6 +118,11 @@ func StreamMessages(model string, systemPrompt string, maxTokens int, claudeStat
 	return nil
 }
 
+type errorResponse struct {
+	Type         string `json:"type"`
+	ErrorType    string `json:"error.type"`
+	ErrorMessage string `json:"error.message"`
+}
 type requestData struct {
 	Model        string         `json:"model"`
 	Messages     []messageParam `json:"messages"`

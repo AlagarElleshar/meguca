@@ -1566,6 +1566,31 @@ var migrations = []func(tx *sql.Tx) error{
 			"bans": {{after, tableInsert}},
 		})
 	},
+	func(tx *sql.Tx) (err error) {
+		queries := []string{
+			`CREATE TYPE state_enum AS ENUM ('waiting','generating', 'done', 'error'')`,
+			`CREATE TABLE claude (
+            id SERIAL PRIMARY KEY,
+            state state_enum,
+            prompt TEXT,
+            response TEXT
+        )`,
+			`ALTER TABLE posts
+         ADD COLUMN claude_id INTEGER UNIQUE`,
+			`ALTER TABLE posts
+         ADD CONSTRAINT fk_posts_claude
+         FOREIGN KEY (claude_id) REFERENCES claude(id)
+         ON DELETE SET NULL`,
+		}
+		err = execAll(tx, queries...)
+		return
+	},
+	func(tx *sql.Tx) (err error) {
+		return registerTriggers(tx, map[string][]triggerDescriptor{
+			"claude": {
+				{after, tableUpdate},
+			}})
+	},
 }
 
 func createIndex(table string, columns ...string) string {
@@ -1611,6 +1636,7 @@ func dropFunctions(tx *sql.Tx, names ...string) (err error) {
 func loadSQL(tx *sql.Tx, paths ...string) (err error) {
 	var buf []byte
 	for _, p := range paths {
+		fmt.Printf("/sql/%s.sql\n", p)
 		buf, err = static.ReadFile(fmt.Sprintf("/sql/%s.sql", p))
 		if err != nil {
 			return

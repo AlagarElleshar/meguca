@@ -3,7 +3,7 @@
 import {handlers, message, connSM, connEvent, decoder} from './connection'
 import { posts, page } from './state'
 import { Post, FormModel, PostView, lightenThread } from './posts'
-import { PostLink, Command, PostData, ImageData, ModerationEntry } from "./common"
+import {PostLink, Command, PostData, ImageData, ModerationEntry, ClaudeState} from "./common"
 import { postAdded } from "./ui"
 import { decrementImageCount, incrementPostCount } from "./page"
 import { getPostName } from "./options"
@@ -23,6 +23,7 @@ type CloseMessage = {
 	id: number
 	links: PostLink[] | null
 	commands: Command[] | null
+	claude: ClaudeState | null
 }
 
 // Message for inserting images into an open post
@@ -147,7 +148,7 @@ export default () => {
 			m.splice(msg))
 	}
 
-	handlers[message.closePost] = ({ id, links, commands }: CloseMessage) =>
+	handlers[message.closePost] = ({ id, links, commands,claude }: CloseMessage) =>
 		handle(id, m => {
 			if (links) {
 				m.links = links
@@ -155,6 +156,9 @@ export default () => {
 			}
 			if (commands) {
 				m.commands = commands
+			}
+			if (claude) {
+				m.claude_state = claude
 			}
 			m.closePost()
 		})
