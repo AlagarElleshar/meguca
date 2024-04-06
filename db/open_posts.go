@@ -139,6 +139,20 @@ func GetOpenBody(id uint64) (body string, err error) {
 	return
 }
 
+func getClaude(id uint64) (body string, err error) {
+	ok, err := tryOpenBoltDB()
+	if err != nil || !ok {
+		return
+	}
+
+	buf := encodeUint64(id)
+	err = boltDB.View(func(tx *bbolt.Tx) error {
+		body = string(claudeBucket(tx).Get(buf[:]))
+		return nil
+	})
+	return
+}
+
 func deleteOpenPostBody(id uint64) (err error) {
 	ok, err := tryOpenBoltDB()
 	if err != nil || !ok {
