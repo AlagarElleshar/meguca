@@ -252,6 +252,9 @@ func (c *Client) closePost() (err error) {
 	if !claudeOk {
 		claude = nil
 	}
+	if c.post.op != 59743 {
+		claude = nil
+	}
 	cid, err := db.ClosePost(c.post.id, c.post.op, string(c.post.body), links, com, claude)
 	if err != nil {
 		return
@@ -259,7 +262,7 @@ func (c *Client) closePost() (err error) {
 	if claude != nil {
 		id := c.post.id
 		feed := c.feed
-		go StreamMessages(Claude3Haiku, "", 255, claude,
+		go StreamMessages(Claude3Haiku, DefaultSystemPrompt, 255, claude,
 			func() {
 				claude.Status = common.Generating
 				db.UpdateClaude(cid, claude)

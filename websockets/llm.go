@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"github.com/bakape/meguca/common"
 	"github.com/bakape/meguca/config"
-	"github.com/go-playground/log"
 	"io"
 	"net/http"
 	"strings"
@@ -38,7 +37,6 @@ func StreamMessages(model string, systemPrompt string, maxTokens int, claudeStat
 	if err != nil {
 		return err
 	}
-	log.Info("Json body: ", string(jsonBody))
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonBody))
 	if err != nil {
@@ -68,7 +66,7 @@ func StreamMessages(model string, systemPrompt string, maxTokens int, claudeStat
 			}
 			claudeState.Status = common.Error
 			claudeState.Response.Reset()
-			claudeState.Response.WriteString(errData.ErrorMessage)
+			claudeState.Response.WriteString(errData.Error.Message)
 			done()
 			return nil
 		}
@@ -119,9 +117,11 @@ func StreamMessages(model string, systemPrompt string, maxTokens int, claudeStat
 }
 
 type errorResponse struct {
-	Type         string `json:"type"`
-	ErrorType    string `json:"error.type"`
-	ErrorMessage string `json:"error.message"`
+	Type  string `json:"type"`
+	Error struct {
+		Type    string `json:"type"`
+		Message string `json:"message"`
+	} `json:"error"`
 }
 type requestData struct {
 	Model        string         `json:"model"`

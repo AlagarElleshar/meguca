@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"database/sql"
 	"fmt"
-	"github.com/go-playground/log"
 	"strconv"
 
 	"github.com/Masterminds/squirrel"
@@ -291,9 +290,6 @@ func scanOP(r rowScanner) (t common.Thread, err error) {
 
 func extractPost(ps postScanner, is imageScanner, cs claudeScanner) (p common.Post, err error) {
 	p, err = ps.Val()
-	if p.ID > 108 {
-		log.Info("Debug")
-	}
 	if err != nil {
 		return
 	}
@@ -329,7 +325,7 @@ func GetPost(id uint64) (res common.StandalonePost, err error) {
 		From("posts as p").
 		LeftJoin("images as i on p.SHA1 = i.SHA1").
 		LeftJoin("claude as c on p.claude_id = c.id").
-		Where("id = ?", id).
+		Where("p.id = ?", id).
 		QueryRow().
 		Scan(args...)
 	if err != nil {
@@ -354,7 +350,6 @@ func GetPost(id uint64) (res common.StandalonePost, err error) {
 	if res.Claude != nil {
 		if res.Claude.Status == common.Generating {
 			resp, err := getClaude(res.ID)
-			log.Info("Claude gotten from boltdb: ", resp)
 			if err == nil {
 				res.Claude.Response.WriteString(resp)
 			}
