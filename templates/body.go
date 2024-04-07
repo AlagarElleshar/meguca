@@ -137,6 +137,9 @@ func streambody(
 				c.string("<b>#claude</b> ")
 				c.escape(l[8:])
 				resp := p.Claude.Response.String()
+				if p.Claude.Status == common.Error {
+					resp = "Error: " + resp
+				}
 				if len(resp) > 0 {
 					//c.string("<blockquote class='claude-response'>")
 					c.string(`<div class="claude-container">

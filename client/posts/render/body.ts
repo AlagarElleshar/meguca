@@ -49,6 +49,9 @@ export default function renderBody(data: PostData): string {
                 html += "<b>#claude </b>"
                 html += l.substring(8)
                 let response = data.claude_state.response
+                if (data.claude_state.status =="error"){
+                    response = "Error: " + response
+                }
                 if (response != null && response !== "") {
                     html += "<div class=\"claude-container\">\n" +
                         "<div class=\"blockquote-divider\"></div>\n" +
