@@ -1568,7 +1568,7 @@ var migrations = []func(tx *sql.Tx) error{
 	},
 	func(tx *sql.Tx) (err error) {
 		queries := []string{
-			`CREATE TYPE state_enum AS ENUM ('waiting','generating', 'done', 'error'')`,
+			`CREATE TYPE state_enum AS ENUM ('waiting','generating', 'done', 'error')`,
 			`CREATE TABLE claude (
             id SERIAL PRIMARY KEY,
             state state_enum,
