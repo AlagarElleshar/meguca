@@ -251,9 +251,6 @@ func (c *Client) closePost() (err error) {
 	if !claudeOk {
 		claude = nil
 	}
-	if c.post.op != 59743 {
-		claude = nil
-	}
 	cid, err := db.ClosePost(c.post.id, c.post.op, string(c.post.body), links, com, claude)
 	if err != nil {
 		return
