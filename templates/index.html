@@ -6,7 +6,7 @@
 {% import "github.com/bakape/meguca/assets" %}
 
 {% func renderIndex(pos common.ModerationLevel) %}{% stripspace %}
-	{% code conf := config.Get() %}
+	{% code _ = config.Get() %}
 	{% code ln := lang.Get() %}
 	{% code confJSON, confHash := config.GetClient() %}
 	{% code boards := config.GetBoards() %}
@@ -267,7 +267,7 @@
 						github.com/bakape/meguca
 					</a>
 					<hr>
-					{%s= strings.Replace(conf.FAQ, "\n", "<br>", -1) %}
+					{%s= strings.Replace(config.Defaults.FAQ, "\n", "<br>", -1) %}
 				</div>
 				{% comment %}
 					Post creation credentials
