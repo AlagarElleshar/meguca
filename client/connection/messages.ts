@@ -15,6 +15,7 @@ export const enum message {
 	stoleImageTo,
 	claudeAppend,
 	claudeDone,
+	claudeError,
 
 	// >= 30 are miscellaneous and do not write to post models
 	synchronise = 30,

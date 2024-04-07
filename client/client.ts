@@ -199,6 +199,14 @@ export default () => {
 			console.log(`>binary claude done: ${id}`)
 		handle(id,(m) => m.claudeDone(response))
 	}
+	handlers[message.claudeError] = (message: ArrayBuffer) => {
+		const view = new DataView(message);
+		let id = view.getFloat64(0, true);
+		let response = decoder.decode(message.slice(8));
+		if(debug)
+			console.log(`>binary claude error: ${id}`)
+		handle(id,(m) => m.claudeError(response))
+	}
 
 	interface StolenImage {
 		id: number;

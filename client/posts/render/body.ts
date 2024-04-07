@@ -44,26 +44,25 @@ export default function renderBody(data: PostData): string {
         }
 
         state.successive_newlines = 0
-        if(data.id == 67){
-            console.log("break")
-        }
-        if (/#claude\s\S.*/.test(l) && !claudeAdded) {
-            html += "<b>#claude </b>"
-            html += l.substring(8)
-            let response = data.claude_state?.response
-            if (response != null && response !== "") {
-                html += "<div class=\"claude-container\">\n" +
-                    "<div class=\"blockquote-divider\"></div>\n" +
-                    "<blockquote class=\"claude-response\">" + escape(response) + "</blockquote>\n" +
-                    "</div>"
-            } else {
-                html += "<div class=\"claude-container\" hidden>\n" +
-                    "<div class=\"blockquote-divider\"></div>\n" +
-                    "<blockquote class=\"claude-response\"></blockquote>\n" +
-                    "</div>"
+        if(data.claude_state !== null) {
+            if (/#claude\s\S.*/.test(l) && !claudeAdded) {
+                html += "<b>#claude </b>"
+                html += l.substring(8)
+                let response = data.claude_state.response
+                if (response != null && response !== "") {
+                    html += "<div class=\"claude-container\">\n" +
+                        "<div class=\"blockquote-divider\"></div>\n" +
+                        "<blockquote class=\"claude-response\">" + escape(response) + "</blockquote>\n" +
+                        "</div>"
+                } else {
+                    html += "<div class=\"claude-container\" hidden>\n" +
+                        "<div class=\"blockquote-divider\"></div>\n" +
+                        "<blockquote class=\"claude-response\"></blockquote>\n" +
+                        "</div>"
+                }
+                claudeAdded = true
+                continue
             }
-            claudeAdded = true
-            continue
         }
         if (l[0] === ">") {
             state.quote = true
@@ -527,7 +526,7 @@ function parseURL(bit: string): string {
             bit = escape(bit)
             return bit.link(bit)
         }
-        if(bit.endsWith("_or4.flv")){
+        if(bit.endsWith(".flv")){
             let link = newTabLink(bit, bit)
             let attrs = {
                 type : "button",

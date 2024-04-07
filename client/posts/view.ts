@@ -1,15 +1,17 @@
-import {Post} from './model'
-import {escape, firstChild, getID, importTemplate, makeFrag, on, pad} from '../util'
-import {parseBody, renderPostLink} from './render'
+import { Post } from './model'
+import {
+    makeFrag, importTemplate, getID, escape, firstChild, pad, on
+} from '../util'
+import { parseBody, relativeTime, renderPostLink } from './render'
 import ImageHandler from "./images"
-import {ViewAttrs} from "../base"
-import {findSyncwatches} from "./syncwatch"
+import { ViewAttrs } from "../base"
+import { findSyncwatches } from "./syncwatch"
 import lang from "../lang"
-import {mine, page, posts} from "../state"
+import { page, mine, posts } from "../state"
 import options from "../options"
 import countries from "./countries"
 import {relativeTimeAbbreviated, secondsToTime} from "../util/time"
-import {commandType, ModerationAction} from '../common';
+import { ModerationAction } from '../common';
 
 
 const modLevelStrings = ["", "janitors", "moderators", "owners", "admin"];
@@ -228,7 +230,6 @@ export default class PostView extends ImageHandler {
         this.reparseBody();
     }
 
-
     // Stop post from displaying
     public hide() {
         this.el.classList.add("hidden")
@@ -426,8 +427,8 @@ export default class PostView extends ImageHandler {
         this.setEditing(false)
     }
 
-    claudeError(response: string) {
-        this.#claudeResponse.innerText = `Error: ${response}`
+    claudeError() {
+        this.reparseBody()
     }
 }
 

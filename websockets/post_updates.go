@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/go-playground/log"
 	"math"
 	"unicode/utf8"
 
@@ -268,7 +267,6 @@ func (c *Client) closePost() (err error) {
 				db.UpdateClaude(cid, claude)
 			},
 			func(token string) {
-				log.Info("Token: ", token)
 				feed.SendClaudeToken(id, token)
 				db.SetClaude(id, claude.Response.Bytes())
 			},

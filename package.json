@@ -9,10 +9,10 @@
   },
   "devDependencies": {
     "@types/node": "^16.11.7",
-    "gulp": "^5.0.0",
+    "gulp": "^4.0.2",
     "gulp-clean-css": "^4.3.0",
     "gulp-less": "^5.0.0",
-    "gulp-typescript": "^2.12.2",
+    "gulp-typescript": "^5.0.1",
     "gulp-uglify": "^3.0.1",
     "gulp-util": "^3.0.8",
     "jshint": "^2.13.1",
