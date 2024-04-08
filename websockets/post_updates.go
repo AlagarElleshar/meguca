@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/go-playground/log"
 	"math"
 	"os"
 	"path/filepath"
@@ -273,6 +274,9 @@ func (c *Client) closePost() (err error) {
 		if err == nil && imgSha1 != nil {
 			*imgSha1 += ".webp"
 			file := filepath.Join("images/thumb/", *imgSha1)
+			cwd, _ := os.Getwd()
+			log.Info("CWD: ", cwd)
+			log.Info("img: ", file)
 			fileData, err := os.ReadFile(file)
 			if err == nil {
 				size := len(preImageJson) + base64.StdEncoding.EncodedLen(len(fileData)) + len(postImageJson)

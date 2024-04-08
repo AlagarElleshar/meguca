@@ -77,7 +77,6 @@ func StreamMessages(model string, systemPrompt string, maxTokens int, claudeStat
 
 	for {
 		line, err := reader.ReadBytes('\n')
-		println(string(line))
 		if strings.HasPrefix(string(line), `{"type":"error"`) {
 			var errData errorResponse
 			err = json.Unmarshal(line, &errData)
