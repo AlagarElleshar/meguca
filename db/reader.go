@@ -353,6 +353,14 @@ func GetPost(id uint64) (res common.StandalonePost, err error) {
 
 	return
 }
+func GetPostSha1(id uint64) (imageSha1 *string, err error) {
+	err = sq.Select("sha1").
+		From("posts").
+		Where("id = ?", id).
+		QueryRow().
+		Scan(&imageSha1)
+	return
+}
 
 func getOPs() squirrel.SelectBuilder {
 	return sq.Select(threadSelectsSQL).

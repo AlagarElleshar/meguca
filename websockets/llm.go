@@ -20,14 +20,33 @@ Your role is to assist users by answering their queries directly and succinctly,
 You will keep your responses extremely concise. The shorter the better.`
 )
 
-func StreamMessages(model string, systemPrompt string, maxTokens int, claudeState *common.ClaudeState, start func(), token func(string), done func()) error {
+func encodeMessages(prompt string, img *[]byte) []byte {
+	buf := bytes.Buffer{}
+	buf.WriteRune('[')
+	if img != nil {
+		buf.Write(*img)
+		buf.WriteRune(',')
+	}
+	buf.WriteString(`{"type":"text","text":`)
+	promptStr, _ := json.Marshal(prompt)
+	buf.Write(promptStr)
+	buf.WriteString(`}`)
+	buf.WriteRune(']')
+	return buf.Bytes()
+}
+
+func StreamMessages(model string, systemPrompt string, maxTokens int, claudeState *common.ClaudeState, img *[]byte, start func(), token func(string), done func()) error {
 	apiKey := config.Server.AnthropicApiKey
 
 	url := "https://api.anthropic.com/v1/messages"
 
 	body := requestData{
 		model,
-		[]messageParam{messageParam{"user", claudeState.Prompt}},
+		[]messageParam{
+			{
+				"user", encodeMessages(claudeState.Prompt, img),
+			},
+		},
 		maxTokens,
 		true,
 		systemPrompt,
@@ -58,6 +77,7 @@ func StreamMessages(model string, systemPrompt string, maxTokens int, claudeStat
 
 	for {
 		line, err := reader.ReadBytes('\n')
+		println(string(line))
 		if strings.HasPrefix(string(line), `{"type":"error"`) {
 			var errData errorResponse
 			err = json.Unmarshal(line, &errData)
@@ -191,8 +211,8 @@ type messageDeltaUsage struct {
 }
 
 type messageParam struct {
-	Role    string `json:"role"`
-	Content string `json:"content"`
+	Role    string          `json:"role"`
+	Content json.RawMessage `json:"content"`
 }
 
 type messageStartEvent struct {

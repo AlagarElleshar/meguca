@@ -3,11 +3,14 @@ package websockets
 import (
 	"bytes"
 	"database/sql"
+	"encoding/base64"
 	"encoding/binary"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"math"
+	"os"
+	"path/filepath"
 	"unicode/utf8"
 
 	"github.com/bakape/meguca/common"
@@ -25,6 +28,8 @@ var (
 	errSpliceNOOP    = errors.New("splice NOOP")
 	errTextOnly      = errors.New("text only board")
 	errHasImage      = errors.New("post already has image")
+	preImageJson     = `{"type":"image","source":{"type":"base64","media_type":"image/webp","data":"`
+	postImageJson    = `"}}`
 )
 
 // Error created, when client supplies invalid splice coordinates to server
@@ -260,9 +265,28 @@ func (c *Client) closePost() (err error) {
 		return
 	}
 	if claude != nil && claudeOk {
+		//Include thumbnail of post
 		id := c.post.id
 		feed := c.feed
-		go StreamMessages(Claude3Haiku, DefaultSystemPrompt, 255, claude,
+		imgSha1, err := db.GetPostSha1(id)
+		var image *[]byte = nil
+		if err == nil && imgSha1 != nil {
+			*imgSha1 += ".webp"
+			file := filepath.Join("images/thumb/", *imgSha1)
+			fileData, err := os.ReadFile(file)
+			if err == nil {
+				size := len(preImageJson) + base64.StdEncoding.EncodedLen(len(fileData)) + len(postImageJson)
+				buf := make([]byte, size)
+				offset := 0
+				offset += copy(buf[offset:], preImageJson)
+				base64.StdEncoding.Encode(buf[offset:], fileData)
+				offset = size - len(postImageJson)
+				copy(buf[offset:], postImageJson)
+
+				image = &buf
+			}
+		}
+		go StreamMessages(Claude3Haiku, DefaultSystemPrompt, 255, claude, image,
 			func() {
 				claude.Status = common.Generating
 				db.UpdateClaude(cid, claude)
