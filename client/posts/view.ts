@@ -2,7 +2,7 @@ import { Post } from './model'
 import {
     makeFrag, importTemplate, getID, escape, firstChild, pad, on
 } from '../util'
-import { parseBody, relativeTime, renderPostLink } from './render'
+import { parseBody, renderPostLink } from './render'
 import ImageHandler from "./images"
 import { ViewAttrs } from "../base"
 import { findSyncwatches } from "./syncwatch"
