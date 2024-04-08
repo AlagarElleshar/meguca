@@ -269,7 +269,6 @@ func (c *Client) closePost() (err error) {
 			},
 			func(token string) {
 				feed.SendClaudeToken(id, token)
-				db.SetClaude(id, claude.Response.Bytes())
 			},
 			func() {
 				isError := claude.Status == common.Error

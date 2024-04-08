@@ -84,9 +84,6 @@ func UpdateClaude(id uint64, claude *common.ClaudeState) {
 			return fmt.Errorf("post with ID %d has no associated Claude", id)
 		}
 
-		if claude.Status == common.Done || claude.Status == common.Error {
-			err = deleteClaude(id)
-		}
 		return
 	})
 

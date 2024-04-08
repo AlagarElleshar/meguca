@@ -52,13 +52,9 @@ func tryOpenBoltDB() (open bool, err error) {
 			return
 		}
 
-		err = boltDB.Update(func(tx *bbolt.Tx) (err error) {
-			_, err = tx.CreateBucketIfNotExists([]byte("open_bodies"))
-			if err != nil {
-				return
-			}
-			_, err = tx.CreateBucketIfNotExists([]byte("claude"))
-			return
+		err = boltDB.Update(func(tx *bbolt.Tx) error {
+			_, err := tx.CreateBucketIfNotExists([]byte("open_bodies"))
+			return err
 		})
 		if err != nil {
 			return
@@ -88,25 +84,8 @@ func SetOpenBody(id uint64, body []byte) (err error) {
 	})
 }
 
-// SetOpenBody sets the open body of a post
-func SetClaude(id uint64, body []byte) (err error) {
-	ok, err := tryOpenBoltDB()
-	if err != nil || !ok {
-		return
-	}
-
-	buf := encodeUint64(id)
-	return boltDB.Batch(func(tx *bbolt.Tx) error {
-		return claudeBucket(tx).Put(buf[:], body)
-	})
-}
-
 func bodyBucket(tx *bbolt.Tx) *bbolt.Bucket {
 	return tx.Bucket([]byte("open_bodies"))
-}
-
-func claudeBucket(tx *bbolt.Tx) *bbolt.Bucket {
-	return tx.Bucket([]byte("claude"))
 }
 
 // Encode uint64 for storage in BoltDB without heap allocations
@@ -139,20 +118,6 @@ func GetOpenBody(id uint64) (body string, err error) {
 	return
 }
 
-func getClaude(id uint64) (body string, err error) {
-	ok, err := tryOpenBoltDB()
-	if err != nil || !ok {
-		return
-	}
-
-	buf := encodeUint64(id)
-	err = boltDB.View(func(tx *bbolt.Tx) error {
-		body = string(claudeBucket(tx).Get(buf[:]))
-		return nil
-	})
-	return
-}
-
 func deleteOpenPostBody(id uint64) (err error) {
 	ok, err := tryOpenBoltDB()
 	if err != nil || !ok {
@@ -162,17 +127,6 @@ func deleteOpenPostBody(id uint64) (err error) {
 	buf := encodeUint64(id)
 	return boltDB.Batch(func(tx *bbolt.Tx) error {
 		return bodyBucket(tx).Delete(buf[:])
-	})
-}
-func deleteClaude(id uint64) (err error) {
-	ok, err := tryOpenBoltDB()
-	if err != nil || !ok {
-		return
-	}
-
-	buf := encodeUint64(id)
-	return boltDB.Batch(func(tx *bbolt.Tx) error {
-		return claudeBucket(tx).Delete(buf[:])
 	})
 }
 
@@ -195,31 +149,6 @@ func injectOpenBodies(posts []*common.Post) (err error) {
 	buc := tx.Bucket([]byte("open_bodies"))
 	for _, p := range posts {
 		p.Body = string(buc.Get(encodeUint64Heap(p.ID)))
-	}
-
-	return tx.Rollback()
-}
-
-// Inject open post bodies from the embedded database into the posts
-func injectClaudeMessages(posts []*common.Post) (err error) {
-	if len(posts) == 0 {
-		return
-	}
-
-	ok, err := tryOpenBoltDB()
-	if err != nil || !ok {
-		return
-	}
-
-	tx, err := boltDB.Begin(false)
-	if err != nil {
-		return
-	}
-
-	buc := tx.Bucket([]byte("claude"))
-	for _, p := range posts {
-		p.Claude.Response.Reset()
-		p.Claude.Response.Write(buc.Get(encodeUint64Heap(p.ID)))
 	}
 
 	return tx.Rollback()

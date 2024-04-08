@@ -255,9 +255,6 @@ func GetThread(id uint64, lastN int) (t common.Thread, err error) {
 		filterOpen(&open, &t.Posts[i])
 	}
 	err = injectOpenBodies(open)
-	if err != nil {
-		err = injectClaudeMessages(open)
-	}
 	return
 }
 
@@ -345,14 +342,6 @@ func GetPost(id uint64) (res common.StandalonePost, err error) {
 		res.Body, err = GetOpenBody(res.ID)
 		if err != nil {
 			return
-		}
-	}
-	if res.Claude != nil {
-		if res.Claude.Status == common.Generating {
-			resp, err := getClaude(res.ID)
-			if err == nil {
-				res.Claude.Response.WriteString(resp)
-			}
 		}
 	}
 	if res.Moderated {
