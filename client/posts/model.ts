@@ -242,8 +242,12 @@ export class Post extends Model implements PostData {
     public claudeError(response: string) {
         if (this.claude_state == null) {
             this.claude_state = {
-                response, status: "error", prompt: "",
+                response: response, status: "error", prompt: "",
             }
+        }
+        else {
+            this.claude_state.status = "error"
+            this.claude_state.response = response
         }
         this.view.claudeError()
     }

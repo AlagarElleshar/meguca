@@ -158,7 +158,16 @@ export default () => {
 				m.commands = commands
 			}
 			if (claude) {
-				m.claude_state = claude
+				// Cannot go from completed to uncompleted
+				if (m.claude_state == null) {
+					m.claude_state = claude
+				}
+				else if (m.claude_state.status == "done" || m.claude_state.status == "error"){
+					//Ignored
+				}
+				else{
+					m.claude_state = claude
+				}
 			}
 			m.closePost()
 		})
@@ -196,7 +205,7 @@ export default () => {
 		let id = view.getFloat64(0, true);
 		let response = decoder.decode(message.slice(8));
 		if(debug)
-			console.log(`>binary claude done: ${id}`)
+			console.log(`>binary claude done: ${id} ${response}`)
 		handle(id,(m) => m.claudeDone(response))
 	}
 	handlers[message.claudeError] = (message: ArrayBuffer) => {
@@ -204,7 +213,7 @@ export default () => {
 		let id = view.getFloat64(0, true);
 		let response = decoder.decode(message.slice(8));
 		if(debug)
-			console.log(`>binary claude error: ${id}`)
+			console.log(`>binary claude error: ${id} ${response}`)
 		handle(id,(m) => m.claudeError(response))
 	}
 

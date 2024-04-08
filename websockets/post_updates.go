@@ -247,15 +247,19 @@ func (c *Client) closePost() (err error) {
 			}
 		}
 	}
-	claudeOk := db.CheckIfClaudeAllowed(c.ip)
-	if !claudeOk {
-		claude = nil
+	claudeOk := true
+	if claude != nil {
+		claudeOk = db.CheckIfClaudeAllowed(c.ip)
+		if !claudeOk {
+			claude.Status = common.Error
+			claude.Response.WriteString("Rate limit reached, try again later.")
+		}
 	}
 	cid, err := db.ClosePost(c.post.id, c.post.op, string(c.post.body), links, com, claude)
 	if err != nil {
 		return
 	}
-	if claude != nil {
+	if claude != nil && claudeOk {
 		id := c.post.id
 		feed := c.feed
 		go StreamMessages(Claude3Haiku, DefaultSystemPrompt, 255, claude,
@@ -268,7 +272,8 @@ func (c *Client) closePost() (err error) {
 				db.SetClaude(id, claude.Response.Bytes())
 			},
 			func() {
-				feed.SendClaudeComplete(id, claude.Response.String())
+				isError := claude.Status == common.Error
+				feed.SendClaudeComplete(id, isError, &claude.Response)
 				db.UpdateClaude(cid, claude)
 			})
 	}

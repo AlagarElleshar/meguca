@@ -223,9 +223,13 @@ export default class PostView extends ImageHandler {
     // Close an open post and clean up
     public closePost() {
         // Check for Claude messages
-        const claudeExists = this.model.claude_state != null
+        let claude = this.model.claude_state
+        const claudeExists = claude != null
         if (!claudeExists) {
             this.setEditing(false);
+        }
+        else if (claude.status == "error" || claude.status == "done"){
+            this.setEditing(false)
         }
         this.reparseBody();
     }
@@ -429,6 +433,7 @@ export default class PostView extends ImageHandler {
 
     claudeError() {
         this.reparseBody()
+        this.setEditing(false)
     }
 }
 

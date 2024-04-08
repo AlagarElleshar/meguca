@@ -1,6 +1,7 @@
 package feeds
 
 import (
+	"bytes"
 	"encoding/binary"
 	"math"
 	"time"
@@ -343,11 +344,15 @@ func (f *Feed) SendClaudeToken(id uint64, token string) {
 	message[messageSize-1] = uint8(common.MessageClaudeAppend)
 	f.claudeMessage <- message
 }
-func (f *Feed) SendClaudeComplete(id uint64, response string) {
-	messageSize := 9 + len(response)
+func (f *Feed) SendClaudeComplete(id uint64, isError bool, response *bytes.Buffer) {
+	messageSize := 9 + response.Len()
 	message := make([]byte, messageSize)
 	binary.LittleEndian.PutUint64(message, math.Float64bits(float64(id)))
-	copy(message[8:], response)
-	message[messageSize-1] = uint8(common.MessageClaudeDone)
+	copy(message[8:], response.Bytes())
+	if isError {
+		message[messageSize-1] = uint8(common.MessageClaudeError)
+	} else {
+		message[messageSize-1] = uint8(common.MessageClaudeDone)
+	}
 	f.claudeMessage <- message
 }
