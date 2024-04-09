@@ -362,13 +362,14 @@ func CheckIfClaudeAllowed(ip string) bool {
 		return false
 	}
 	if count < 4 {
-		fiveMinutesAgo := time.Now().Add(-5 * time.Minute)
+		fiveMinutesAgo := time.Now().Add(-5 * time.Minute).Unix()
 
 		err = sq.Select("COUNT(*)").
 			From("posts").
 			Where("ip = ? and time <= ?", ip, fiveMinutesAgo).QueryRow().Scan(&count)
-		if err != nil {
+		if err == nil {
 			return count > 0
 		}
 	}
+	return false
 }
