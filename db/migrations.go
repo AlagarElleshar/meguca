@@ -1591,6 +1591,17 @@ var migrations = []func(tx *sql.Tx) error{
 				{after, tableUpdate},
 			}})
 	},
+	func(tx *sql.Tx) (err error) {
+		err = execAll(tx,
+			`DROP INDEX editing`,
+			`ALTER TABLE posts DROP CONSTRAINT posts_claude_id_key`,
+			`DROP INDEX posts_time_idx`)
+		return
+	},
+	func(tx *sql.Tx) (err error) {
+		_, err = tx.Exec(`DROP INDEX post_board`)
+		return
+	},
 }
 
 func createIndex(table string, columns ...string) string {
