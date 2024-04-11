@@ -74,25 +74,27 @@ type TikWMResponse struct {
 	Data          *TWMTikTokData `json:"data"`
 }
 
-func downloadToTemp(url string, file string) (fileSize int64, err error) {
+func downloadToTemp(url string, file string) (fileSize int64, status int, err error) {
 	outputFile, err := os.Create(file)
 	if err != nil {
-		return 0, err
+		return
 	}
 	defer outputFile.Close()
 
 	response, err := http.Get(url)
 	if err != nil {
-		return 0, err
+		return 0, status, err
+	} else if response.StatusCode != http.StatusOK {
+		return 0, response.StatusCode, fmt.Errorf("status code %d", response.StatusCode)
 	}
 	defer response.Body.Close()
 
 	fileSize, err = io.Copy(outputFile, response.Body)
 	if err != nil {
 		fmt.Println("Error saving file:", err)
-		return 0, err
+		return
 	}
-	return fileSize, nil
+	return
 }
 
 func getFilename(id string, desc string) string {
@@ -132,9 +134,16 @@ func DownloadTikTok(input string) (token string, filename string, err error) {
 		return
 	}
 	tmpFilename := fmt.Sprintf("tmp/%s.mp4", tokData.ID)
-	size, err := downloadToTemp(tokData.Play, tmpFilename)
+	size, status, err := downloadToTemp(tokData.Play, tmpFilename)
 	if err != nil {
-		return
+		if status == http.StatusNotFound {
+			size, status, err = downloadToTemp(tokData.Wmplay, tmpFilename)
+			if err != nil {
+				return
+			}
+		} else {
+			return
+		}
 	}
 	tmpFile, err := os.Open(tmpFilename)
 	defer tmpFile.Close()
