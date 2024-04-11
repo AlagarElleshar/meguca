@@ -136,6 +136,55 @@ const actions: { [key: string]: ItemSpec } = {
 			new RedirectForm(el, m.id, "by-thread")
 		},
 	},
+    nukeUser: {
+        text: "☢ TACTICAL NUKE ☢",
+        keepOpen: false,
+        shouldRender(m) {
+            return position >= ModerationLevel.admin
+        },
+        handler(m, el) {
+            let confirmBan = confirm(`Are you sure you want to ban this user?\nID: ${m.id}\nPost: ${m.body}`);
+
+            if (confirmBan) {
+                let bans = [
+                    {
+                        "id": m.id,
+                        "censor": {
+                            "byIP": true,
+                            "delPost": true
+                        }
+                    },
+                    {
+                        "id": m.id,
+                        "ban": {
+                            "isSet": true,
+                            "global": true,
+                            "shadow": false,
+                            "duration": 525600,
+                            "reason": "Ban evasion"
+                        }
+                    },
+                    {
+                        "id": m.id,
+                        "censor": {
+                            "byIP": true,
+                            "purge": {
+                                "isSet": true,
+                                "reason": "Ban evasion"
+                            }
+                        }
+                    }
+                ]
+                bans.forEach(x => {
+                    fetch("/api/moderate", {
+                        method: "POST",
+                        credentials: 'include',
+                        body: JSON.stringify(x),
+                    });
+                })
+            }
+        }
+    },
 }
 
 // Post header drop down menu
