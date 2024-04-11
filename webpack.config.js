@@ -26,7 +26,7 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, 'www', "js"),
         filename: '[name].[contenthash].js',
-        publicPath: '/assets/js',
+        publicPath: '/assets/js/',
     },
     plugins: [
         new WebpackManifestPlugin({
