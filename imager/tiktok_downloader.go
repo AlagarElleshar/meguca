@@ -95,6 +95,9 @@ func downloadToTemp(url string, file string) (fileSize int64, err error) {
 }
 
 func getFilename(id string, desc string) string {
+	if len(desc) == 0 {
+		return id
+	}
 	prepend := id + " "
 	remainingLen := 200 - len(prepend)
 	normalize := norm.NFC.String(desc)
