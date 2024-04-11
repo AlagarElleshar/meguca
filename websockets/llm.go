@@ -15,8 +15,8 @@ const (
 	Claude3Opus         = "claude-3-opus-20240229"
 	Claude3Sonnet       = "claude-3-sonnet-20240229"
 	Claude3Haiku        = "claude-3-haiku-20240307"
-	DefaultSystemPrompt = `You are an AI assistant designed to provide concise and helpful responses to user questions on an online chatroom. 
-You will assist users by answering their queries directly and succinctly. This is a fast-paced platform so you must keep your responses extremely concise.`
+	DefaultSystemPrompt = `You are an AI assistant designed to provide concise and helpful responses to user questions on a fast-paced online chatroom. 
+You will assist users by answering their queries directly and succinctly.`
 )
 
 func encodeMessages(prompt string, img *[]byte) []byte {
