@@ -36,14 +36,15 @@ type TWMTikTokData struct {
 		Duration int    `json:"duration"`
 		Album    string `json:"album"`
 	} `json:"music_info"`
-	PlayCount     int  `json:"play_count"`
-	DiggCount     int  `json:"digg_count"`
-	CommentCount  int  `json:"comment_count"`
-	ShareCount    int  `json:"share_count"`
-	DownloadCount int  `json:"download_count"`
-	CollectCount  int  `json:"collect_count"`
-	CreateTime    int  `json:"create_time"`
-	IsAd          bool `json:"is_ad"`
+	PlayCount     int             `json:"play_count"`
+	DiggCount     int             `json:"digg_count"`
+	CommentCount  int             `json:"comment_count"`
+	ShareCount    int             `json:"share_count"`
+	DownloadCount int             `json:"download_count"`
+	CollectCount  int             `json:"collect_count"`
+	CreateTime    int             `json:"create_time"`
+	IsAd          bool            `json:"is_ad"`
+	Images        json.RawMessage `json:"images"`
 	CommerceInfo  struct {
 		AdvPromotable          bool `json:"adv_promotable"`
 		AuctionAdInvited       bool `json:"auction_ad_invited"`
@@ -124,6 +125,10 @@ func DownloadTikTok(input string) (token string, filename string, err error) {
 	tokData := <-twmResponseChannel
 	err = <-twmErrChannel
 	if err != nil || tokData == nil {
+		return
+	}
+	if tokData.Images != nil {
+		err = errors.New("Image URL Unsupported")
 		return
 	}
 	tmpFilename := fmt.Sprintf("tmp/%s.mp4", tokData.ID)
