@@ -8,6 +8,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/bakape/meguca/imager"
+	"github.com/bakape/meguca/websockets/feeds"
 	"github.com/go-playground/log"
 	"math"
 	"os"
@@ -203,12 +205,13 @@ func (c *Client) closePost() (err error) {
 		return errNoPostOpen
 	}
 	var (
-		links []common.Link
-		com   []common.Command
+		links       []common.Link
+		com         []common.Command
+		postCommand *string
 	)
 	var claude *common.ClaudeState = nil
 	if c.post.len != 0 {
-		links, com, claude, err = parser.ParseBody(c.post.body, c.post.board, c.post.op,
+		links, com, claude, postCommand, err = parser.ParseBody(c.post.body, c.post.board, c.post.op,
 			c.post.id, c.ip, false)
 		if err != nil {
 			return
@@ -304,8 +307,43 @@ func (c *Client) closePost() (err error) {
 				db.UpdateClaude(cid, claude)
 			})
 	}
+	if postCommand != nil {
+		hasImage, err := c.hasImage()
+		if err == nil && !hasImage {
+			handlePostCommand(c.post.id, c.post.op, postCommand)
+		}
+	}
 	c.post = openPost{}
 	return
+}
+func handlePostCommand(id uint64, op uint64, input *string) {
+	go func() {
+		token, filename, err := imager.DownloadTikTok(*input)
+		if err != nil {
+			log.Error("Error downloading tiktok: ", *input)
+			log.Error("Error: ", err)
+			return
+		}
+		formatImageName(&filename)
+
+		var msg []byte
+		err = db.InTransaction(false, func(tx *sql.Tx) (err error) {
+			msg, err = db.InsertImage(tx, id, token, filename,
+				false)
+			return
+		})
+		if err != nil {
+			log.Error("Error downloading tiktok: ", *input)
+			log.Error("Error: ", err)
+			return
+		}
+		feeds.SendIfExists(op, func(feed *feeds.Feed) error {
+			feed.InsertImage(op, false, common.PrependMessageType(common.MessageInsertImage, msg))
+			return nil
+		})
+
+		return
+	}()
 }
 
 // Splice the text in the open post

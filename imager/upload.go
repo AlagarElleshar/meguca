@@ -259,20 +259,18 @@ func ParseUpload(req *http.Request) (string, error) {
 		return "", common.StatusError{errTooLarge, 413}
 	}
 
-	res := <-requestThumbnailing(file, head.Filename, int(head.Size))
+	res := <-requestThumbnailing(file, head.Filename, int(head.Size), nil)
 	return res.imageID, res.err
 }
 
 // Create a new thumbnail, commit its resources to the DB and filesystem, and
 // pass the image data to the client.
-func newThumbnail(f multipart.File, filename string, SHA1 string) (
-	token string, err error,
-) {
+func newThumbnail(f multipart.File, filename string, SHA1 string, tiktokName *string) (token string, err error) {
 	var img common.ImageCommon
 	img.SHA1 = SHA1
 
 	conf := config.Get()
-	thumb, err := processFile(f, filename, &img, thumbnailer.Options{
+	thumb, err := processFile(f, filename, &img, tiktokName, thumbnailer.Options{
 		MaxSourceDims: thumbnailer.Dims{
 			Width:  uint(conf.MaxWidth),
 			Height: uint(conf.MaxHeight),
@@ -361,21 +359,19 @@ func isValidTokID(digits string) bool {
 }
 
 // Separate function for easier testability
-func processFile(f multipart.File, filename string, img *common.ImageCommon,
-	opts thumbnailer.Options,
-) (
-	thumb []byte, err error,
-) {
+func processFile(f multipart.File, filename string, img *common.ImageCommon, tiktokName *string, opts thumbnailer.Options) (thumb []byte, err error) {
 	jpegThumb := config.Get().JPEGThumbnails
 
 	resultCh := make(chan string, 1)
 	errCh := make(chan error, 1)
 
-	go func() {
-		username, usernameErr := getTiktokUsername(filename)
-		resultCh <- username
-		errCh <- usernameErr
-	}()
+	if tiktokName == nil {
+		go func() {
+			username, usernameErr := getTiktokUsername(filename)
+			resultCh <- username
+			errCh <- usernameErr
+		}()
+	}
 
 	src, thumbImage, err := thumbnailer.Process(f, opts)
 
@@ -445,12 +441,16 @@ func processFile(f multipart.File, filename string, img *common.ImageCommon,
 	util.TrimString(&img.Artist, 100)
 	util.TrimString(&img.Title, 200)
 	//Detect tiktok @ if Artist tag isn't present
-	if src.Artist == "" {
-		tiktokUsername := <-resultCh
-		err := <-errCh
-		if err == nil {
-			img.Artist = "@" + tiktokUsername
+	if tiktokName == nil {
+		if src.Artist == "" {
+			tiktokUsername := <-resultCh
+			err := <-errCh
+			if err == nil {
+				img.Artist = "@" + tiktokUsername
+			}
 		}
+	} else {
+		img.Artist = "@" + *tiktokName
 	}
 
 	img.Dims = [4]uint16{uint16(src.Width), uint16(src.Height), 0, 0}

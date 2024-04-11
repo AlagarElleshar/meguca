@@ -22,16 +22,7 @@ func init() {
 
 // ParseBody parses the entire post text body for commands and links.
 // internal: function was called by automated upkeep task
-func ParseBody(
-	body []byte,
-	board string,
-	thread uint64,
-	id uint64,
-	ip string,
-	internal bool,
-) (
-	links []common.Link, com []common.Command, claude *common.ClaudeState, err error,
-) {
+func ParseBody(body []byte, board string, thread uint64, id uint64, ip string, internal bool) (links []common.Link, com []common.Command, claude *common.ClaudeState, postCommandLink *string, err error) {
 	err = IsPrintableString(string(body), true)
 	if err != nil {
 		if internal {
@@ -130,7 +121,11 @@ func ParseBody(
 			string(m[1]),
 			bytes.Buffer{},
 		}
-		return
+	}
+	m = common.PostCommandRegexp.FindSubmatch(body)
+	if m != nil {
+		result := string(m[1])
+		postCommandLink = &result
 	}
 
 	return

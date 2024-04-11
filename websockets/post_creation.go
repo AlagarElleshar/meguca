@@ -94,7 +94,7 @@ func CreateThread(req ThreadCreationRequest, ip string) (
 	if err != nil {
 		return
 	}
-	post, err = constructPost(req.ReplyCreationRequest, conf, ip, 0)
+	post, postCommand, err := constructPost(req.ReplyCreationRequest, conf, ip, 0)
 	if err != nil {
 		return
 	}
@@ -126,6 +126,8 @@ func CreateThread(req ThreadCreationRequest, ip string) (
 			if err != nil {
 				return
 			}
+		} else if !conf.TextOnly && req.Image.Token == "" && postCommand != nil {
+			handlePostCommand(post.ID, post.ID, postCommand)
 		}
 		return
 	})
@@ -189,7 +191,7 @@ func CreatePost(
 		return
 	}
 
-	post, err = constructPost(req, conf, ip, op)
+	post, postCommand, err := constructPost(req, conf, ip, op)
 	if err != nil {
 		return
 	}
@@ -213,6 +215,9 @@ func CreatePost(
 
 		return
 	})
+	if !hasImage && postCommand != nil {
+		handlePostCommand(post.ID, post.OP, postCommand)
+	}
 
 	msg, err = common.EncodeMessage(common.MessageInsertPost, post.Post)
 	return
@@ -293,7 +298,7 @@ func constructPost(
 	ip string,
 	op uint64,
 ) (
-	post db.Post, err error,
+	post db.Post, postCommand *string, err error,
 ) {
 	post = db.Post{
 		StandalonePost: common.StandalonePost{
@@ -390,7 +395,7 @@ func constructPost(
 		// TODO: Move DB checks out of the parser. The parser should just parse.
 		// Return slices of pointers to links and commands that need to be
 		// validated.
-		post.Links, post.Commands, _, err = parser.ParseBody(
+		post.Links, post.Commands, _, postCommand, err = parser.ParseBody(
 			[]byte(req.Body),
 			conf.ID,
 			post.OP,
@@ -398,6 +403,11 @@ func constructPost(
 			ip,
 			false,
 		)
+		clients := feeds.GetByThread(op)
+		if len(clients) == 0 {
+			return
+		}
+
 		if err != nil {
 			return
 		}

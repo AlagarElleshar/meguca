@@ -68,7 +68,7 @@ func TestProcessArchive(t *testing.T) {
 			var img common.ImageCommon
 			f := test.OpenSample(t, c.file)
 			defer f.Close()
-			thumb, err := processFile(f, &img, dummyOpts)
+			thumb, err := processFile(f, &img, dummyOpts, nil)
 			if c.err != "" {
 				if err == nil {
 					t.Fatalf("expected an error")

@@ -118,14 +118,14 @@ func removeFromFeed(id uint64, board string, c common.Client) {
 
 // SendTo sends a message to a feed, if it exists
 func SendTo(id uint64, msg []byte) {
-	sendIfExists(id, func(f *Feed) error {
+	SendIfExists(id, func(f *Feed) error {
 		f.Send(msg)
 		return nil
 	})
 }
 
 // Run a send function of a feed, if it exists
-func sendIfExists(id uint64, fn func(*Feed) error) error {
+func SendIfExists(id uint64, fn func(*Feed) error) error {
 	feeds.mu.RLock()
 	defer feeds.mu.RUnlock()
 
@@ -138,7 +138,7 @@ func sendIfExists(id uint64, fn func(*Feed) error) error {
 // InsertPostInto inserts a post into a tread feed, if it exists. Only use for
 // already closed posts.
 func InsertPostInto(post common.StandalonePost, msg []byte) {
-	sendIfExists(post.OP, func(f *Feed) error {
+	SendIfExists(post.OP, func(f *Feed) error {
 		f.InsertPost(post.Post, msg)
 		return nil
 	})
@@ -161,7 +161,7 @@ func ClosePost(id, op uint64, links []common.Link, commands []common.Command, cl
 		return
 	}
 
-	sendIfExists(op, func(f *Feed) error {
+	SendIfExists(op, func(f *Feed) error {
 		f.ClosePost(id, msg)
 		return nil
 	})
@@ -183,7 +183,7 @@ func handlePostModeration(msg string) (err error) {
 		return
 	}
 	op, logID := arr[0], arr[1]
-	return sendIfExists(op, func(f *Feed) (err error) {
+	return SendIfExists(op, func(f *Feed) (err error) {
 		e, err := db.GetModLogEntry(logID)
 		if err != nil {
 			return

@@ -68,7 +68,7 @@ func TestImageProcessing(t *testing.T) {
 					Width:  150,
 					Height: 150,
 				},
-			})
+			}, nil)
 			if err != nil {
 				t.Fatal(err)
 			}

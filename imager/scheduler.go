@@ -26,10 +26,11 @@ var (
 )
 
 type jobRequest struct {
-	file     multipart.File
-	filename string
-	size     int
-	res      chan<- thumbnailingResponse
+	file       multipart.File
+	filename   string
+	size       int
+	res        chan<- thumbnailingResponse
+	tiktokName *string
 }
 
 type thumbnailingResponse struct {
@@ -38,12 +39,12 @@ type thumbnailingResponse struct {
 }
 
 // Queues upload processing to prevent resource overuse
-func requestThumbnailing(file multipart.File, filename string, size int) <-chan thumbnailingResponse {
+func requestThumbnailing(file multipart.File, filename string, size int, tiktokName *string) <-chan thumbnailingResponse {
 	// 2 separate queues - one for small and one for bigger files.
 	// Allows for some degree of concurrent thumbnailing without exhausting
 	// server resources.
 	ch := make(chan thumbnailingResponse)
-	req := jobRequest{file, filename, size, ch}
+	req := jobRequest{file, filename, size, ch, tiktokName}
 	if size <= 4<<20 {
 		scheduleSmallJob <- req
 	} else {
@@ -59,11 +60,12 @@ func init() {
 			runtime.LockOSThread()
 			for {
 				req := <-queue
-				id, err := processRequest(req.file, req.filename, req.size)
+				id, err := processRequest(req.file, req.filename, req.size, req.tiktokName)
 				req.res <- thumbnailingResponse{id, err}
 			}
 		}(ch)
 	}
+	initTiktokDownloader()
 }
 
 // Hash file to string
@@ -99,7 +101,7 @@ func hashFile(rs io.ReadSeeker, h hash.Hash, encode func([]byte) string,
 	}
 }
 
-func processRequest(file multipart.File, filename string, size int) (token string, err error) {
+func processRequest(file multipart.File, filename string, size int, tiktokName *string) (token string, err error) {
 	SHA1, _, err := hashFile(file, sha1.New(), hex.EncodeToString)
 	if err != nil {
 		return
@@ -119,7 +121,7 @@ func processRequest(file multipart.File, filename string, size int) (token strin
 		return
 	}
 	if !exists {
-		token, err = newThumbnail(file, filename, SHA1)
+		token, err = newThumbnail(file, filename, SHA1, tiktokName)
 	}
 	return
 }
