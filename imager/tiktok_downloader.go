@@ -134,7 +134,7 @@ func DownloadTikTok(input string) (token string, filename string, err error) {
 	if err != nil {
 		return
 	}
-	filename = getFilename(tokData.ID, tokData.Title)
+	filename = getFilename(tokData.ID, strings.Trim(tokData.Title, " "))
 	res := <-requestThumbnailing(tmpFile, filename, int(size), &tokData.Author.UniqueID)
 	if res.err != nil {
 		err = res.err
