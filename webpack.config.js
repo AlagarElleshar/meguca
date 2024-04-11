@@ -1,4 +1,5 @@
 const path = require('path');
+const {WebpackManifestPlugin} = require("webpack-manifest-plugin");
 
 const commonConfig = {
     devtool: 'source-map',
@@ -15,21 +16,22 @@ const commonConfig = {
     },
 }
 
-module.exports = [
-    {
-        ...commonConfig,
-        entry: './client/main.ts',
-        output: {
-            path: path.resolve(__dirname, 'www', "js"),
-            filename: 'main.js'
-        }
+
+module.exports = {
+    ...commonConfig,
+    entry: {
+        main: './client/main.ts',
+        static: './client/static/main.ts',
     },
-    {
-        ...commonConfig,
-        entry: './client/static/main.ts',
-        output: {
-            path: path.resolve(__dirname, 'www', "js","static"),
-            filename: 'main.js'
-        }
-    }
-]
+    output: {
+        path: path.resolve(__dirname, 'www', "js"),
+        filename: '[name].[contenthash].js',
+        publicPath: '/assets/js',
+    },
+    plugins: [
+        new WebpackManifestPlugin({
+            fileName: '../../manifest.json',
+            basePath: '',
+        }),
+    ],
+};

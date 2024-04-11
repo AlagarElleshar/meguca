@@ -1,6 +1,8 @@
 package common
 
 import (
+	"encoding/json"
+	"github.com/go-playground/log"
 	"os"
 	"regexp"
 	"sort"
@@ -92,9 +94,28 @@ var (
 	)
 	DiceRegexp   = regexp.MustCompile(`(\d*)d(\d+)`)
 	ClaudeRegexp = regexp.MustCompile(`(?m)^#claude (\S.*?)$`)
+	MainJS       string
+	StaticJS     string
 )
 
 func init() {
+	// Read the manifest.json file
+	content, err := os.ReadFile("manifest.json")
+	if err != nil {
+		log.Fatal("Error reading manifest.json:", err)
+	}
+
+	// Parse the JSON content
+	var manifest map[string]string
+	err = json.Unmarshal(content, &manifest)
+	if err != nil {
+		log.Fatal("Error parsing manifest.json:", err)
+	}
+
+	// Extract the values of main.js and static.js
+	MainJS = manifest["main.js"]
+	StaticJS = manifest["static.js"]
+	log.Info("Loaded manifest.json")
 	sort.Strings(Langs)
 	sort.Strings(Themes)
 }

@@ -1,5 +1,6 @@
 {% import "encoding/json" %}
 {% import "github.com/bakape/meguca/lang" %}
+{% import "github.com/bakape/meguca/common" %}
 
 Boilerplate HTML for hover post previews on standalone pages
 {% func BoilerPlate() %}{% stripspace %}
@@ -56,6 +57,9 @@ Boilerplate HTML for hover post previews on standalone pages
 <script id="lang-data" type="application/json">
     {% code buf, _ := json.Marshal(ln.Common) %}
     {%z= buf %}
+</script>
+<script id="webpack-location">
+    var webpackStaticJSFile = "{%s= common.StaticJS %}";
 </script>
 <script src="/assets/js/scripts/staticLoader.js"></script>
 <body>

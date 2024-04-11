@@ -70,7 +70,7 @@
 	function loadScript(path) {
 		var script = document.createElement('script');
 		script.type = 'text/javascript';
-		script.src = '/assets/' + path + '.js';
+		script.src = path;
 		head.appendChild(script);
 		return script;
 	}
@@ -95,7 +95,7 @@
 		// 		document.head.appendChild(script);
 		// 	});
 		// } else {
-		loadScript("js/main")
+		loadScript(webpackMainJSFile)
 		// 	.onload = function () {
 		// 	require("main");
 		// };

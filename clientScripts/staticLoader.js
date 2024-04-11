@@ -8,7 +8,7 @@
 		return script;
 	}
 
-	loadScript("js/static/main")
+	loadScript(webpackStaticJSFile)
 	// 	.onload = function () {
 	// 	require("client/static/main");
 	// };

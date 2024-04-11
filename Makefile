@@ -4,9 +4,13 @@ export gulp=$(node_bins)/gulp
 export webpack=$(node_bins)/webpack
 export GO111MODULE=on
 
-.PHONY: server client imager test
+ifeq ($(shell uname -s),Linux)
+    GO_BUILD_TAGS = -tags "libsqlite3 linux"
+endif
 
-all: server client
+.PHONY: client server imager test
+
+all: client server
 
 client: client_vendor
 	$(webpack)
@@ -26,7 +30,7 @@ generate:
 
 server:
 	go generate
-	go build -v
+	go build -v $(GO_BUILD_TAGS)
 
 client_clean:
 	rm -rf www/js www/css/*.css www/css/maps node_modules
