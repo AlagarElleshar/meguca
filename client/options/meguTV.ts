@@ -1,5 +1,5 @@
 import options from ".";
-import { setAttrs } from "../util";
+import {importTemplate, setAttrs} from "../util";
 import { page } from "../state";
 import { sourcePath, serverNow } from "../posts";
 import { fileTypes } from "../common"
@@ -25,13 +25,8 @@ function render() {
 
 	let cont = document.getElementById("megu-tv")
 	if (!cont) {
-		cont = document.createElement("div")
-		setAttrs(cont, {
-			id: "megu-tv",
-			class: "modal glass",
-			style: "display: block;",
-		});
-		document.getElementById("modal-overlay").prepend(cont);
+		const modalOverlay = document.getElementById("modal-overlay");
+		modalOverlay.prepend(importTemplate("megu-tv"));
 	}
 
 	if (options.workModeToggle) {
@@ -53,6 +48,7 @@ function render() {
 			el.setAttribute("data-sha1", playlist[i].sha1);
 			el.setAttribute("style", "max-width:30vw");
 			el.setAttribute("preload", "auto")
+			el.id = "megu-tv-video"
 			el.onmouseenter = () => el.controls = true;
 			el.onmouseleave = () => el.controls = false;
 			el.src = sourcePath(playlist[i].sha1, playlist[i].file_type);

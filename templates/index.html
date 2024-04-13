@@ -173,12 +173,22 @@
 		{% endif %}
 		<template name="flv-player">
 			<div id="flv-player-cont" class="modal glass" style="display: block;">
-                <div id="flv-player-controls">
+                <div class="player-controls">
 					<button type="button" id="flv-screenshot-button">􀌞</button>
                     <button type="button" id="flv-reload-button">􀅈</button>
                     <button type="button" id="flv-close-button">􀆄</button>
                 </div>
 				<video id="flv-player"></video>
+			</div>
+		</template>
+		<template name="megu-tv">
+			<div id="megu-tv" class="modal glass" style="display: block;">
+				<div class="player-controls">
+					<button type="button" id="megu-screenshot-button">􀌞</button>
+					<button type="button" id="megu-share-button">􀈂</button>
+					<button type="button" id="megu-mute-button">􀊢</button>
+					<button type="button" id="megu-close-button">􀆄</button>
+				</div>
 			</div>
 		</template>
 	</head>

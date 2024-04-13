@@ -185,8 +185,16 @@ function addMeguHash(e: MouseEvent) {
 	}
 }
 
-function addStreamFrame(e: MouseEvent) {
-	let videoElement = e.target as HTMLVideoElement
+function addFlvFrame(e: MouseEvent){
+	let videoElement : HTMLVideoElement = <HTMLVideoElement>document.getElementById("megu-tv-video")
+	addStreamFrame(videoElement)
+}
+function addMeguFrame(e: MouseEvent){
+	let videoElement : HTMLVideoElement = <HTMLVideoElement>document.getElementById("megu-tv-video")
+	addStreamFrame(videoElement)
+}
+
+function addStreamFrame(videoElement: HTMLVideoElement) {
 	const canvas = document.createElement('canvas');
 	canvas.width = videoElement.videoWidth;
 	canvas.height = videoElement.videoHeight;
@@ -408,10 +416,14 @@ export default () => {
 	})
 
 	on(document, "click", addMeguHash, {
-		selector: "#megu-tv"
+		selector: "#megu-share-button"
 	})
 
-	on(document, "click", addStreamFrame, {
+	on(document, "click", addMeguFrame, {
+		selector: "#megu-screenshot-button"
+	})
+
+	on(document, "click", addFlvFrame, {
 		selector: "#flv-screenshot-button"
 	})
 
