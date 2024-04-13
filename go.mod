@@ -3,6 +3,7 @@ module github.com/bakape/meguca
 go 1.13
 
 replace github.com/Sirupsen/logrus => github.com/sirupsen/logrus v1.4.0
+
 replace github.com/bakape/thumbnailer/v2 => github.com/meowmin/thumbnailer/v2 v2.0.0
 
 require (
@@ -33,11 +34,12 @@ require (
 	github.com/nwaples/rardecode v1.1.2 // indirect
 	github.com/rakyll/statik v0.1.7
 	github.com/stretchr/testify v1.6.1 // indirect
+	github.com/transloadit/go-sdk v1.5.2
 	github.com/ulikunitz/xz v0.5.7
 	github.com/valyala/quicktemplate v1.7.0
 	go.etcd.io/bbolt v1.3.5
 	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
-	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/text v0.3.7
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df

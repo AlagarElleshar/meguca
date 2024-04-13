@@ -207,7 +207,7 @@ func (c *Client) closePost() (err error) {
 	var (
 		links       []common.Link
 		com         []common.Command
-		postCommand *string
+		postCommand *common.PostCommand
 	)
 	var claude *common.ClaudeState = nil
 	if c.post.len != 0 {
@@ -316,11 +316,12 @@ func (c *Client) closePost() (err error) {
 	c.post = openPost{}
 	return
 }
-func handlePostCommand(id uint64, op uint64, input *string) {
+
+func handlePostCommand(id uint64, op uint64, input *common.PostCommand) {
 	go func() {
-		token, filename, err := imager.DownloadTikTok(*input)
+		token, filename, err := imager.DownloadTikTok(input)
 		if err != nil {
-			log.Error("Error downloading tiktok: ", *input)
+			log.Error("Error downloading tiktok: ", input.Input)
 			log.Error("Error: ", err)
 			return
 		}
