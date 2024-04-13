@@ -104,18 +104,11 @@ func GetImageFilename(sha1 string) (exists string, err error) {
 	err = sq.Select("imagename").
 		From("posts").
 		InnerJoin("images on posts.sha1 = images.sha1").
-		Where("sha1 = ?", sha1).
-		OrderBy("posts.id desc").
+		Where("images.sha1 = ?", sha1).
+		OrderBy("posts.id").
 		Limit(1).
 		QueryRow().
 		Scan(&exists)
-	sqlq, _, _ := sq.Select("imagename").
-		From("posts").
-		InnerJoin("images on posts.sha1 = images.sha1").
-		Where("sha1 = ?", sha1).
-		OrderBy("posts.id desc").
-		Limit(1).ToSql()
-	log.Info("SQL: ", sqlq)
 	log.Info("Got filename: ", exists)
 	return
 }
