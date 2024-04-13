@@ -38,8 +38,10 @@ function render() {
 	// Should help caching.
 	const existing: { [sha1: string]: HTMLVideoElement } = {};
 	for (let ch of [...cont.children] as HTMLVideoElement[]) {
-		ch.remove();
-		existing[ch.getAttribute("data-sha1")] = ch;
+		if(ch.tagName === "VIDEO") {
+			ch.remove();
+			existing[ch.getAttribute("data-sha1")] = ch;
+		}
 	}
 	for (let i = 0; i < playlist.length; i++) {
 		let el = existing[playlist[i].sha1];
