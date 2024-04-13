@@ -234,7 +234,7 @@ func UploadMeguHash(w http.ResponseWriter, r *http.Request) {
 	} else if token != "" {
 		response := struct {
 			Token    string `json:"token"`
-			Filename string `json:"filename"`
+			Filename string `json:"name"`
 		}{token, filename}
 		responseBytes, err := json.Marshal(&response)
 		if err != nil {
