@@ -324,7 +324,12 @@ export default class FormModel extends Post {
 			const pr = this.view.upload.uploadFileHash(hash);
 			this.view.input.focus();
 			this.handleUploadResponse(await pr);
-			this.inputBody = "👈 ~~Reposted from MeguTV~~\n" + this.inputBody;
+			this.view.input.setSelectionRange(0, 0);
+			this.view.input.value ="👈 ~~Reposted from MeguTV~~\n" +  this.view.input.value
+			this.view.onInput()
+			// this.paste()
+			// this.view.replaceText("👈 ~~Reposted from MeguTV~~\n" + this.body, p.pos,
+			// 	postSM.state !== postState.draft || old.length !== 0)
 		}
 	}
 
