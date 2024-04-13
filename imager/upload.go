@@ -217,9 +217,11 @@ func UploadMeguHash(w http.ResponseWriter, r *http.Request) {
 			filename, err = db.GetImageFilename(sha1)
 			if err != nil {
 				token, err = db.NewImageToken(tx, sha1)
+				log.Info("Got filename: ", filename)
 			}
 			return
 		})
+		log.Info("Got filename2: ", filename)
 		if err != nil {
 			return
 		}
@@ -228,6 +230,7 @@ func UploadMeguHash(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}()
+	log.Info("Got filename3: ", filename)
 	if err != nil {
 		LogError(w, r, err)
 	} else if token != "" {
