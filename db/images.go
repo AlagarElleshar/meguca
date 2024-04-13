@@ -107,6 +107,7 @@ func GetImageFilename(sha1 string) (exists string, err error) {
 		Where("sha1 = ?", sha1).
 		OrderBy("posts.id desc").
 		Limit(1).
+		QueryRow().
 		Scan(&exists)
 	log.Info("Got filename: ", exists)
 	return
