@@ -135,6 +135,12 @@ type Command struct {
 	Dice      []uint16
 }
 
+type PostCommand struct {
+	Input    string
+	Rotation int
+	HD       bool
+}
+
 // MarshalJSON implements json.Marshaler
 func (c Command) MarshalJSON() ([]byte, error) {
 	b := make([]byte, 0, 128)

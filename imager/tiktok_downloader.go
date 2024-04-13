@@ -4,12 +4,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/bakape/meguca/common"
 	"github.com/go-playground/log"
 	"golang.org/x/text/unicode/norm"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
+	"os/exec"
 	"strings"
 	"time"
 )
@@ -62,7 +64,7 @@ type TWMTikTokData struct {
 }
 
 var (
-	twmRequestChannel  chan *string
+	twmRequestChannel  chan *common.PostCommand
 	twmResponseChannel chan *TWMTikTokData
 	twmErrChannel      chan error
 )
@@ -72,6 +74,16 @@ type TikWMResponse struct {
 	Msg           string         `json:"msg"`
 	ProcessedTime float64        `json:"processed_time"`
 	Data          *TWMTikTokData `json:"data"`
+}
+
+func rotateVideoFile(filename string, rotation int) error {
+	cmd := exec.Command("exiftool", fmt.Sprintf("-rotation=%d", rotation), filename)
+
+	err := cmd.Run()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func downloadToTemp(url string, file string) (fileSize int64, status int, err error) {
@@ -122,8 +134,8 @@ func getFilename(id string, desc string) string {
 	return prepend + string(descBytes[:pos])
 }
 
-func DownloadTikTok(input string) (token string, filename string, err error) {
-	twmRequestChannel <- &input
+func DownloadTikTok(input *common.PostCommand) (token string, filename string, err error) {
+	twmRequestChannel <- input
 	tokData := <-twmResponseChannel
 	err = <-twmErrChannel
 	if err != nil || tokData == nil {
@@ -145,6 +157,9 @@ func DownloadTikTok(input string) (token string, filename string, err error) {
 			return
 		}
 	}
+	if input.Rotation != 0 {
+		err = rotateVideoFile(tmpFilename, input.Rotation)
+	}
 	tmpFile, err := os.Open(tmpFilename)
 	defer tmpFile.Close()
 	defer os.Remove(tmpFilename)
@@ -160,7 +175,7 @@ func DownloadTikTok(input string) (token string, filename string, err error) {
 }
 
 func initTiktokDownloader() {
-	twmRequestChannel = make(chan *string)
+	twmRequestChannel = make(chan *common.PostCommand)
 	twmResponseChannel = make(chan *TWMTikTokData)
 	twmErrChannel = make(chan error)
 	go func() {
@@ -175,11 +190,11 @@ func initTiktokDownloader() {
 
 }
 
-func getTiktokVideoURL(twmInput *string) (tiktokData *TWMTikTokData, err error) {
+func getTiktokVideoURL(twmInput *common.PostCommand) (tiktokData *TWMTikTokData, err error) {
 	client := &http.Client{}
 
 	data := url.Values{
-		"url": {*twmInput},
+		"url": {twmInput.Input},
 		"web": {"0"},
 		"hd":  {"0"},
 	}

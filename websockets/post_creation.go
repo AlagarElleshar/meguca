@@ -298,7 +298,7 @@ func constructPost(
 	ip string,
 	op uint64,
 ) (
-	post db.Post, postCommand *string, err error,
+	post db.Post, postCommand *common.PostCommand, err error,
 ) {
 	post = db.Post{
 		StandalonePost: common.StandalonePost{
