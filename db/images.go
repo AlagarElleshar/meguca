@@ -300,7 +300,8 @@ func VideoPlaylist(board string) (videos []Video, err error) {
 				and file_type in (?, ?)
 				and audio = true
 				and video = true
-				and length between 10 and 600`,
+				and length between 10 and 60
+                and codec != 'hevc'`,
 				board,
 				int(common.WEBM),
 				int(common.MP4),
