@@ -216,14 +216,11 @@ func UploadMeguHash(w http.ResponseWriter, r *http.Request) {
 		err = db.InTransaction(false, func(tx *sql.Tx) (err error) {
 			filename, err = db.GetImageFilename(sha1)
 			if err != nil {
-				token, err = db.NewImageToken(tx, sha1)
-				log.Info("Got filename: ", filename)
-				log.Info("Got token: ", token)
+				return
 			}
+			token, err = db.NewImageToken(tx, sha1)
 			return
 		})
-		log.Info("Got filename2: ", filename)
-		log.Info("Got token: ", token)
 		if err != nil {
 			return
 		}
@@ -232,8 +229,6 @@ func UploadMeguHash(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}()
-	log.Info("Got filename3: ", filename)
-	log.Info("Got token: ", token)
 	if err != nil {
 		LogError(w, r, err)
 	} else if token != "" {
@@ -242,7 +237,6 @@ func UploadMeguHash(w http.ResponseWriter, r *http.Request) {
 			Filename string `json:"filename"`
 		}{token, filename}
 		responseBytes, err := json.Marshal(&response)
-		log.Info("Response: ", string(responseBytes))
 		if err != nil {
 			LogError(w, r, err)
 		} else {
