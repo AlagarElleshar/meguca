@@ -3,11 +3,18 @@ import {extend} from '../util'
 import Collection from './collection'
 import PostView from './view'
 import {SpliceResponse} from '../client'
-import {mine, seenPosts, storeSeenPost, posts, hidden} from "../state"
+import {hidden, mine, posts, seenPosts, storeSeenPost} from "../state"
 import {notifyAboutReply} from "../ui"
 import {
-    PostData, TextState, PostLink, Command, ImageData,
-    ModerationEntry, ModerationAction, ModerationLevel, ClaudeState,
+    ClaudeState,
+    Command,
+    ImageData,
+    ModerationAction,
+    ModerationEntry,
+    ModerationLevel,
+    PostData,
+    PostLink,
+    TextState,
 } from "../common"
 import {hideRecursively} from "./hide"
 import options from "../options"
@@ -244,8 +251,7 @@ export class Post extends Model implements PostData {
             this.claude_state = {
                 response: response, status: "error", prompt: "",
             }
-        }
-        else {
+        } else {
             this.claude_state.status = "error"
             this.claude_state.response = response
         }

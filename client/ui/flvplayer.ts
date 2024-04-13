@@ -65,8 +65,8 @@ export async function playLive(url: string) {
         player.play();
         currentURL = url;
     }
-
 }
+
 
 export async function playButtonClicked(url: string) {
     console.log("Button clicked, " + playerOpen);

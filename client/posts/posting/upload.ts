@@ -229,6 +229,38 @@ export default class UploadForm extends View<Post> {
         };
     }
 
+    public async uploadFileHash(hash: string): Promise<FileData> | null {
+        if (!navigator.onLine || this.isUploading) {
+            return null;
+        }
+        let token: string;
+        // Detect, if the crypto API can be used
+        if (location.protocol === "https:"
+            || location.hostname === "localhost"
+        ) {
+            // First send a an sha1 hash to the server, in case it already has
+            // the file thumbnailed and we don't need to upload.
+            const res = await fetch("/api/upload-hash", {
+                method: "POST",
+                body: hash,
+            });
+            const text = await res.text();
+            if (this.handleResponse(res.status, text)) {
+                token = text;
+            } else {
+                return null;
+            }
+        }
+        if (!token) {
+            return null;
+        }
+        return {
+            token,
+            name: hash,
+            spoiler: false,
+        };
+    }
+
     // Handle a server response and return, if the request succeeded.
     private handleResponse(code: number, text: string): boolean {
         switch (code) {

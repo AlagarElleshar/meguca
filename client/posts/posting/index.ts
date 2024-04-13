@@ -172,6 +172,42 @@ function quotePost(e: MouseEvent) {
 	postModel.addReference(id, sel)
 }
 
+function addMeguHash(e: MouseEvent) {
+	let meguDiv = e.target as HTMLElement
+	let hash = meguDiv.firstElementChild.getAttribute("data-sha1");
+	// On board pages do nothing
+	if (!state.page.thread) {
+		return
+	}
+	postSM.feed(postEvent.open)
+	if(postModel && hash) {
+		postModel.uploadFileHash(hash);
+	}
+}
+
+function addStreamFrame(e: MouseEvent) {
+	let videoElement = e.target as HTMLVideoElement
+	const canvas = document.createElement('canvas');
+	canvas.width = videoElement.videoWidth;
+	canvas.height = videoElement.videoHeight;
+	const context = canvas.getContext('2d');
+	context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+	canvas.toBlob(blob => {
+		if (blob) {
+			const ts = new Date().getTime();
+			const jpgFile = new File([blob], `frame-${ts}.jpg`, { type: "image/jpeg" });
+			// On board pages do nothing
+			if (!state.page.thread) {
+				return
+			}
+			postSM.feed(postEvent.open)
+			if(postModel && jpgFile) {
+				postModel.uploadFile(jpgFile)
+			}
+		}
+	}, "image/jpeg");
+}
+
 // Update the draft post's fields on identity change, if any
 function updateIdentity() {
 	if (postSM.state === postState.draft && !state.boardConfig.forcedAnon) {
@@ -369,6 +405,14 @@ export default () => {
 	// Handle clicks on post quoting links
 	on(document, "click", quotePost, {
 		selector: "a.quote",
+	})
+
+	on(document, "click", addMeguHash, {
+		selector: "#megu-tv"
+	})
+
+	on(document, "click", addStreamFrame, {
+		selector: "#flv-screenshot-button"
 	})
 
 	// Store last selected range that is not a quote link

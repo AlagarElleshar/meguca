@@ -319,6 +319,14 @@ export default class FormModel extends Post {
 		}
 	}
 
+	public async uploadFileHash(hash: string) {
+		if (!boardConfig.textOnly && !this.image) {
+			const pr = this.view.upload.uploadFileHash(hash);
+			this.view.input.focus();
+			this.handleUploadResponse(await pr);
+		}
+	}
+
 	private handleUploadResponse(data: FileData | null) {
 		// Upload failed, canceled or image added while thumbnailing
 		if (!data || this.image || this.allocatingImage) {
