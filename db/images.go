@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"github.com/go-playground/log"
 	"io"
 	"time"
 
@@ -107,6 +108,7 @@ func GetImageFilename(sha1 string) (exists string, err error) {
 		OrderBy("posts.id desc").
 		Limit(1).
 		Scan(&exists)
+	log.Info("Got filename: ", exists)
 	return
 }
 
