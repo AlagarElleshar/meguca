@@ -236,6 +236,7 @@ func UploadMeguHash(w http.ResponseWriter, r *http.Request) {
 			Filename string `json:"filename"`
 		}{token, filename}
 		responseBytes, err := json.Marshal(&response)
+		log.Info("Response: ", string(responseBytes))
 		if err != nil {
 			LogError(w, r, err)
 		} else {
