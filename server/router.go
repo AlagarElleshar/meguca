@@ -84,6 +84,7 @@ func createRouter() http.Handler {
 		// All upload images
 		api.POST("/upload", imager.NewImageUpload)
 		api.POST("/upload-hash", imager.UploadImageHash)
+		api.POST("/upload-megu-hash", imager.UploadMeguHash)
 		api.POST("/create-thread", createThread)
 		api.POST("/create-reply", createReply)
 

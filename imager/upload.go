@@ -7,6 +7,7 @@ import (
 	"crypto/md5"
 	"database/sql"
 	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"gopkg.in/vansante/go-ffprobe.v2"
 	"image"
@@ -197,6 +198,49 @@ func UploadImageHash(w http.ResponseWriter, r *http.Request) {
 		LogError(w, r, err)
 	} else if token != "" {
 		w.Write([]byte(token))
+	}
+}
+func UploadMeguHash(w http.ResponseWriter, r *http.Request) {
+	token, filename, err := func() (token string, filename string, err error) {
+		bypass, err := validateUploader(w, r)
+		if err != nil {
+			return
+		}
+
+		buf, err := ioutil.ReadAll(http.MaxBytesReader(w, r.Body, 40))
+		if err != nil {
+			return
+		}
+		sha1 := string(buf)
+
+		err = db.InTransaction(false, func(tx *sql.Tx) (err error) {
+			filename, err = db.GetImageFilename(sha1)
+			if err != nil {
+				token, err = db.NewImageToken(tx, sha1)
+			}
+			return
+		})
+		if err != nil {
+			return
+		}
+		if !bypass {
+			err = incrementSpamScore(w, r)
+		}
+		return
+	}()
+	if err != nil {
+		LogError(w, r, err)
+	} else if token != "" {
+		response := struct {
+			Token    string `json:"token"`
+			Filename string `json:"filename"`
+		}{token, filename}
+		responseBytes, err := json.Marshal(&response)
+		if err != nil {
+			LogError(w, r, err)
+		} else {
+			w.Write(responseBytes)
+		}
 	}
 }
 

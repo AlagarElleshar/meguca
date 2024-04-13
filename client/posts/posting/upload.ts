@@ -229,36 +229,37 @@ export default class UploadForm extends View<Post> {
         };
     }
 
+    // For use with megu tv only
     public async uploadFileHash(hash: string): Promise<FileData> | null {
         if (!navigator.onLine || this.isUploading) {
             return null;
         }
-        let token: string;
+        let response: FileData;
         // Detect, if the crypto API can be used
         if (location.protocol === "https:"
             || location.hostname === "localhost"
         ) {
             // First send a an sha1 hash to the server, in case it already has
             // the file thumbnailed and we don't need to upload.
-            const res = await fetch("/api/upload-hash", {
+            const res = await fetch("/api/upload-megu-hash", {
                 method: "POST",
                 body: hash,
             });
-            const text = await res.text();
-            if (this.handleResponse(res.status, text)) {
-                token = text;
-            } else {
-                return null;
+            try {
+                response = await res.json();
+            } catch (error) {
+                let text = await res.text()
+                if (this.handleResponse(res.status, text)) {
+                } else {
+                    return null;
+                }
             }
         }
-        if (!token) {
+        if (!response) {
             return null;
         }
-        return {
-            token,
-            name: hash,
-            spoiler: false,
-        };
+        response.spoiler = false
+        return response
     }
 
     // Handle a server response and return, if the request succeeded.

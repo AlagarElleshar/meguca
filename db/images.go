@@ -99,6 +99,16 @@ func ImageExists(tx *sql.Tx, sha1 string) (exists bool, err error) {
 	}
 	return
 }
+func GetImageFilename(sha1 string) (exists string, err error) {
+	err = sq.Select("imagename").
+		From("posts").
+		InnerJoin("images on posts.sha1 = images.sha1").
+		Where("sha1 = ?", sha1).
+		OrderBy("posts.id desc").
+		Limit(1).
+		Scan(&exists)
+	return
+}
 
 // ImageVisible returns if the image is attached to any non-deleted and unspoilered posts on the board
 func ImageVisible(sha1, board string) (visible bool, err error) {
