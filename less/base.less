@@ -441,8 +441,8 @@ iframe[src^="https://www.youtube"] {
 	z-index: -1;
 }
 
-#flv-player-cont:hover {
-  #flv-player-controls {
+#flv-player-cont:hover, #megu-tv:hover {
+  .player-controls {
     display:block;
   }
 }
@@ -465,7 +465,6 @@ iframe[src^="https://www.youtube"] {
 
 #megu-tv {
 	display: block;
-	position: absolute;
 	border: none;
 	padding: 0;
 	video {
