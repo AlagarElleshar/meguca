@@ -28,6 +28,7 @@ function render() {
 		const modalOverlay = document.getElementById("modal-overlay");
 		modalOverlay.prepend(importTemplate("megu-tv"));
 	}
+	cont = document.getElementById("megu-tv")
 
 	if (options.workModeToggle) {
 		cont.removeAttribute("style");
@@ -37,10 +38,12 @@ function render() {
 	// Remove old videos and add new ones, while preserving existing one.
 	// Should help caching.
 	const existing: { [sha1: string]: HTMLVideoElement } = {};
-	for (let ch of [...cont.children] as HTMLVideoElement[]) {
-		if(ch.tagName === "VIDEO") {
-			ch.remove();
-			existing[ch.getAttribute("data-sha1")] = ch;
+	if(cont.children != null) {
+		for (let ch of [...cont.children] as HTMLVideoElement[]) {
+			if (ch.tagName === "VIDEO") {
+				ch.remove();
+				existing[ch.getAttribute("data-sha1")] = ch;
+			}
 		}
 	}
 	for (let i = 0; i < playlist.length; i++) {
