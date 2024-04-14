@@ -57,7 +57,6 @@ export default class UploadForm extends View<Post> {
     private xhr: XMLHttpRequest;
     private bufferedFile: File; // In case we need to resubmit a file
     public attachTiktokButton: HTMLElement;
-    private tiktokFormShown = false;
 
     constructor(model: Post, el: HTMLElement,attachTiktokCallback: () => void) {
         super({ el, model });
@@ -342,6 +341,8 @@ export default class UploadForm extends View<Post> {
             this.xhr = null;
             this.mask.hidden = true;
             this.button.hidden = true;
+            this.attachTiktokButton.hidden = true
+            this.model.view.removeTiktokForm()
             return text;
         }
         return "";
@@ -364,6 +365,7 @@ export default class UploadForm extends View<Post> {
         this.spoiler.hidden = false;
         this.mask.hidden = false;
         this.button.hidden = false;
+        this.attachTiktokButton.hidden = false;
 
         this.audioChunks = [];
         if (this.micButton) {
@@ -385,6 +387,8 @@ export default class UploadForm extends View<Post> {
     // Hide the upload and cancellation button
     public hideButton() {
         this.button.hidden = true;
+        this.attachTiktokButton.hidden = true;
+        this.model.view.removeTiktokForm();
         if (this.micButton) {
             this.micButton.hidden = true;
         }

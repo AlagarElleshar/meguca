@@ -77,8 +77,9 @@ export default class FormView extends PostView {
         })
         templateEl.querySelector(".attach-tiktok-attach").addEventListener("click",()=>{
             let inputVal = input.value
-            let hdCheck = (<HTMLInputElement>templateEl.querySelector(".attach-tiktok-form-hd input")).checked
-            this.model.attachTiktok(inputVal,hdCheck)
+            let hdCheck = (<HTMLInputElement>templateEl.querySelector(".attach-tiktok-form-params input")).checked
+            let rotation = templateEl.querySelector("select").value
+            this.model.attachTiktok(inputVal,hdCheck,rotation)
             templateEl.remove()
             this.upload.attachTiktokButton.hidden = false;
         })

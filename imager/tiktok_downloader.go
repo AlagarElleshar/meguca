@@ -1,15 +1,19 @@
 package imager
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/bakape/meguca/common"
 	"github.com/go-playground/log"
+	transloadit "github.com/transloadit/go-sdk"
 	"golang.org/x/text/unicode/norm"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
+	"os/exec"
 	"strings"
 	"time"
 )
@@ -22,6 +26,7 @@ type TWMTikTokData struct {
 	OriginCover string `json:"origin_cover"`
 	Duration    int    `json:"duration"`
 	Play        string `json:"play"`
+	HDPlay      string `json:"hdplay"`
 	Wmplay      string `json:"wmplay"`
 	Size        int    `json:"size"`
 	WmSize      int    `json:"wm_size"`
@@ -101,6 +106,7 @@ func downloadHDToTemp(url string, file string, rotation int) (fileSize int64, st
 			"vcodec": "libx264",
 			"crf":    20,
 			"c:a":    "copy",
+			"preset": "faster",
 		},
 		"width":  "${file.meta.width}",
 		"height": "${file.meta.height}",
@@ -203,10 +209,10 @@ func DownloadTikTok(input *common.PostCommand) (token string, filename string, e
 	}
 	tmpFilename := fmt.Sprintf("tmp/%s.mp4", tokData.ID)
 	var size int64
-	if input.HD {
-
+	if tokData.Duration > 20 {
+		input.HD = false
 	}
-	if input.HD == true {
+	if input.HD {
 		size, _, err = downloadHDToTemp(tokData.HDPlay, tmpFilename, input.Rotation)
 		if err != nil {
 			defer os.Remove(tmpFilename)

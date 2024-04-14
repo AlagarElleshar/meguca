@@ -445,10 +445,11 @@ func (c *Client) setLastTime() {
 
 func (c *Client) attachTiktok(data []byte) (err error) {
 	size := len(data)
+	rotVal := int(data[size-2]) * 90
 	commandData := common.PostCommand{
 		Input:    string(data[:size-1]),
-		Rotation: 0,
-		HD:       data[size-1] == 0,
+		Rotation: rotVal,
+		HD:       data[size-1] != 0,
 	}
 	handlePostCommand(c.post.id, c.post.op, &commandData)
 	return

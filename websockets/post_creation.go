@@ -127,7 +127,7 @@ func CreateThread(req ThreadCreationRequest, ip string) (
 				return
 			}
 		} else if !conf.TextOnly && req.Image.Token == "" && postCommand != nil {
-			handlePostCommand(post.ID, post.ID, postCommand)
+			//handlePostCommand(post.ID, post.ID, postCommand)
 		}
 		return
 	})
@@ -191,7 +191,7 @@ func CreatePost(
 		return
 	}
 
-	post, postCommand, err := constructPost(req, conf, ip, op)
+	post, _, err = constructPost(req, conf, ip, op)
 	if err != nil {
 		return
 	}
@@ -215,9 +215,9 @@ func CreatePost(
 
 		return
 	})
-	if !hasImage && postCommand != nil {
-		handlePostCommand(post.ID, post.OP, postCommand)
-	}
+	//if !hasImage && postCommand != nil {
+	//	handlePostCommand(post.ID, post.OP, postCommand)
+	//}
 
 	msg, err = common.EncodeMessage(common.MessageInsertPost, post.Post)
 	return

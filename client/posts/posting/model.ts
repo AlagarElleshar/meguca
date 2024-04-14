@@ -281,22 +281,31 @@ export default class FormModel extends Post {
 			delete handlers[message.postID]
 		}
 	}
-	public attachTiktok(input: string, hd: boolean){
+	public attachTiktok(input: string, hd: boolean, rotation: string){
 		if(postSM.state == postState.draft) {
 			this.allocatingImage = true;
 			this.requestAlloc(this.trimInput(this.view.input.value, true),
 				null);
 		}
 		const strArray = new TextEncoder().encode(input);
-		const bufferSize = strArray.length + 1 + 1;
+		const bufferSize = strArray.length + 3;
 		const buffer = new ArrayBuffer(bufferSize);
 		const view = new DataView(buffer);
 
 		for (let i = 0; i < strArray.length; i++) {
 			view.setUint8(i, strArray[i]);
 		}
-		view.setUint8(strArray.length, hd ? 1 : 0);
-		view.setUint8(strArray.length+1,message.attachTiktok)
+		if (rotation === "90") {
+			view.setUint8(strArray.length, 1);
+		} else if (rotation === "180") {
+			view.setUint8(strArray.length, 2);
+		} else if (rotation === "270") {
+			view.setUint8(strArray.length, 3);
+		} else {
+			view.setUint8(strArray.length, 0);
+		}
+        view.setUint8(strArray.length + 1, hd ? 1 : 0);
+        view.setUint8(strArray.length + 2, message.attachTiktok)
 		sendBinary(buffer)
 	}
 

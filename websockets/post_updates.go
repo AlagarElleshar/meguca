@@ -310,7 +310,7 @@ func (c *Client) closePost() (err error) {
 	if postCommand != nil {
 		hasImage, err := c.hasImage()
 		if err == nil && !hasImage {
-			handlePostCommand(c.post.id, c.post.op, postCommand)
+			//handlePostCommand(c.post.id, c.post.op, postCommand)
 		}
 	}
 	c.post = openPost{}

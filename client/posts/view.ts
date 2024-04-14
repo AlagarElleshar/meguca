@@ -436,6 +436,14 @@ export default class PostView extends ImageHandler {
         this.reparseBody()
         this.setEditing(false)
     }
+
+    public removeTiktokForm(){
+        let form = this.el.querySelector(".attach-tiktok-form")
+        if(form != null){
+            form.remove()
+        }
+
+    }
 }
 
 function updateTimeTooltip(event: MouseEvent) {
