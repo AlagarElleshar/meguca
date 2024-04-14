@@ -94,7 +94,7 @@ var (
 	)
 	DiceRegexp        = regexp.MustCompile(`(\d*)d(\d+)`)
 	ClaudeRegexp      = regexp.MustCompile(`(?m)^#claude (\S.*?)$`)
-	PostCommandRegexp = regexp.MustCompile(`(?m)^#post (\S.*?)(?:\s(-?\d+))?\s*?$`)
+	PostCommandRegexp = regexp.MustCompile(`(?m)^#post(hd)? (\S.*?)(?:\s(-?\d+))?\s*?$`)
 	MainJS            string
 	StaticJS          string
 )

@@ -127,8 +127,9 @@ func ParseBody(body []byte, board string, thread uint64, id uint64, ip string, i
 	if m != nil {
 		postCom := common.PostCommand{}
 		postCommand = &postCom
-		postCom.Input = string(m[1])
-		rotation := m[2]
+		postCom.Input = string(m[2])
+		rotation := m[3]
+		postCom.HD = m[1] != nil
 		if rotation != nil {
 			rotationVal, err := strconv.ParseInt(string(rotation), 10, 64)
 			if err == nil {
