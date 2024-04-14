@@ -29,6 +29,7 @@ const (
 	MessageClaudeDone
 	MessageClaudeError
 	MessageAttachTiktok
+	MessageNekoTV
 )
 
 // >= 30 are miscellaneous and do not write to post models

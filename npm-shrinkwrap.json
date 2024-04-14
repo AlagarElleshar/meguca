@@ -13,6 +13,7 @@
       },
       "devDependencies": {
         "@types/node": "^16.11.7",
+        "@types/youtube": "^0.0.50",
         "gulp": "^4.0.2",
         "gulp-clean-css": "^4.3.0",
         "gulp-less": "^5.0.0",
@@ -131,6 +132,12 @@
       "version": "16.11.7",
       "resolved": "https://registry.npmjs.org/@types/node/-/node-16.11.7.tgz",
       "integrity": "sha512-QB5D2sqfSjCmTuWcBWyJ+/44bcjO7VbjSbOE0ucoVbAsSNQc4Lt6QkgkVXkTDwkL4z/beecZNDvVX15D4P8Jbw==",
+      "dev": true
+    },
+    "node_modules/@types/youtube": {
+      "version": "0.0.50",
+      "resolved": "https://registry.npmjs.org/@types/youtube/-/youtube-0.0.50.tgz",
+      "integrity": "sha512-d4GpH4uPYp9W07kc487tiq6V/EUHl18vZWFMbQoe4Sk9LXEWzFi/BMf9x7TI4m7/j7gU3KeX8H6M8aPBgykeLw==",
       "dev": true
     },
     "node_modules/@webassemblyjs/ast": {
@@ -7267,6 +7274,12 @@
       "version": "16.11.7",
       "resolved": "https://registry.npmjs.org/@types/node/-/node-16.11.7.tgz",
       "integrity": "sha512-QB5D2sqfSjCmTuWcBWyJ+/44bcjO7VbjSbOE0ucoVbAsSNQc4Lt6QkgkVXkTDwkL4z/beecZNDvVX15D4P8Jbw==",
+      "dev": true
+    },
+    "@types/youtube": {
+      "version": "0.0.50",
+      "resolved": "https://registry.npmjs.org/@types/youtube/-/youtube-0.0.50.tgz",
+      "integrity": "sha512-d4GpH4uPYp9W07kc487tiq6V/EUHl18vZWFMbQoe4Sk9LXEWzFi/BMf9x7TI4m7/j7gU3KeX8H6M8aPBgykeLw==",
       "dev": true
     },
     "@webassemblyjs/ast": {

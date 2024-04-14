@@ -9,6 +9,7 @@
   },
   "devDependencies": {
     "@types/node": "^16.11.7",
+    "@types/youtube": "^0.0.50",
     "gulp": "^4.0.2",
     "gulp-clean-css": "^4.3.0",
     "gulp-less": "^5.0.0",

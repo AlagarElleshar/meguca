@@ -7,14 +7,16 @@ import (
 	"errors"
 	"github.com/bakape/meguca/common"
 	"github.com/bakape/meguca/db"
+	"github.com/bakape/meguca/websockets"
 	"sync"
 )
 
 // Contains and manages all active update feeds
 var feeds = feedMap{
 	// 64 len map to avoid some possible reallocation as the server starts
-	feeds:   make(map[uint64]*Feed, 64),
-	tvFeeds: make(map[string]*tvFeed, 64),
+	feeds:       make(map[uint64]*Feed, 64),
+	tvFeeds:     make(map[string]*tvFeed, 64),
+	nekotvFeeds: make(map[uint64]*NekoTVFeed, 64),
 }
 
 // Export to avoid circular dependency
@@ -25,9 +27,10 @@ func init() {
 
 // Container for managing client<->update-feed assignment and interaction
 type feedMap struct {
-	feeds   map[uint64]*Feed
-	tvFeeds map[string]*tvFeed
-	mu      sync.RWMutex
+	feeds       map[uint64]*Feed
+	tvFeeds     map[string]*tvFeed
+	mu          sync.RWMutex
+	nekotvFeeds map[uint64]*NekoTVFeed
 }
 
 // Add client to feed and send it the current status of the feed for
@@ -92,6 +95,21 @@ func SubscribeToMeguTV(c common.Client) (err error) {
 		}
 	}
 	tvf.add <- c
+	return
+}
+
+func HandleNekoTV(c *websockets.Client) (err error) {
+	feeds.mu.Lock()
+	defer feeds.mu.Unlock()
+	_, thread, _ := GetSync(c)
+	ntv, ok := feeds.nekotvFeeds[thread]
+	if !ok {
+		ntv = NewNekoTVFeed()
+		ntv.init()
+		feeds.nekotvFeeds[thread] = ntv
+		ntv.start(thread)
+	}
+	ntv.sendConnectedMessage(c)
 	return
 }
 
