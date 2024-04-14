@@ -176,10 +176,10 @@ func CreatePost(
 
 	// Post must have either at least one character or an image to be allocated
 	hasImage := !conf.TextOnly && req.Image.Token != "" && req.Image.Name != ""
-	if req.Body == "" && !hasImage {
-		err = errNoTextOrImage
-		return
-	}
+	//if req.Body == "" && !hasImage {
+	//	err = errNoTextOrImage
+	//	return
+	//}
 
 	// Assert thread is not locked
 	locked, err := db.CheckThreadLocked(op)

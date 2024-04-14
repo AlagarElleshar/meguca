@@ -62,6 +62,34 @@ article:not(.reply-form):hover .control {
 	display: initial;
 }
 
+.attach-tiktok-form {
+	display:flex;
+	flex-direction: column;
+	width: 100%;
+	padding-top: 10px;
+	align-items: stretch;
+	gap: 5px;
+	.attach-tiktok-form-row1 {
+		display: flex;
+		align-items: center;
+		gap: 3px;
+		input {
+			flex-grow: 1;
+		}
+	}
+	.attach-tiktok-form-row2 {
+		display: flex;
+		justify-content: space-between;
+		.attach-tiktok-form-hd {
+			display: flex;
+			align-items: center;
+		}
+		.attach-tiktok-form-buttons{
+			display: flex;
+			gap: 3px;
+		}
+	}
+}
 
 body {
 	overflow-x: hidden;
@@ -369,7 +397,7 @@ td {
 }
 //this prevents zooming in on mobile
 @media screen and (pointer: coarse) and (max-width: 700px){
-	#text-input {
+	#text-input, .attach-tiktok-form input[type="text"] {
 		font-size: 16px;
 	}
 }

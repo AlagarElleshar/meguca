@@ -7,6 +7,7 @@ import { postSM, postEvent, postState } from "."
 import UploadForm from "./upload"
 import identity from "./identity"
 import lang from "../../lang";
+import {message, sendBinary} from "../../connection";
 
 // Element at the bottom of the thread to keep the fixed reply form from
 // overlapping any other posts, when scrolled till bottom
@@ -50,7 +51,8 @@ export default class FormView extends PostView {
 
         if (!boardConfig.textOnly) {
             this.upload = new UploadForm(this.model,
-                this.el.querySelector(".upload-container"));
+                this.el.querySelector(".upload-container"),
+                ()=>{this.onAttachTiktokButton()});
         }
 
         const bq = this.el.querySelector("blockquote")
@@ -58,6 +60,28 @@ export default class FormView extends PostView {
         bq.append(this.input)
         requestAnimationFrame(() =>
             this.input.focus());
+    }
+
+    public onAttachTiktokButton() {
+        this.upload.attachTiktokButton.hidden = true;
+        let template = importTemplate("attach-tiktok-form")
+        this.el.append(template);
+        let templateEl = this.el.querySelector(".attach-tiktok-form")
+        let input = <HTMLInputElement>templateEl.querySelector(".attach-tiktok-form-row1 > input")
+        templateEl.querySelector(".attach-tiktok-cancel").addEventListener("click",()=>{
+            templateEl.remove()
+            this.upload.attachTiktokButton.hidden = false;
+        })
+        templateEl.querySelector(".attach-tiktok-paste").addEventListener("click",()=>{
+            navigator.clipboard.readText().then(text => {input.value = text})
+        })
+        templateEl.querySelector(".attach-tiktok-attach").addEventListener("click",()=>{
+            let inputVal = input.value
+            let hdCheck = (<HTMLInputElement>templateEl.querySelector(".attach-tiktok-form-hd input")).checked
+            this.model.attachTiktok(inputVal,hdCheck)
+            templateEl.remove()
+            this.upload.attachTiktokButton.hidden = false;
+        })
     }
 
     // Render a temporary view of the identity fields, so the user can see what

@@ -132,9 +132,10 @@
 			<div id="post-controls">
 				<input name="done" type="button" value="{%s= ln.Common.UI["done"] %}">
 				<span class="upload-container" hidden>
-					<button>
+					<button class="upload-button">
 						{%s= ln.Common.UI["uploadFile"] %}
 					</button>
+                    <button class="attach-tiktok">Attach TikTok</button>
 					<span data-id="spoiler">
 						<label>
 							<input type="checkbox" name="spoiler">
@@ -152,9 +153,23 @@
 				<div id="char-count" title="{%s= ln.UI["charCount"] %}"><div></div><div>/2000</div></div>
 			</div>
 		</template>
+		<template name="attach-tiktok-form">
+			<div class="attach-tiktok-form">
+				<div class="attach-tiktok-form-row1">TikTok URL:<input type="text">
+					<button class="attach-tiktok-paste symbol">􀉃</button>
+				</div>
+				<div class="attach-tiktok-form-row2">
+					<span class="attach-tiktok-form-hd">HD:<input type="checkbox"></span>
+					<span class="attach-tiktok-form-buttons">
+						<button class="attach-tiktok-attach">Attach</button>
+						<button class="attach-tiktok-cancel">Cancel</button>
+					</span>
+				</div>
+			</div>
+		</template>
 		<template name="notification">
 			<div class="notification modal glass show">
-				<b class="admin"><b>
+				<b class="admin"></b>
 			</div>
 		</template>
 		<template name="sticky">

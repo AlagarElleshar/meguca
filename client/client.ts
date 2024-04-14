@@ -143,7 +143,7 @@ export default () => {
 			text: decoder.decode(binaryMessage.slice(12))
 		}
 		if(debug)
-			console.log(`>binary splice ${msg}`)
+			console.log(`>binary splice ${JSON.stringify(msg)}`)
 		handle(msg.id, m =>
 			m.splice(msg))
 	}

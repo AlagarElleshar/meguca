@@ -55,6 +55,8 @@ func (c *Client) runHandlerBinary(typ common.MessageType, msg []byte) error {
 		return c.spliceText(data)
 	case common.MessageBackspace:
 		return c.backspace()
+	case common.MessageAttachTiktok:
+		return c.attachTiktok(data)
 	default:
 		return errInvalidPayload(msg)
 	}

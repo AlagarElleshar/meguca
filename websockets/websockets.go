@@ -442,3 +442,14 @@ func (c *Client) setLastTime() {
 	defer c.mu.Unlock()
 	c.lastTime = time.Now().Unix()
 }
+
+func (c *Client) attachTiktok(data []byte) (err error) {
+	size := len(data)
+	commandData := common.PostCommand{
+		Input:    string(data[:size-1]),
+		Rotation: 0,
+		HD:       data[size-1] == 0,
+	}
+	handlePostCommand(c.post.id, c.post.op, &commandData)
+	return
+}

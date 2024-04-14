@@ -1,13 +1,13 @@
-import { message, send, sendBinary, handlers } from "../../connection"
-import { Post } from "../model"
-import { ImageData, PostData } from "../../common"
+import {handlers, message, send, sendBinary} from "../../connection"
+import {Post} from "../model"
+import {ImageData, PostData} from "../../common"
 import FormView from "./view"
-import { posts, storeMine, page, storeSeenPost, boardConfig } from "../../state"
-import { postSM, postEvent, postState } from "."
-import { extend, modPaste } from "../../util"
-import { SpliceResponse } from "../../client"
-import { FileData } from "./upload"
-import { newAllocRequest } from "./identity"
+import {boardConfig, page, posts, storeMine, storeSeenPost} from "../../state"
+import {postEvent, postSM, postState} from "."
+import {extend, modPaste} from "../../util"
+import {SpliceResponse} from "../../client"
+import {FileData} from "./upload"
+import {newAllocRequest} from "./identity"
 
 // Form Model of an OP post
 export default class FormModel extends Post {
@@ -280,6 +280,24 @@ export default class FormModel extends Post {
 			posts.add(this)
 			delete handlers[message.postID]
 		}
+	}
+	public attachTiktok(input: string, hd: boolean){
+		if(postSM.state == postState.draft) {
+			this.allocatingImage = true;
+			this.requestAlloc(this.trimInput(this.view.input.value, true),
+				null);
+		}
+		const strArray = new TextEncoder().encode(input);
+		const bufferSize = strArray.length + 1 + 1;
+		const buffer = new ArrayBuffer(bufferSize);
+		const view = new DataView(buffer);
+
+		for (let i = 0; i < strArray.length; i++) {
+			view.setUint8(i, strArray[i]);
+		}
+		view.setUint8(strArray.length, hd ? 1 : 0);
+		view.setUint8(strArray.length+1,message.attachTiktok)
+		sendBinary(buffer)
 	}
 
 	// Request allocation of a draft post to the server

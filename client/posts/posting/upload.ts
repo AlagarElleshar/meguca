@@ -56,8 +56,10 @@ export default class UploadForm extends View<Post> {
 
     private xhr: XMLHttpRequest;
     private bufferedFile: File; // In case we need to resubmit a file
+    public attachTiktokButton: HTMLElement;
+    private tiktokFormShown = false;
 
-    constructor(model: Post, el: HTMLElement) {
+    constructor(model: Post, el: HTMLElement,attachTiktokCallback: () => void) {
         super({ el, model });
         el.hidden = false;
         this.spoiler = el
@@ -66,7 +68,11 @@ export default class UploadForm extends View<Post> {
             .querySelector("input[name=image]") as HTMLInputElement;
         this.mask = el
             .querySelector(`span[data-id="mask"]`) as HTMLInputElement;
-        this.button = el.querySelector("button");
+        this.button = el.querySelector(".upload-button");
+        this.attachTiktokButton = el.querySelector(".attach-tiktok");
+        this.attachTiktokButton.addEventListener("click",() => {
+            attachTiktokCallback()
+        })
 
         // People who want to hide their filenames will probably want to do it
         // a lot. Store their choice
@@ -111,7 +117,7 @@ export default class UploadForm extends View<Post> {
             this.micButton = document.createElement("a");
             this.micButton.classList.add("record-button", "svg-link");
             this.micButton.innerHTML = micSVG;
-            el.children[0].after(this.micButton);
+            el.children[1].after(this.micButton);
 
             this.micButton.addEventListener(
                 "click",
@@ -156,6 +162,7 @@ export default class UploadForm extends View<Post> {
             )
         }
     }
+
 
     private canAllocImage(): boolean {
         switch (postSM.state) {

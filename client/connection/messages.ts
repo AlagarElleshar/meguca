@@ -16,6 +16,7 @@ export const enum message {
 	claudeAppend,
 	claudeDone,
 	claudeError,
+	attachTiktok,
 
 	// >= 30 are miscellaneous and do not write to post models
 	synchronise = 30,
