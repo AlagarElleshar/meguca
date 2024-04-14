@@ -233,6 +233,7 @@ export default class PostView extends ImageHandler {
             this.setEditing(false)
         }
         this.reparseBody();
+        this.removeTiktokForm();
     }
 
     // Stop post from displaying
