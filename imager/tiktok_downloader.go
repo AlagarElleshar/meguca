@@ -214,7 +214,8 @@ func DownloadTikTok(input *common.PostCommand) (token string, filename string, e
 	}
 	if input.HD {
 		// Test to see if hdplay is actually h264
-		probeData, err := ffprobe.ProbeURL(context.Background(), tokData.HDPlay)
+		var probeData *ffprobe.ProbeData
+		probeData, err = ffprobe.ProbeURL(context.Background(), tokData.HDPlay)
 		if probeData == nil {
 			input.HD = false
 		} else if probeData.FirstVideoStream().CodecName == "h264" {
