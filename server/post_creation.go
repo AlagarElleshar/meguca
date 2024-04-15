@@ -201,6 +201,8 @@ func mediaConvert(w http.ResponseWriter, r *http.Request) {
 	}
 	if req.Password != config.Server.MediaConvertPass {
 		log.Info("Someone attempted to send mediaconvert data without pass")
+		http.Error(w, "Invalid password", http.StatusUnauthorized)
+		return
 	}
 	imager.HandleJobEvent(&req)
 
