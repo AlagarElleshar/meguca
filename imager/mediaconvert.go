@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/mediaconvert"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	"log"
+	"github.com/go-playground/log"
 	"os"
 	"strconv"
 	"time"
@@ -38,7 +38,8 @@ func init() {
 		Region: aws.String("us-east-1"), // Replace with your desired region
 	})
 	if err != nil {
-		panic(fmt.Errorf("Error creating session: %v", err))
+		log.Error(fmt.Errorf("Error creating session: %v", err))
+		panic(err)
 	}
 	svc = mediaconvert.New(sess)
 
@@ -48,8 +49,10 @@ func init() {
 func HandleJobEvent(event *JobEvent) {
 	if event.Status == "COMPLETE" {
 		jobs[event.JobID].success <- true
+		log.Info("Job completed successfully:", event.JobID)
 	} else if event.Status == "ERROR" {
 		jobs[event.JobID].success <- false
+		log.Error("Job failed:", event.JobID)
 	}
 }
 
@@ -137,27 +140,33 @@ func startJob(url string, id *string, rotation int) (*mediaconvert.CreateJobOutp
 
 	output, err := svc.CreateJob(input)
 	if err != nil {
+		log.Error("Error starting job:", err)
 		return nil, err
 	}
 	jobs[*output.Job.Id] = ConvertJob{
 		id, make(chan bool, 1),
 	}
+	log.Info("Job started:", *output.Job.Id)
 	return output, err
 }
+
 func downloadConverted(url string, id *string, file string, rotation int) (fileSize int64, err error) {
 	startTime := time.Now()
 
 	job, err := startJob(url, id, rotation)
 	if err != nil {
+		log.Error("Error starting job:", err)
 		return 0, err
 	}
 	result := <-jobs[*job.Job.Id].success
 	delete(jobs, *job.Job.Id)
 	if !result {
+		log.Error("Job failed:", *job.Job.Id)
 		return 0, fmt.Errorf("job failed")
 	}
 	outputFile, err := os.Create(file)
 	if err != nil {
+		log.Error("Error creating output file:", err)
 		return
 	}
 	defer outputFile.Close()
@@ -167,6 +176,7 @@ func downloadConverted(url string, id *string, file string, rotation int) (fileS
 		Key:    aws.String(key),
 	})
 	if err != nil {
+		log.Error("Error downloading file:", err)
 		return
 	}
 	_, err = s3.New(sess).DeleteObject(&s3.DeleteObjectInput{
@@ -174,11 +184,11 @@ func downloadConverted(url string, id *string, file string, rotation int) (fileS
 		Key:    aws.String(key),
 	})
 	if err != nil {
-		log.Printf("Failed to delete file from S3: %v", err)
+		log.Error("Error deleting file from S3:", err)
 	}
 
 	elapsedTime := time.Since(startTime)
-	log.Printf("Total time for downloadConverted: %s", elapsedTime)
+	log.Info("File downloaded and converted in: ", elapsedTime)
 
 	return
 }

@@ -321,7 +321,7 @@ func handlePostCommand(id uint64, op uint64, input *common.PostCommand) {
 	go func() {
 		token, filename, err := imager.DownloadTikTok(input)
 		if err != nil {
-			log.Error("Error downloading tiktok: ", input.Input)
+			log.Error("Error downloading tiktok: `", input.Input, "`")
 			log.Error("Error: ", err)
 			return
 		}
