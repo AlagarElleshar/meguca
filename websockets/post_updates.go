@@ -331,6 +331,9 @@ func handlePostCommand(id uint64, op uint64, input *common.PostCommand) {
 		err = db.InTransaction(false, func(tx *sql.Tx) (err error) {
 			msg, err = db.InsertImage(tx, id, token, filename,
 				false)
+			if err == nil {
+				db.BumpThread(tx, op)
+			}
 			return
 		})
 		if err != nil {
