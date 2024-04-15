@@ -1,12 +1,14 @@
 package imager
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/bakape/meguca/common"
 	"github.com/go-playground/log"
 	"golang.org/x/text/unicode/norm"
+	"gopkg.in/vansante/go-ffprobe.v2"
 	"io"
 	"net/http"
 	"net/url"
@@ -211,13 +213,23 @@ func DownloadTikTok(input *common.PostCommand) (token string, filename string, e
 		input.HD = false
 	}
 	if input.HD {
-		//size, _, err = downloadHDToTemp(tokData.HDPlay, tmpFilename, input.Rotation)
-		size, err = downloadConverted(tokData.HDPlay, &tokData.ID, tmpFilename, input.Rotation)
-		if err != nil {
-			defer os.Remove(tmpFilename)
-			return
+		// Test to see if hdplay is actually h264
+		probeData, err := ffprobe.ProbeURL(context.Background(), tokData.HDPlay)
+		if probeData == nil {
+			input.HD = false
+		} else if probeData.FirstVideoStream().CodecName == "h264" {
+			// Treat hdplay like an SD video
+			input.HD = false
+			tokData.Play = tokData.HDPlay
+		} else {
+			size, err = downloadConverted(tokData.HDPlay, &tokData.ID, tmpFilename, input.Rotation)
+			if err != nil {
+				defer os.Remove(tmpFilename)
+				return
+			}
 		}
-	} else {
+	}
+	if !input.HD {
 		var status int
 		size, status, err = downloadToTemp(tokData.Play, tmpFilename)
 		if err != nil {
