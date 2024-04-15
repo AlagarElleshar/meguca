@@ -87,6 +87,7 @@ func createRouter() http.Handler {
 		api.POST("/upload-megu-hash", imager.UploadMeguHash)
 		api.POST("/create-thread", createThread)
 		api.POST("/create-reply", createReply)
+		api.POST("/media-convert", mediaConvert)
 
 		assets.GET("/images/*path", serveImages)
 

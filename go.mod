@@ -10,6 +10,7 @@ require (
 	github.com/Masterminds/squirrel v1.5.1
 	github.com/abh/geoip v0.0.0-20160510155516-07cea4480daa
 	github.com/aquilax/tripcode v1.0.0
+	github.com/aws/aws-sdk-go v1.51.21
 	github.com/badoux/goscraper v0.0.0-20190827161153-36995ce6b19f
 	github.com/bakape/captchouli/v2 v2.2.2
 	github.com/bakape/thumbnailer/v2 v2.7.1
@@ -38,8 +39,8 @@ require (
 	github.com/ulikunitz/xz v0.5.7
 	github.com/valyala/quicktemplate v1.7.0
 	go.etcd.io/bbolt v1.3.5
-	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
-	golang.org/x/text v0.3.7
+	golang.org/x/crypto v0.14.0
+	golang.org/x/text v0.13.0
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
