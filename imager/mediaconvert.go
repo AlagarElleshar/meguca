@@ -47,6 +47,10 @@ func init() {
 }
 
 func HandleJobEvent(event *JobEvent) {
+	_, ok := jobs[event.JobID]
+	if !ok {
+		return
+	}
 	if event.Status == "COMPLETE" {
 		jobs[event.JobID].success <- true
 		log.Info("Job completed successfully:", event.JobID)

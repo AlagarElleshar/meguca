@@ -70,7 +70,7 @@ export default class FormView extends PostView {
         let input = <HTMLInputElement>templateEl.querySelector(".attach-tiktok-form-row1 > input")
         const lastHDSetting = localStorage.getItem('attach-hd-tiktoks');
         let hdCheck = (<HTMLInputElement>templateEl.querySelector(".attach-tiktok-form-params input"))
-        hdCheck.value = JSON.parse(lastHDSetting)
+        hdCheck.checked = JSON.parse(lastHDSetting)
 
         templateEl.querySelector(".attach-tiktok-cancel").addEventListener("click",()=>{
             templateEl.remove()
