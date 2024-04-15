@@ -169,6 +169,13 @@ func downloadConverted(url string, id *string, file string, rotation int) (fileS
 	if err != nil {
 		return
 	}
+	_, err = s3.New(session.New()).DeleteObject(&s3.DeleteObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key),
+	})
+	if err != nil {
+		log.Printf("Failed to delete file from S3: %v", err)
+	}
 
 	elapsedTime := time.Since(startTime)
 	log.Printf("Total time for downloadConverted: %s", elapsedTime)
