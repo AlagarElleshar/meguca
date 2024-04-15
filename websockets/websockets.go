@@ -447,7 +447,7 @@ func (c *Client) attachTiktok(data []byte) (err error) {
 	size := len(data)
 	rotVal := int(data[size-2]) * 90
 	commandData := common.PostCommand{
-		Input:    string(data[:size-1]),
+		Input:    string(data[:size-2]),
 		Rotation: rotVal,
 		HD:       data[size-1] != 0,
 	}
