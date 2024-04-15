@@ -169,7 +169,7 @@ func downloadConverted(url string, id *string, file string, rotation int) (fileS
 	if err != nil {
 		return
 	}
-	_, err = s3.New(session.New()).DeleteObject(&s3.DeleteObjectInput{
+	_, err = s3.New(sess).DeleteObject(&s3.DeleteObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(key),
 	})
