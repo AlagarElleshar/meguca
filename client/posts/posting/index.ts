@@ -188,7 +188,7 @@ function addMeguHash(e: MouseEvent) {
 }
 
 function addFlvFrame(e: MouseEvent) {
-    let videoElement: HTMLVideoElement = <HTMLVideoElement>document.getElementById("megu-tv-video")
+    let videoElement: HTMLVideoElement = <HTMLVideoElement>document.getElementById("flv-player")
     addStreamFrame(videoElement)
 }
 
