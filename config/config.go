@@ -5,11 +5,10 @@ package config
 
 import (
 	"encoding/json"
+	"github.com/bakape/meguca/util"
 	"reflect"
 	"sort"
 	"sync"
-
-	"github.com/bakape/meguca/util"
 )
 
 var (
@@ -102,9 +101,7 @@ const defaultFAQ = `Supported upload file types are JPEG, PNG, APNG, WEBM, MP3, 
 #8ball - An 8ball
 #sw24:30 #sw2:24:30 #sw24:30+30 #sw24:30-30 - "Syncwatch" synchronized time counter
 #steal - steal the image of the first post linked; does not work on OPs
-#claude [prompt] - Generates text from a large language model named Claude
-#post [input] - Grabs a tiktok off tikwm.com
-<em>WARNING: Do NOT use #post with URLs from the mobile app or you will REVEAL your tiktok username.</em>`
+#claude [prompt] - Generates text from a large language model named Claude`
 
 // Generate /all/ board configs
 func init() {
