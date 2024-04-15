@@ -207,7 +207,7 @@ func DownloadTikTok(input *common.PostCommand) (token string, filename string, e
 	}
 	tmpFilename := fmt.Sprintf("tmp/%s.mp4", tokData.ID)
 	var size int64
-	if tokData.Duration > 20 {
+	if tokData.Duration > 30 {
 		input.HD = false
 	}
 	if input.HD {
