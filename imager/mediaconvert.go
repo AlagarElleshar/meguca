@@ -7,8 +7,10 @@ import (
 	"github.com/aws/aws-sdk-go/service/mediaconvert"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"log"
 	"os"
 	"strconv"
+	"time"
 )
 
 var (
@@ -143,6 +145,8 @@ func startJob(url string, id *string, rotation int) (*mediaconvert.CreateJobOutp
 	return output, err
 }
 func downloadConverted(url string, id *string, file string, rotation int) (fileSize int64, err error) {
+	startTime := time.Now()
+
 	job, err := startJob(url, id, rotation)
 	if err != nil {
 		return 0, err
@@ -165,5 +169,9 @@ func downloadConverted(url string, id *string, file string, rotation int) (fileS
 	if err != nil {
 		return
 	}
+
+	elapsedTime := time.Since(startTime)
+	log.Printf("Total time for downloadConverted: %s", elapsedTime)
+
 	return
 }
