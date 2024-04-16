@@ -263,7 +263,7 @@ func DownloadTikTok(input *common.PostCommand) (token string, filename string, e
 	return res.imageID, filename, nil
 }
 
-func initTiktokDownloader() {
+func init() {
 	//options := transloadit.DefaultConfig
 	//
 	//var config struct {

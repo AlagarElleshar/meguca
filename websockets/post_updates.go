@@ -14,6 +14,7 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"sync"
 	"unicode/utf8"
 
 	"github.com/bakape/meguca/common"
@@ -24,15 +25,17 @@ import (
 )
 
 var (
-	errNoPostOpen    = errors.New("no post open")
-	errEmptyPost     = errors.New("post body empty")
-	errTooManyLines  = errors.New("too many lines in post body")
-	errSpliceTooLong = errors.New("splice text too long")
-	errSpliceNOOP    = errors.New("splice NOOP")
-	errTextOnly      = errors.New("text only board")
-	errHasImage      = errors.New("post already has image")
-	preImageJson     = `{"type":"image","source":{"type":"base64","media_type":"image/webp","data":"`
-	postImageJson    = `"}}`
+	errNoPostOpen      = errors.New("no post open")
+	errEmptyPost       = errors.New("post body empty")
+	errTooManyLines    = errors.New("too many lines in post body")
+	errSpliceTooLong   = errors.New("splice text too long")
+	errSpliceNOOP      = errors.New("splice NOOP")
+	errTextOnly        = errors.New("text only board")
+	errHasImage        = errors.New("post already has image")
+	preImageJson       = `{"type":"image","source":{"type":"base64","media_type":"image/webp","data":"`
+	postImageJson      = `"}}`
+	pendingTiktoks     = map[uint64]feeds.PendingTikToks{}
+	pendingTiktokMutex = sync.Mutex{}
 )
 
 // Error created, when client supplies invalid splice coordinates to server
@@ -318,18 +321,25 @@ func (c *Client) closePost() (err error) {
 }
 
 func handlePostCommand(id uint64, op uint64, input *common.PostCommand, feed *feeds.Feed) {
+	result, ok := pendingTiktoks[id]
+	if ok && (result == feeds.Done || result == feeds.Loading) {
+		return
+	}
+	feed.UpdatePendingTiktokState(id, feeds.Loading)
+	pendingTiktokMutex.Lock()
+	pendingTiktoks[id] = feeds.Loading
+	pendingTiktokMutex.Unlock()
+
 	go func() {
-		result, ok := feed.GetPendingTiktokState(id)
-		if !ok || (result == feeds.Done || result == feeds.Loading) {
-			return
-		}
-		feed.UpdatePendingTiktokState(id, feeds.Loading)
 		log.Info("Proceeding with tiktok download")
 		token, filename, err := imager.DownloadTikTok(input)
 		if err != nil {
 			log.Error("Error downloading tiktok: `", input.Input, "`")
 			log.Error("Error: ", err)
 			feed.UpdatePendingTiktokState(id, feeds.Error)
+			pendingTiktokMutex.Lock()
+			delete(pendingTiktoks, id)
+			pendingTiktokMutex.Unlock()
 			return
 		}
 		formatImageName(&filename)
@@ -347,6 +357,9 @@ func handlePostCommand(id uint64, op uint64, input *common.PostCommand, feed *fe
 			log.Error("Error downloading tiktok: ", *input)
 			log.Error("Error: ", err)
 			feed.UpdatePendingTiktokState(id, feeds.Error)
+			pendingTiktokMutex.Lock()
+			delete(pendingTiktoks, id)
+			pendingTiktokMutex.Unlock()
 			return
 		}
 		feeds.SendIfExists(op, func(feed *feeds.Feed) error {
@@ -354,6 +367,9 @@ func handlePostCommand(id uint64, op uint64, input *common.PostCommand, feed *fe
 			return nil
 		})
 		feed.UpdatePendingTiktokState(id, feeds.Done)
+		pendingTiktokMutex.Lock()
+		delete(pendingTiktoks, id)
+		pendingTiktokMutex.Unlock()
 
 		return
 	}()

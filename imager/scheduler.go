@@ -65,7 +65,6 @@ func init() {
 			}
 		}(ch)
 	}
-	initTiktokDownloader()
 }
 
 // Hash file to string
