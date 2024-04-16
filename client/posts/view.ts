@@ -20,6 +20,7 @@ const modLevelStrings = ["", "janitors", "moderators", "owners", "admin"];
 // Base post view class
 export default class PostView extends ImageHandler {
     #claudeResponse: HTMLElement | null;
+    #loadingBarOn: boolean = false;
     constructor(model: Post, el: HTMLElement | null) {
         const attrs: ViewAttrs = { model }
         if (el) {
@@ -443,7 +444,23 @@ export default class PostView extends ImageHandler {
         if(form != null){
             form.remove()
         }
+    }
 
+    public setShowLoadingBar(value: boolean){
+        if(this.#loadingBarOn == value){
+            return
+        }
+        this.#loadingBarOn = value
+        if(value){
+            let loadingBar = importTemplate("loading-bar");
+            this.el.append(loadingBar)
+        }
+        else{
+            let loadingBar = this.el.querySelector(".loading-bar")
+            if(loadingBar != null){
+                loadingBar.remove()
+            }
+        }
     }
 }
 

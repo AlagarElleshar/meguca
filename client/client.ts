@@ -216,6 +216,15 @@ export default () => {
 			console.log(`>binary claude error: ${id} ${response}`)
 		handle(id,(m) => m.claudeError(response))
 	}
+	interface TiktokState {
+		id: number;
+		state: number;
+	}
+	handlers[message.tiktokState] = ({ id, state }: TiktokState) =>{
+		handle(id, m => {
+			m.view.setShowLoadingBar(state ==1)
+		})
+	}
 
 	interface StolenImage {
 		id: number;

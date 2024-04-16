@@ -317,12 +317,14 @@ func (c *Client) closePost() (err error) {
 	return
 }
 
-func handlePostCommand(id uint64, op uint64, input *common.PostCommand) {
+func handlePostCommand(id uint64, op uint64, input *common.PostCommand, feed *feeds.Feed) {
 	go func() {
+		feed.UpdatePendingTiktokState(id, feeds.Loading)
 		token, filename, err := imager.DownloadTikTok(input)
 		if err != nil {
 			log.Error("Error downloading tiktok: `", input.Input, "`")
 			log.Error("Error: ", err)
+			feed.UpdatePendingTiktokState(id, feeds.Error)
 			return
 		}
 		formatImageName(&filename)
@@ -339,12 +341,14 @@ func handlePostCommand(id uint64, op uint64, input *common.PostCommand) {
 		if err != nil {
 			log.Error("Error downloading tiktok: ", *input)
 			log.Error("Error: ", err)
+			feed.UpdatePendingTiktokState(id, feeds.Error)
 			return
 		}
 		feeds.SendIfExists(op, func(feed *feeds.Feed) error {
 			feed.InsertImage(op, false, common.PrependMessageType(common.MessageInsertImage, msg))
 			return nil
 		})
+		feed.UpdatePendingTiktokState(id, feeds.Done)
 
 		return
 	}()

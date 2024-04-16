@@ -21,6 +21,7 @@ type PostState = {
 	spoilered: boolean
 	closed: boolean
 	body: string
+	pending_tiktoks: number
 }
 
 // Send a requests to the server to synchronise to the current page and
@@ -62,6 +63,7 @@ async function syncRecentPost(id: number, p: PostState) {
 		return
 	}
 
+	model.view.setShowLoadingBar(p.pending_tiktoks == 1)
 	if (p.hash_image && !model.image) {
 		// Possible conflict due to deleted image
 		if (model.image = (await fetchPost(id)).image) {

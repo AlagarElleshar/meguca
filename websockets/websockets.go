@@ -451,6 +451,6 @@ func (c *Client) attachTiktok(data []byte) (err error) {
 		Rotation: rotVal,
 		HD:       data[size-1] != 0,
 	}
-	handlePostCommand(c.post.id, c.post.op, &commandData)
+	handlePostCommand(c.post.id, c.post.op, &commandData, c.feed)
 	return
 }

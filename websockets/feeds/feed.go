@@ -356,3 +356,17 @@ func (f *Feed) SendClaudeComplete(id uint64, isError bool, response *bytes.Buffe
 	}
 	f.claudeMessage <- message
 }
+
+func (f *Feed) UpdatePendingTiktokState(id uint64, state PendingTikToks) {
+	stateUpdate := struct {
+		ID    uint64         `json:"id"`
+		State PendingTikToks `json:"state"`
+	}{
+		id,
+		state,
+	}
+	msg, _ := common.EncodeMessage(common.MessageTiktokState, stateUpdate)
+	f.modifyPost(message{id, msg}, func(p *cachedPost) {
+		p.PendingTikToks = state
+	})
+}
