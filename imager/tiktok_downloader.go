@@ -15,6 +15,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -70,6 +71,7 @@ var (
 	twmRequestChannel  chan *common.PostCommand
 	twmResponseChannel chan *TWMTikTokData
 	twmErrChannel      chan error
+	twmMutex           sync.Mutex
 	//transloaditClient  transloadit.Client
 )
 
@@ -197,9 +199,11 @@ func getFilename(id string, desc string) string {
 }
 
 func DownloadTikTok(input *common.PostCommand) (token string, filename string, err error) {
+	twmMutex.Lock()
 	twmRequestChannel <- input
 	tokData := <-twmResponseChannel
 	err = <-twmErrChannel
+	twmMutex.Unlock()
 	if err != nil || tokData == nil {
 		return
 	}
