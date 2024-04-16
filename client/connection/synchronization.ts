@@ -91,6 +91,7 @@ async function fetchUnclosed(post: Post) {
 	extend(post, await fetchPost(post.id))
 	post.propagateLinks()
 	post.view.render()
+	post.view.setShowLoadingBar(false)
 }
 
 async function fetchPost(id: number): Promise<PostData> {
