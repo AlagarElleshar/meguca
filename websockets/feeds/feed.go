@@ -367,6 +367,15 @@ func (f *Feed) SendClaudeComplete(id uint64, isError bool, response *bytes.Buffe
 	}
 	f.claudeMessage <- message
 }
+func (f *Feed) GetPendingTiktokState(id uint64) (p PendingTikToks, ok bool) {
+	//return f.cache.Recent[id].PendingTikToks
+	var post cachedPost
+	post, ok = f.cache.Recent[id]
+	if ok {
+		p = post.PendingTikToks
+	}
+	return
+}
 
 func (f *Feed) UpdatePendingTiktokState(id uint64, state PendingTikToks) {
 	stateUpdate := struct {

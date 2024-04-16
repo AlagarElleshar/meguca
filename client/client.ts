@@ -163,7 +163,7 @@ export default () => {
 					m.claude_state = claude
 				}
 				else if (m.claude_state.status == "done" || m.claude_state.status == "error"){
-					//Ignored
+					//Ignored done
 				}
 				else{
 					m.claude_state = claude
@@ -221,6 +221,8 @@ export default () => {
 		state: number;
 	}
 	handlers[message.tiktokState] = ({ id, state }: TiktokState) =>{
+		if(debug)
+			console.log(`>state tiktok ${id} ${state}`)
 		handle(id, m => {
 			m.view.setShowLoadingBar(state ==1)
 		})

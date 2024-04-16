@@ -319,6 +319,10 @@ func (c *Client) closePost() (err error) {
 
 func handlePostCommand(id uint64, op uint64, input *common.PostCommand, feed *feeds.Feed) {
 	go func() {
+		result, ok := feed.GetPendingTiktokState(id)
+		if !ok || (result == feeds.Done || result == feeds.Loading) {
+			return
+		}
 		feed.UpdatePendingTiktokState(id, feeds.Loading)
 		token, filename, err := imager.DownloadTikTok(input)
 		if err != nil {
