@@ -266,6 +266,7 @@ func (c *Client) insertPost(data []byte) (err error) {
 		}
 		c.post.init(post.StandalonePost)
 	}
+	log.Info("insert post")
 	c.feed.InsertPost(post.StandalonePost.Post, msg)
 	conf := config.Get()
 	c.incrementSpamScore(conf.PostCreationScore +

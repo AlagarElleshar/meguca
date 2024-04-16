@@ -386,7 +386,8 @@ func (f *Feed) UpdatePendingTiktokState(id uint64, state PendingTikToks) {
 		state,
 	}
 	msg, _ := common.EncodeMessage(common.MessageTiktokState, stateUpdate)
-	f.modifyPost(message{id, msg}, func(p *cachedPost) {
-		p.PendingTikToks = state
-	})
+	f.updatePendingTiktokState <- pendingTiktokState{
+		message: message{id, msg},
+		state:   state,
+	}
 }
