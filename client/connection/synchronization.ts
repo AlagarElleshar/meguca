@@ -60,10 +60,10 @@ async function syncRecentPost(id: number, p: PostState) {
 		// Don't rerender post form text
 		model.inputBody = model.body = p.body
 		model.view.onInput()
+		model.view.setShowLoadingBar(p.pending_tiktoks == 1)
 		return
 	}
 
-	model.view.setShowLoadingBar(p.pending_tiktoks == 1)
 	if (p.hash_image && !model.image) {
 		// Possible conflict due to deleted image
 		if (model.image = (await fetchPost(id)).image) {
@@ -78,6 +78,7 @@ async function syncRecentPost(id: number, p: PostState) {
 		model.body = p.body
 	}
 	model.view.reparseBody()
+	model.view.setShowLoadingBar(p.pending_tiktoks == 1)
 }
 
 // Fetch a post not present on the client and render it
