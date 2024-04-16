@@ -98,8 +98,11 @@ func startJob(url string, id *string, rotation int) (*mediaconvert.CreateJobOutp
 							CodecSettings: &mediaconvert.VideoCodecSettings{
 								Codec: aws.String("H_264"),
 								H264Settings: &mediaconvert.H264Settings{
-									MaxBitrate:         aws.Int64(15000000),
-									RateControlMode:    aws.String("QVBR"),
+									MaxBitrate:      aws.Int64(18000000),
+									RateControlMode: aws.String("QVBR"),
+									QvbrSettings: &mediaconvert.H264QvbrSettings{
+										QvbrQualityLevel: aws.Int64(7),
+									},
 									SceneChangeDetect:  aws.String("TRANSITION_DETECTION"),
 									QualityTuningLevel: aws.String("SINGLE_PASS"),
 								},
