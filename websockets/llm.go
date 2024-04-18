@@ -90,6 +90,18 @@ func StreamMessages(model string, systemPrompt string, maxTokens int, claudeStat
 			done()
 			return nil
 		}
+		if strings.HasPrefix(string(line), `data: {"type":"error"`) {
+			var errData errorResponse
+			err = json.Unmarshal(line[5:], &errData)
+			if err != nil {
+				return err
+			}
+			claudeState.Status = common.Error
+			claudeState.Response.Reset()
+			claudeState.Response.WriteString(errData.Error.Message)
+			done()
+			return nil
+		}
 		if err != nil {
 			if err == io.EOF {
 				break
