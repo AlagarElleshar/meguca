@@ -214,8 +214,9 @@ func (c *Client) closePost() (err error) {
 	)
 	var claude *common.ClaudeState = nil
 	if c.post.len != 0 {
-		links, com, claude, postCommand, err = parser.ParseBody(c.post.body, c.post.board, c.post.op,
-			c.post.id, c.ip, false)
+		start := time.Now()
+		links, com, claude, postCommand, err = parser.ParseBody(c.post.body, c.post.board, c.post.op, c.post.id, c.ip, false)
+		fmt.Printf("ParseBody took %v\n", time.Since(start))
 		if err != nil {
 			return
 		}
@@ -225,7 +226,10 @@ func (c *Client) closePost() (err error) {
 				from = links[len(links)-1].ID
 				img  *common.Image
 			)
+
+			start := time.Now()
 			img, err = db.TransferImage(from, c.post.id, c.post.op)
+			fmt.Printf("TransferImage took %v\n", time.Since(start))
 			if err != nil {
 				return
 			}
@@ -261,13 +265,18 @@ func (c *Client) closePost() (err error) {
 	}
 	claudeOk := true
 	if claude != nil {
+		start := time.Now()
 		claudeOk = db.CheckIfClaudeAllowed(c.ip)
+		fmt.Printf("CheckIfClaudeAllowed took %v\n", time.Since(start))
 		if !claudeOk {
 			claude.Status = common.Error
 			claude.Response.WriteString("Rate limit reached, try again later.")
 		}
 	}
+
+	start := time.Now()
 	cid, err := db.ClosePost(c.post.id, c.post.op, string(c.post.body), links, com, claude)
+	fmt.Printf("ClosePost took %v\n", time.Since(start))
 	if err != nil {
 		return
 	}
@@ -275,7 +284,10 @@ func (c *Client) closePost() (err error) {
 		//Include thumbnail of post
 		id := c.post.id
 		feed := c.feed
+
+		start := time.Now()
 		imgSha1, err := db.GetPostSha1(id)
+		fmt.Printf("GetPostSha1 took %v\n", time.Since(start))
 		var image *[]byte = nil
 		if err == nil && imgSha1 != nil {
 			*imgSha1 += ".webp"
@@ -283,7 +295,10 @@ func (c *Client) closePost() (err error) {
 			cwd, _ := os.Getwd()
 			log.Info("CWD: ", cwd)
 			log.Info("img: ", file)
+
+			start := time.Now()
 			fileData, err := os.ReadFile(file)
+			fmt.Printf("os.ReadFile took %v\n", time.Since(start))
 			if err == nil {
 				size := len(preImageJson) + base64.StdEncoding.EncodedLen(len(fileData)) + len(postImageJson)
 				buf := make([]byte, size)
@@ -299,7 +314,9 @@ func (c *Client) closePost() (err error) {
 		go StreamMessages(Claude3Haiku, DefaultSystemPrompt, 255, claude, image,
 			func() {
 				claude.Status = common.Generating
+				start := time.Now()
 				db.UpdateClaude(cid, claude)
+				fmt.Printf("UpdateClaude took %v\n", time.Since(start))
 			},
 			func(token string) {
 				feed.SendClaudeToken(id, token)
@@ -307,11 +324,15 @@ func (c *Client) closePost() (err error) {
 			func() {
 				isError := claude.Status == common.Error
 				feed.SendClaudeComplete(id, isError, &claude.Response)
+				start := time.Now()
 				db.UpdateClaude(cid, claude)
+				fmt.Printf("UpdateClaude took %v\n", time.Since(start))
 			})
 	}
 	if postCommand != nil {
+		start := time.Now()
 		hasImage, err := c.hasImage()
+		fmt.Printf("hasImage took %v\n", time.Since(start))
 		if err == nil && !hasImage {
 			//handlePostCommand(c.post.id, c.post.op, postCommand)
 		}

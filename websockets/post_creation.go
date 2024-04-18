@@ -230,7 +230,9 @@ func (c *Client) insertPost(data []byte) (err error) {
 		return
 	}
 
+	start := time.Now()
 	needCaptcha, err := db.NeedCaptcha(c.captchaSession, c.ip)
+	fmt.Printf("db.NeedCaptcha took %v\n", time.Since(start))
 	if err != nil {
 		return
 	}
@@ -247,7 +249,10 @@ func (c *Client) insertPost(data []byte) (err error) {
 	req.Open = true
 
 	_, op, board := feeds.GetSync(c)
+
+	start = time.Now()
 	post, msg, err := CreatePost(op, board, c.ip, req)
+	fmt.Printf("CreatePost took %v\n", time.Since(start))
 	if err != nil {
 		return
 	}
@@ -260,7 +265,9 @@ func (c *Client) insertPost(data []byte) (err error) {
 	}
 
 	if post.Editing {
+		start = time.Now()
 		err = db.SetOpenBody(post.ID, []byte(post.Body))
+		fmt.Printf("db.SetOpenBody took %v\n", time.Since(start))
 		if err != nil {
 			return
 		}
