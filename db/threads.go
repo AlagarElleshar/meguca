@@ -224,6 +224,17 @@ func CheckIpPostCount(ip string) (count int, err error) {
 	return
 }
 
+func GetLatestGeneral(generalName *string) (board string, id uint64, err error) {
+	err = sq.Select("board", "id").
+		From("threads").
+		Where(squirrel.Like{"subject": "%" + *generalName + "%"}).
+		OrderBy("bump_time DESC").
+		QueryRow().
+		Scan(&board, &id)
+
+	return
+}
+
 func Read() {
 
 }

@@ -195,7 +195,16 @@ func createRouter() http.Handler {
 
 // Redirects to / requests to /all/ board
 func redirectToDefault(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "/all/", 301)
+	if config.Server.DefaultGeneralThread != nil {
+		board, id, err := db.GetLatestGeneral(config.Server.DefaultGeneralThread)
+		if err != nil {
+			http.Redirect(w, r, "/all/", 301)
+		} else {
+			http.Redirect(w, r, fmt.Sprintf("/%s/%d", board, id), 301)
+		}
+	} else {
+		http.Redirect(w, r, "/all/", 301)
+	}
 }
 
 // Generate a robots.txt with only select boards preventing indexing
