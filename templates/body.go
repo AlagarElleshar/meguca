@@ -129,7 +129,7 @@ func streambody(
 		}
 
 		c.state.successiveNewlines = 0
-		if p.Claude != nil && !claudeFound {
+		if p.Claude != nil && p.Claude.Response.Len() != 0 && !claudeFound {
 
 			matched, err := regexp.MatchString(`#claude\s\S.*`, l)
 			if err == nil && matched {
