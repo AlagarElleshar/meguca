@@ -275,9 +275,7 @@ func (c *Client) closePost() (err error) {
 		}
 	}
 
-	start := time.Now()
 	cid, err := db.ClosePost(c.post.id, c.post.op, string(c.post.body), links, com, claude)
-	log.Info("ClosePost took ", time.Since(start))
 	if err != nil {
 		return
 	}
