@@ -232,7 +232,7 @@ func (c *Client) insertPost(data []byte) (err error) {
 
 	start := time.Now()
 	needCaptcha, err := db.NeedCaptcha(c.captchaSession, c.ip)
-	log.Info("db.NeedCaptcha took %v\n", time.Since(start))
+	log.Info("db.NeedCaptcha took ", time.Since(start))
 	if err != nil {
 		return
 	}
@@ -252,7 +252,7 @@ func (c *Client) insertPost(data []byte) (err error) {
 
 	start = time.Now()
 	post, msg, err := CreatePost(op, board, c.ip, req)
-	log.Info("CreatePost took %v\n", time.Since(start))
+	log.Info("CreatePost took ", time.Since(start))
 	if err != nil {
 		return
 	}
@@ -267,7 +267,7 @@ func (c *Client) insertPost(data []byte) (err error) {
 	if post.Editing {
 		start = time.Now()
 		err = db.SetOpenBody(post.ID, []byte(post.Body))
-		log.Info("db.SetOpenBody took %v\n", time.Since(start))
+		log.Info("db.SetOpenBody took ", time.Since(start))
 		if err != nil {
 			return
 		}
