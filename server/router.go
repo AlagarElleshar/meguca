@@ -200,7 +200,7 @@ func redirectToDefault(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			http.Redirect(w, r, "/all/", 301)
 		} else {
-			http.Redirect(w, r, fmt.Sprintf("/%s/%d", board, id), 301)
+			http.Redirect(w, r, fmt.Sprintf("/%s/%d?last=100#bottom", board, id), 301)
 		}
 	} else {
 		http.Redirect(w, r, "/all/", 301)
