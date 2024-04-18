@@ -10,9 +10,7 @@ import (
 
 // ClosePost closes an open post and commits any links and hash commands
 func ClosePost(id, op uint64, body string, links []common.Link, com []common.Command, claude *common.ClaudeState) (cid uint64, err error) {
-	defer func(start time.Time) {
-		log.Printf("ClosePost function took %v", time.Since(start))
-	}(time.Now())
+	funcStart := time.Now()
 
 	err = InTransaction(false, func(tx *sql.Tx) (err error) {
 		start := time.Now()
@@ -35,20 +33,18 @@ func ClosePost(id, op uint64, body string, links []common.Link, com []common.Com
 			}
 		}
 
-		postsMap := map[string]interface{}{
-			"editing":  false,
-			"body":     body,
-			"commands": commandRow(com),
-			"password": nil,
-		}
+		query := sq.Update("posts").
+			Set("editing", false).
+			Set("body", body).
+			Set("commands", commandRow(com)).
+			Set("password", nil)
 
 		if claude != nil {
-			postsMap["claude_id"] = cid
+			query = query.Set("claude_id", cid)
 		}
 
 		start = time.Now()
-		_, err = sq.Update("posts").
-			SetMap(postsMap).
+		_, err = query.
 			Where("id = ?", id).
 			RunWith(tx).
 			Exec()
@@ -80,6 +76,7 @@ func ClosePost(id, op uint64, body string, links []common.Link, com []common.Com
 	start := time.Now()
 	err = deleteOpenPostBody(id)
 	log.Printf("deleteOpenPostBody took %v", time.Since(start))
+	log.Printf("ClosePost took %v", time.Since(funcStart))
 	return
 }
 func UpdateClaude(id uint64, claude *common.ClaudeState) {
