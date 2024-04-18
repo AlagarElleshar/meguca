@@ -183,6 +183,8 @@ func getFilename(id string, desc string) string {
 	if len(normalize) <= remainingLen {
 		return prepend + normalize
 	}
+	suffix := "… "
+	remainingLen -= len(suffix)
 	descBytes := []byte(normalize)
 	pos := 0
 	for {
@@ -195,7 +197,7 @@ func getFilename(id string, desc string) string {
 		}
 		pos += nextPos
 	}
-	return prepend + string(descBytes[:pos])
+	return prepend + string(descBytes[:pos]) + suffix
 }
 
 func DownloadTikTok(input *common.PostCommand) (token string, filename string, err error) {
