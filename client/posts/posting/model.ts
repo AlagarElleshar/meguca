@@ -286,6 +286,7 @@ export default class FormModel extends Post {
 			this.allocatingImage = true;
 			this.requestAlloc(this.trimInput(this.view.input.value, true),
 				null);
+			this.view.updateDoneButton()
 		}
 		const strArray = new TextEncoder().encode(input);
 		const bufferSize = strArray.length + 3;
