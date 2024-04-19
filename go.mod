@@ -30,12 +30,11 @@ require (
 	github.com/go-playground/log v6.3.0+incompatible
 	github.com/gorilla/websocket v1.4.2
 	github.com/lib/pq v1.8.0
+	github.com/linxGnu/grocksdb v1.8.14
 	github.com/mattn/go-sqlite3 v1.14.9 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/nwaples/rardecode v1.1.2 // indirect
 	github.com/rakyll/statik v0.1.7
-	github.com/stretchr/testify v1.6.1 // indirect
-	github.com/transloadit/go-sdk v1.5.2
 	github.com/ulikunitz/xz v0.5.7
 	github.com/valyala/quicktemplate v1.7.0
 	go.etcd.io/bbolt v1.3.5

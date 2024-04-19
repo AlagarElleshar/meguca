@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"github.com/linxGnu/grocksdb"
 	"net/url"
 	"os"
 	"os/exec"
@@ -15,7 +16,6 @@ import (
 	"github.com/bakape/meguca/util"
 	"github.com/go-playground/log"
 	_ "github.com/lib/pq" // Postgres driver
-	"go.etcd.io/bbolt"
 )
 
 var (
@@ -29,7 +29,7 @@ var (
 	sq squirrel.StatementBuilderType
 
 	// Embedded database for temporary storage
-	boltDB *bbolt.DB
+	rocksDB *grocksdb.DB
 )
 
 // Connects to PostgreSQL database and performs schema upgrades
@@ -73,7 +73,7 @@ func LoadTestDB(suffix string) (close func() error, err error) {
 			return
 		}
 
-		err = boltDB.Close()
+		rocksDB.Close()
 		if err != nil {
 			return
 		}
@@ -219,20 +219,27 @@ func CreateSystemAccount(tx *sql.Tx) (err error) {
 func ClearTables(tables ...string) error {
 	for _, t := range tables {
 		// Clear open post body bucket
-		if boltDBisOpen() {
+		if rocksDBisOpen() {
 			switch t {
 			case "boards", "threads", "posts":
-				err := boltDB.Update(func(tx *bbolt.Tx) error {
-					buc := tx.Bucket([]byte("open_bodies"))
-					c := buc.Cursor()
-					for k, _ := c.First(); k != nil; k, _ = c.Next() {
-						err := buc.Delete(k)
-						if err != nil {
-							return err
-						}
-					}
-					return nil
-				})
+				readOpts := grocksdb.NewDefaultReadOptions()
+				defer readOpts.Destroy()
+
+				writeOpts := grocksdb.NewDefaultWriteOptions()
+				defer writeOpts.Destroy()
+				iter := rocksDB.NewIterator(readOptions)
+				iter.SeekToFirst()
+				firstSlice := iter.Key()
+				first := firstSlice.Data()
+				firstSlice.Free()
+				iter.SeekToLast()
+				lastSlice := iter.Key()
+				last := lastSlice.Data()
+				lastSlice.Free()
+				iter.Close()
+				wb := grocksdb.NewWriteBatch()
+				wb.DeleteRange(first, last)
+				err := rocksDB.Write(writeOpts, wb)
 				if err != nil {
 					return err
 				}
