@@ -10,7 +10,7 @@ ifeq ($(UNAME_S),Darwin)
 	ROCKSDB_LDFLAGS := $(shell pkg-config --libs rocksdb liblz4 libzstd) -L/opt/homebrew/Cellar/snappy/1.1.10/lib
 else ifeq ($(UNAME_S),Linux)
 	ROCKSDB_CFLAGS := $(HOME)/rocksdb/include
-	ROCKSDB_LDFLAGS := $(HOME)/rocksdb/include
+	ROCKSDB_LDFLAGS := $(HOME)/rocksdb
 endif
 
 ifeq ($(UNAME_S),Linux)
