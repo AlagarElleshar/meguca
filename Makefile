@@ -4,6 +4,10 @@ export gulp=$(node_bins)/gulp
 export webpack=$(node_bins)/webpack
 export GO111MODULE=on
 
+ROCKSDB_CFLAGS := $(shell pkg-config --cflags rocksdb liblz4 libzstd) -I/opt/homebrew/Cellar/snappy/1.1.10/include/
+ROCKSDB_LDFLAGS := -lstdc++ -lm -lz -lsnappy -llz4 -lzstd
+ROCKSDB_LDFLAGS += $(shell pkg-config --libs rocksdb liblz4 libzstd) -L/opt/homebrew/Cellar/snappy/1.1.10/lib
+
 ifeq ($(shell uname -s),Linux)
     GO_BUILD_TAGS = -tags "libsqlite3 linux"
 endif
@@ -30,7 +34,7 @@ generate:
 
 server:
 	go generate
-	go build -v $(GO_BUILD_TAGS)
+	CGO_CFLAGS="$(ROCKSDB_CFLAGS)" CGO_LDFLAGS="$(ROCKSDB_LDFLAGS)" go build -v $(GO_BUILD_TAGS)
 
 client_clean:
 	rm -rf www/js www/css/*.css www/css/maps node_modules
@@ -47,4 +51,3 @@ test_no_race:
 test_docker:
 	docker-compose build
 	docker-compose run --rm -e CI=true meguca make test
-
