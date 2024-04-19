@@ -4,9 +4,13 @@ export gulp=$(node_bins)/gulp
 export webpack=$(node_bins)/webpack
 export GO111MODULE=on
 
-ROCKSDB_CFLAGS := $(shell pkg-config --cflags rocksdb liblz4 libzstd) -I/opt/homebrew/Cellar/snappy/1.1.10/include/
-ROCKSDB_LDFLAGS := -lstdc++ -lm -lz -lsnappy -llz4 -lzstd
-ROCKSDB_LDFLAGS += $(shell pkg-config --libs rocksdb liblz4 libzstd) -L/opt/homebrew/Cellar/snappy/1.1.10/lib
+ifeq ($(UNAME_S),Darwin)
+	ROCKSDB_CFLAGS := $(shell pkg-config --cflags rocksdb liblz4 libzstd) -I/opt/homebrew/Cellar/snappy/1.1.10/include/
+	ROCKSDB_LDFLAGS := $(shell pkg-config --libs rocksdb liblz4 libzstd) -L/opt/homebrew/Cellar/snappy/1.1.10/lib
+else ifeq ($(UNAME_S),Linux)
+	ROCKSDB_CFLAGS := $HOME/rocksdb/include
+	ROCKSDB_LDFLAGS := $HOME/rocksdb/include
+endif
 
 ifeq ($(shell uname -s),Linux)
     GO_BUILD_TAGS = -tags "libsqlite3 linux"
