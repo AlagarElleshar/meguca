@@ -195,15 +195,19 @@ func createRouter() http.Handler {
 
 // Redirects to / requests to /all/ board
 func redirectToDefault(w http.ResponseWriter, r *http.Request) {
+	// Set cache-control headers to prevent caching
+	w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
+	w.Header().Set("Pragma", "no-cache")
+
 	if config.Server.DefaultGeneralThread != nil {
 		board, id, err := db.GetLatestGeneral(config.Server.DefaultGeneralThread)
 		if err != nil {
-			http.Redirect(w, r, "/all/", 301)
+			http.Redirect(w, r, "/all/", http.StatusFound)
 		} else {
-			http.Redirect(w, r, fmt.Sprintf("/%s/%d?last=100#bottom", board, id), 301)
+			http.Redirect(w, r, fmt.Sprintf("/%s/%d?last=100#bottom", board, id), http.StatusFound)
 		}
 	} else {
-		http.Redirect(w, r, "/all/", 301)
+		http.Redirect(w, r, "/all/", http.StatusFound)
 	}
 }
 

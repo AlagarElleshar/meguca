@@ -14,12 +14,7 @@ func ClosePost(id, op uint64, body string, links []common.Link, com []common.Com
 
 	err = InTransaction(false, func(tx *sql.Tx) (err error) {
 		start := time.Now()
-		defer func() {
-			log.Printf("InTransaction took %v", time.Since(start))
-		}()
-
 		if claude != nil {
-			start := time.Now()
 			err = sq.Insert("claude").
 				Columns("state", "prompt", "response").
 				Values("waiting", claude.Prompt, claude.Response.String()).
@@ -58,6 +53,7 @@ func ClosePost(id, op uint64, body string, links []common.Link, com []common.Com
 		log.Printf("writeLinks took %v", time.Since(start))
 		return
 	})
+	log.Printf("InTransaction took %v", time.Since(funcStart))
 
 	if err != nil {
 		return
