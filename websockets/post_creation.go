@@ -182,7 +182,10 @@ func CreatePost(
 	//}
 
 	// Assert thread is not locked
+	start := time.Now()
 	locked, err := db.CheckThreadLocked(op)
+	elapsed := time.Since(start)
+	log.Info("db.CheckThreadLocked took", elapsed)
 	switch {
 	case err != nil:
 		return
@@ -191,7 +194,10 @@ func CreatePost(
 		return
 	}
 
+	start = time.Now()
 	post, _, err = constructPost(req, conf, ip, op)
+	elapsed = time.Since(start)
+	log.Info("constructPost took", elapsed)
 	if err != nil {
 		return
 	}
@@ -200,6 +206,7 @@ func CreatePost(
 
 	// Must ensure image token usage is done atomically, as not to cause
 	// possible data races with unused image cleanup
+	start = time.Now()
 	err = db.InTransaction(false, func(tx *sql.Tx) (err error) {
 		err = db.InsertPost(tx, &post)
 		if err != nil {
@@ -215,6 +222,9 @@ func CreatePost(
 
 		return
 	})
+	elapsed = time.Since(start)
+	log.Info("Createpost InTransaction took", elapsed)
+
 	//if !hasImage && postCommand != nil {
 	//	handlePostCommand(post.ID, post.OP, postCommand)
 	//}

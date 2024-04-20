@@ -8,12 +8,35 @@ import (
 	"github.com/bakape/meguca/common"
 )
 
+var insertPostStmt *sql.Stmt
+
 // Post is for writing new posts to a database. It contains the Password
 // field, which is never exposed publically through Post.
 type Post struct {
 	common.StandalonePost
 	Password []byte
 	IP       string
+}
+
+func prepareInsertPostStmt() (err error) {
+
+	insertPostStmt, err = sqlDB.Prepare(`
+        INSERT INTO posts (
+            editing, board, op, body, flag,
+            name, trip, auth, sage,
+            password, ip 
+        )
+        VALUES (
+            $1, $2, $3, $4, $5,
+            $6, $7, $8, $9,
+            $10, $11
+        )
+        RETURNING id, time, moderated
+    `)
+	if err != nil {
+		return
+	}
+	return
 }
 
 func selectPost(id uint64, columns ...string) rowScanner {
@@ -108,32 +131,40 @@ func WritePost(tx *sql.Tx, p Post) (err error) {
 // Thread OPs must have their post ID set to the thread ID.
 // Any images are to be inserted in a separate call.
 func InsertPost(tx *sql.Tx, p *Post) (err error) {
-	args := make([]interface{}, 0, 12)
-	args = append(args,
-		p.Editing, p.Board, p.OP, p.Body, p.Flag,
-		p.Name, p.Trip, p.Auth, p.Sage,
-		p.Password, p.IP)
-
-	q := sq.Insert("posts").
-		Columns(
-			"editing", "board", "op", "body", "flag",
-			"name", "trip", "auth", "sage",
-			"password", "ip",
-		)
-
 	if p.ID != 0 { // OP of a thread
+		args := make([]interface{}, 0, 12)
+		args = append(args,
+			p.Editing, p.Board, p.OP, p.Body, p.Flag,
+			p.Name, p.Trip, p.Auth, p.Sage,
+			p.Password, p.IP)
+
+		q := sq.Insert("posts").
+			Columns(
+				"editing", "board", "op", "body", "flag",
+				"name", "trip", "auth", "sage",
+				"password", "ip",
+			)
+
 		q = q.Columns("id")
 		args = append(args, p.ID)
-	}
-
-	err = q.
-		Values(args...).
-		Suffix("returning id, time, moderated").
-		RunWith(tx).
-		QueryRow().
-		Scan(&p.ID, &p.Time, &p.Moderated)
-	if err != nil {
-		return
+		err = q.
+			Values(args...).
+			Suffix("returning id, time, moderated").
+			RunWith(tx).
+			QueryRow().
+			Scan(&p.ID, &p.Time, &p.Moderated)
+		if err != nil {
+			return
+		}
+	} else {
+		err = tx.Stmt(insertPostStmt).QueryRow(
+			p.Editing, p.Board, p.OP, p.Body, p.Flag,
+			p.Name, p.Trip, p.Auth, p.Sage,
+			p.Password, p.IP,
+		).Scan(&p.ID, &p.Time, &p.Moderated)
+		if err != nil {
+			return
+		}
 	}
 
 	if p.Moderated {

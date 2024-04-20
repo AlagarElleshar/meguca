@@ -8,6 +8,26 @@ import (
 	"time"
 )
 
+var (
+	updatePostsStmt *sql.Stmt
+)
+
+func prepareUpdatePostsStmt() (err error) {
+	updatePostsStmt, err = sqlDB.Prepare(`
+        UPDATE posts
+        SET editing = $1,
+            body = $2,
+            commands = $3,
+            password = $4,
+            claude_id = $5
+        WHERE id = $6
+    `)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return
+}
+
 // ClosePost closes an open post and commits any links and hash commands
 func ClosePost(id, op uint64, body string, links []common.Link, com []common.Command, claude *common.ClaudeState) (cid uint64, err error) {
 	funcStart := time.Now()
@@ -26,31 +46,18 @@ func ClosePost(id, op uint64, body string, links []common.Link, com []common.Com
 			if err != nil {
 				return
 			}
+			_, err = tx.Stmt(updatePostsStmt).Exec(false, body, commandRow(com), nil, cid, id)
+			if err != nil {
+				return
+			}
+		} else {
+			_, err = tx.Stmt(updatePostsStmt).Exec(false, body, commandRow(com), nil, nil, id)
+			if err != nil {
+				return
+			}
 		}
 
-		query := sq.Update("posts").
-			Set("editing", false).
-			Set("body", body).
-			Set("commands", commandRow(com)).
-			Set("password", nil)
-
-		if claude != nil {
-			query = query.Set("claude_id", cid)
-		}
-
-		start = time.Now()
-		_, err = query.
-			Where("id = ?", id).
-			RunWith(tx).
-			Exec()
-		log.Printf("Updating posts table took %v", time.Since(start))
-		if err != nil {
-			return
-		}
-
-		start = time.Now()
 		err = writeLinks(tx, id, links)
-		log.Printf("writeLinks took %v", time.Since(start))
 		return
 	})
 	log.Printf("InTransaction took %v", time.Since(funcStart))

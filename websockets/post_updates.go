@@ -313,9 +313,7 @@ func (c *Client) closePost() (err error) {
 		go StreamMessages(Claude3Haiku, DefaultSystemPrompt, 255, claude, image,
 			func() {
 				claude.Status = common.Generating
-				start := time.Now()
 				db.UpdateClaude(cid, claude)
-				log.Info("UpdateClaude took ", time.Since(start))
 			},
 			func(token string) {
 				feed.SendClaudeToken(id, token)
