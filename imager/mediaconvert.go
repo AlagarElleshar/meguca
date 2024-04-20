@@ -63,7 +63,7 @@ func HandleJobEvent(event *JobEvent) {
 func startJob(url string, id *string, rotation int) (*mediaconvert.CreateJobOutput, error) {
 	var rotationString string
 	if rotation == 0 {
-		rotationString = "DEGREE_0"
+		rotationString = "AUTO"
 	} else {
 		n := strconv.Itoa(rotation)
 		rotationString = "DEGREES_" + n
