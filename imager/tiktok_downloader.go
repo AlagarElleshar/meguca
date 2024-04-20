@@ -83,7 +83,7 @@ type TikWMResponse struct {
 }
 
 func rotateVideoFile(filename string, rotation int) error {
-	cmd := exec.Command("exiftool", fmt.Sprintf("-rotation=%d", rotation), filename)
+	cmd := exec.Command("exiftool", fmt.Sprintf("-rotation=%d", rotation), "overwrite_original", filename)
 
 	err := cmd.Run()
 	if err != nil {
