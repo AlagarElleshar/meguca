@@ -46,6 +46,7 @@ func rocksDBisOpen() bool {
 func tryOpenRocksDB() (open bool, err error) {
 	rocksDBOnce.Do(func() {
 		opts := grocksdb.NewDefaultOptions()
+		opts.OptimizeForPointLookup(64)
 		opts.SetCreateIfMissing(true)
 		rocksDB, err = grocksdb.OpenDb(opts, "rdb.db")
 
