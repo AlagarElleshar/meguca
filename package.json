@@ -25,6 +25,7 @@
     "webpack-manifest-plugin": "^5.0.0"
   },
   "dependencies": {
-    "mpegts.js": "^1.7.3"
+    "mpegts.js": "^1.7.3",
+    "ts-proto": "^1.172.0"
   }
 }
