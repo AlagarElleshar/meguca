@@ -21,7 +21,7 @@ endif
 
 all: client server
 
-client:
+client: client_deps
 	npm run build
 
 client_deps:
