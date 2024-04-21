@@ -38,3 +38,4 @@ db_*.db
 .mypy_cache/
 templates/*.html.go
 /update_webpack.py
+/rdb.db/

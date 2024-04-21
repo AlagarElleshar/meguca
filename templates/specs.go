@@ -391,6 +391,7 @@ var optionSpecs = [...][]inputSpec{
 		{ID: "meguTV"},
 	},
 	{
+		{ID: "arrowKeysNavigate"},
 		{
 			ID:   "newPost",
 			Type: _shortcut,

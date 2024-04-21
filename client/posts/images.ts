@@ -137,12 +137,11 @@ export default class ImageHandler extends View<Post> {
 	// Render the information caption above the image
 	private renderFigcaption(reveal: boolean) {
 		let el = this.getFigcaption()
-		let firstRender = false;
-		if (!el) {
-			el = importTemplate("figcaption").firstChild as HTMLElement
-			firstRender = true;
-			this.el.querySelector("header").after(el)
+		if(el){
+			el.remove()
 		}
+		el = importTemplate("figcaption").firstChild as HTMLElement
+		this.el.querySelector("header").after(el)
 
 		// const [hToggle, , , , info] = Array.from(el.children) as HTMLElement[]
 		const hToggle = el.getElementsByClassName("image-toggle")[0] as HTMLElement
@@ -157,73 +156,69 @@ export default class ImageHandler extends View<Post> {
 
 		const data = this.model.image;
 
-		if(firstRender) {
+		const [hasAudio, duration, fileSize, dimensions, codec, postingTime] = Array.from(el.querySelector(".fileinfo").children) as HTMLElement[]
 
-			const [hasAudio, duration, fileSize, dimensions, codec, postingTime] = Array.from(el.querySelector(".fileinfo").children) as HTMLElement[]
-
-			if (!data.audio) {
-				hasAudio.remove()
-			}
-
-			if (data.length) {
-				let s: string;
-				if (data.length < 60) {
-					s = `0:${pad(data.length)}`;
-				} else {
-					const min = Math.floor(data.length / 60);
-					s = `${pad(min)}:${pad(data.length - min * 60)}`;
-				}
-				duration.insertAdjacentText('beforeend', s);
-			} else {
-				duration.remove()
-			}
-
-			const {size} = data;
-			let s: string;
-			if (size < (1 << 10)) {
-				s = size + ' B';
-			} else if (size < (1 << 20)) {
-				s = Math.round(size / (1 << 10)) + ' KB';
-			} else {
-				const text = Math.round(size / (1 << 20) * 10).toString();
-				s = `${text.slice(0, -1)}.${text.slice(-1)} MB`;
-			}
-			fileSize.insertAdjacentText('beforeend', s);
-
-			const [w, h] = data.dims;
-			if (w || h) {
-				dimensions.insertAdjacentText('beforeend', `${w}×${h}`);
-			} else {
-				dimensions.remove()
-			}
-
-			if (data.codec) {
-				codec.insertAdjacentText('beforeend', data.codec.toUpperCase());
-			} else {
-				codec.remove()
-			}
-
-			let mediaMetadataString = "";
-			if (data.artist) {
-				mediaMetadataString += `[${data.artist}`;
-				if (data.title) {
-					mediaMetadataString += ` - ${data.title}]`;
-				} else {
-					mediaMetadataString += ']';
-				}
-			} else if (data.title) {
-				mediaMetadataString += `[${data.title}]`;
-			}
-			el.querySelector(".media-metadata").textContent = mediaMetadataString;
-			let tokID = getTokID(data.name);
-			if(tokID != null){
-				this.renderSource(tokID,el,postingTime)
-			}
-			else{
-				postingTime.remove();
-			}
+		if (!data.audio) {
+			hasAudio.remove()
 		}
 
+		if (data.length) {
+			let s: string;
+			if (data.length < 60) {
+				s = `0:${pad(data.length)}`;
+			} else {
+				const min = Math.floor(data.length / 60);
+				s = `${pad(min)}:${pad(data.length - min * 60)}`;
+			}
+			duration.insertAdjacentText('beforeend', s);
+		} else {
+			duration.remove()
+		}
+
+		const {size} = data;
+		let s: string;
+		if (size < (1 << 10)) {
+			s = size + ' B';
+		} else if (size < (1 << 20)) {
+			s = Math.round(size / (1 << 10)) + ' KB';
+		} else {
+			const text = Math.round(size / (1 << 20) * 10).toString();
+			s = `${text.slice(0, -1)}.${text.slice(-1)} MB`;
+		}
+		fileSize.insertAdjacentText('beforeend', s);
+
+		const [w, h] = data.dims;
+		if (w || h) {
+			dimensions.insertAdjacentText('beforeend', `${w}×${h}`);
+		} else {
+			dimensions.remove()
+		}
+
+		if (data.codec) {
+			codec.insertAdjacentText('beforeend', data.codec.toUpperCase());
+		} else {
+			codec.remove()
+		}
+
+		let mediaMetadataString = "";
+		if (data.artist) {
+			mediaMetadataString += `[${data.artist}`;
+			if (data.title) {
+				mediaMetadataString += ` - ${data.title}]`;
+			} else {
+				mediaMetadataString += ']';
+			}
+		} else if (data.title) {
+			mediaMetadataString += `[${data.title}]`;
+		}
+		el.querySelector(".media-metadata").textContent = mediaMetadataString;
+		let tokID = getTokID(data.name);
+		if(tokID != null){
+			this.renderSource(tokID,el,postingTime)
+		}
+		else{
+			postingTime.remove();
+		}
 
 		// Render a name + download link of an image
 		const ext = fileTypes[data.file_type],

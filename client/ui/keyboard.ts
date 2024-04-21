@@ -24,11 +24,15 @@ function handleShortcut(event: KeyboardEvent) {
 		switch (event.key) {
 			case "w":
 			case "ArrowLeft":
-				navigatePost(true)
+				if (options.arrowKeysNavigate) {
+					navigatePost(true)
+				}
 				break
 			case "s":
 			case "ArrowRight":
-				navigatePost(false)
+				if (options.arrowKeysNavigate) {
+					navigatePost(false)
+				}
 				break
 			case "q":
 				if (page.thread) {
