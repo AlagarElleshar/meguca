@@ -1,0 +1,15 @@
+@import "neko.less";
+
+article, aside {
+  background-color: fadeout(@postBG, 50%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+@font-face {
+  font-family: "Neko Font";
+  src: url("/assets/css/nekofont.woff2") format("woff2");
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Neko Font","Segoe UI","Noto Sans",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
+}

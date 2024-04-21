@@ -40,6 +40,11 @@ type syncCount struct {
 	Total  int `json:"total"`
 }
 
+type pendingTiktokState struct {
+	message message
+	state   PendingTikToks
+}
+
 // Feed is a feed with synchronization logic of a certain thread
 type Feed struct {
 	// Thread ID
@@ -72,6 +77,8 @@ type Feed struct {
 	lastSyncCount syncCount
 	// Let sent sync counter
 	claudeMessage chan []byte
+	// Tiktok state
+	updatePendingTiktokState chan pendingTiktokState
 	// set of queued post IDs
 	queuedPosts map[uint64]struct{}
 	// queued append body messages
@@ -186,6 +193,10 @@ func (f *Feed) Start() (err error) {
 			case msg := <-f.closePost:
 				f.modifyPost(msg, func(p *cachedPost) {
 					p.Closed = true
+				})
+			case msg := <-f.updatePendingTiktokState:
+				f.modifyPost(msg.message, func(p *cachedPost) {
+					p.PendingTikToks = msg.state
 				})
 			case msg := <-f.claudeMessage:
 				f.sendToAllBinary(msg)
@@ -355,4 +366,28 @@ func (f *Feed) SendClaudeComplete(id uint64, isError bool, response *bytes.Buffe
 		message[messageSize-1] = uint8(common.MessageClaudeDone)
 	}
 	f.claudeMessage <- message
+}
+func (f *Feed) GetPendingTiktokState(id uint64) (p PendingTikToks, ok bool) {
+	//return f.cache.Recent[id].PendingTikToks
+	var post cachedPost
+	post, ok = f.cache.Recent[id]
+	if ok {
+		p = post.PendingTikToks
+	}
+	return
+}
+
+func (f *Feed) UpdatePendingTiktokState(id uint64, state PendingTikToks) {
+	stateUpdate := struct {
+		ID    uint64         `json:"id"`
+		State PendingTikToks `json:"state"`
+	}{
+		id,
+		state,
+	}
+	msg, _ := common.EncodeMessage(common.MessageTiktokState, stateUpdate)
+	f.updatePendingTiktokState <- pendingTiktokState{
+		message: message{id, msg},
+		state:   state,
+	}
 }

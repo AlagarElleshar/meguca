@@ -4,11 +4,36 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/bakape/meguca/common"
+	"log"
+	"time"
 )
+
+var (
+	updatePostsStmt *sql.Stmt
+)
+
+func prepareUpdatePostsStmt() (err error) {
+	updatePostsStmt, err = sqlDB.Prepare(`
+        UPDATE posts
+        SET editing = $1,
+            body = $2,
+            commands = $3,
+            password = $4,
+            claude_id = $5
+        WHERE id = $6
+    `)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return
+}
 
 // ClosePost closes an open post and commits any links and hash commands
 func ClosePost(id, op uint64, body string, links []common.Link, com []common.Command, claude *common.ClaudeState) (cid uint64, err error) {
+	funcStart := time.Now()
+
 	err = InTransaction(false, func(tx *sql.Tx) (err error) {
+		start := time.Now()
 		if claude != nil {
 			err = sq.Insert("claude").
 				Columns("state", "prompt", "response").
@@ -17,46 +42,46 @@ func ClosePost(id, op uint64, body string, links []common.Link, com []common.Com
 				RunWith(tx).
 				QueryRow().
 				Scan(&cid)
+			log.Printf("Inserting into claude table took %v", time.Since(start))
+			if err != nil {
+				return
+			}
+			_, err = tx.Stmt(updatePostsStmt).Exec(false, body, commandRow(com), nil, cid, id)
+			if err != nil {
+				return
+			}
+		} else {
+			_, err = tx.Stmt(updatePostsStmt).Exec(false, body, commandRow(com), nil, nil, id)
 			if err != nil {
 				return
 			}
 		}
-		postsMap := map[string]interface{}{
-			"editing":  false,
-			"body":     body,
-			"commands": commandRow(com),
-			"password": nil,
-		}
-		if claude != nil {
-			postsMap["claude_id"] = cid
-		}
-		_, err = sq.Update("posts").
-			SetMap(postsMap).
-			Where("id = ?", id).
-			RunWith(tx).
-			Exec()
-		if err != nil {
-			return
-		}
+
 		err = writeLinks(tx, id, links)
 		return
 	})
+	log.Printf("InTransaction took %v", time.Since(funcStart))
+
 	if err != nil {
 		return
 	}
 
 	if !common.IsTest {
+		start := time.Now()
 		// TODO: Propagate this with DB listener
 		err = common.ClosePost(id, op, links, com, claude)
+		log.Printf("common.ClosePost took %v", time.Since(start))
 		if err != nil {
 			return
 		}
 	}
 
+	start := time.Now()
 	err = deleteOpenPostBody(id)
+	log.Printf("deleteOpenPostBody took %v", time.Since(start))
+	log.Printf("ClosePost took %v", time.Since(funcStart))
 	return
 }
-
 func UpdateClaude(id uint64, claude *common.ClaudeState) {
 	_ = InTransaction(false, func(tx *sql.Tx) (err error) {
 		// Update the Claude associated with the post using a subquery

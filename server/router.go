@@ -87,6 +87,7 @@ func createRouter() http.Handler {
 		api.POST("/upload-megu-hash", imager.UploadMeguHash)
 		api.POST("/create-thread", createThread)
 		api.POST("/create-reply", createReply)
+		api.POST("/media-convert", mediaConvert)
 
 		assets.GET("/images/*path", serveImages)
 
@@ -194,7 +195,20 @@ func createRouter() http.Handler {
 
 // Redirects to / requests to /all/ board
 func redirectToDefault(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "/all/", 301)
+	// Set cache-control headers to prevent caching
+	w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
+	w.Header().Set("Pragma", "no-cache")
+
+	if config.Server.DefaultGeneralThread != nil {
+		board, id, err := db.GetLatestGeneral(config.Server.DefaultGeneralThread)
+		if err != nil {
+			http.Redirect(w, r, "/all/", http.StatusFound)
+		} else {
+			http.Redirect(w, r, fmt.Sprintf("/%s/%d?last=100#bottom", board, id), http.StatusFound)
+		}
+	} else {
+		http.Redirect(w, r, "/all/", http.StatusFound)
+	}
 }
 
 // Generate a robots.txt with only select boards preventing indexing

@@ -163,6 +163,11 @@ func HasImage(id uint64) (has bool, err error) {
 	return
 }
 
+func BumpThread(tx *sql.Tx, thread uint64) error {
+	_, err := tx.Exec(`SELECT bump_thread($1, $2)`, thread, false)
+	return err
+}
+
 // InsertImage insert an image into an existing open post and return image
 // JSON
 func InsertImage(tx *sql.Tx, postID uint64, token, name string, spoiler bool,

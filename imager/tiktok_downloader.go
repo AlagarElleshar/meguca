@@ -7,14 +7,15 @@ import (
 	"fmt"
 	"github.com/bakape/meguca/common"
 	"github.com/go-playground/log"
-	transloadit "github.com/transloadit/go-sdk"
 	"golang.org/x/text/unicode/norm"
+	"gopkg.in/vansante/go-ffprobe.v2"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -70,7 +71,8 @@ var (
 	twmRequestChannel  chan *common.PostCommand
 	twmResponseChannel chan *TWMTikTokData
 	twmErrChannel      chan error
-	transloaditClient  transloadit.Client
+	twmMutex           sync.Mutex
+	//transloaditClient  transloadit.Client
 )
 
 type TikWMResponse struct {
@@ -81,7 +83,7 @@ type TikWMResponse struct {
 }
 
 func rotateVideoFile(filename string, rotation int) error {
-	cmd := exec.Command("exiftool", fmt.Sprintf("-rotation=%d", rotation), filename)
+	cmd := exec.Command("exiftool", fmt.Sprintf("-rotation=%d", rotation), "overwrite_original", filename)
 
 	err := cmd.Run()
 	if err != nil {
@@ -90,64 +92,64 @@ func rotateVideoFile(filename string, rotation int) error {
 	return nil
 }
 
-func downloadHDToTemp(url string, file string, rotation int) (fileSize int64, status int, err error) {
-	assembly := transloadit.NewAssembly()
-	//assembly.AddFile("video", url)
-	assembly.AddStep("imported", map[string]interface{}{
-		"robot": "/http/import",
-		"url":   url,
-	})
-	encodeStep := map[string]interface{}{
-		"use":          "imported",
-		"robot":        "/video/encode",
-		"ffmpeg_stack": "v6.0.0",
-		"preset":       "hls-1080p",
-		"ffmpeg": map[string]interface{}{
-			"vcodec": "libx264",
-			"crf":    20,
-			"c:a":    "copy",
-			"preset": "faster",
-		},
-		"width":  "${file.meta.width}",
-		"height": "${file.meta.height}",
-	}
-	if rotation > 0 {
-		encodeStep["rotate"] = rotation
-	}
-	assembly.AddStep("encoded-video", encodeStep)
-	assembly.TemplateID = "4e4e97b7977b442a836041bf0dd3ba71"
-
-	// Start the upload
-	info, err := transloaditClient.StartAssembly(context.Background(), assembly)
-	if err != nil {
-		panic(err)
-	}
-	info, err = transloaditClient.WaitForAssembly(context.Background(), info)
-	if err != nil {
-		panic(err)
-	}
-	out_url := info.Results["encoded-video"][0].URL
-	outputFile, err := os.Create(file)
-	if err != nil {
-		return
-	}
-	defer outputFile.Close()
-
-	response, err := http.Get(out_url)
-	if err != nil {
-		return 0, status, err
-	} else if response.StatusCode != http.StatusOK {
-		return 0, response.StatusCode, fmt.Errorf("status code %d", response.StatusCode)
-	}
-	defer response.Body.Close()
-
-	fileSize, err = io.Copy(outputFile, response.Body)
-	if err != nil {
-		fmt.Println("Error saving file:", err)
-		return
-	}
-	return
-}
+//	func downloadHDToTemp(url string, file string, rotation int) (fileSize int64, status int, err error) {
+//		assembly := transloadit.NewAssembly()
+//		//assembly.AddFile("video", url)
+//		assembly.AddStep("imported", map[string]interface{}{
+//			"robot": "/http/import",
+//			"url":   url,
+//		})
+//		encodeStep := map[string]interface{}{
+//			"use":          "imported",
+//			"robot":        "/video/encode",
+//			"ffmpeg_stack": "v6.0.0",
+//			"preset":       "hls-1080p",
+//			"ffmpeg": map[string]interface{}{
+//				"vcodec": "libx264",
+//				"crf":    20,
+//				"c:a":    "copy",
+//				"preset": "faster",
+//			},
+//			"width":  "${file.meta.width}",
+//			"height": "${file.meta.height}",
+//		}
+//		if rotation > 0 {
+//			encodeStep["rotate"] = rotation
+//		}
+//		assembly.AddStep("encoded-video", encodeStep)
+//		assembly.TemplateID = "4e4e97b7977b442a836041bf0dd3ba71"
+//
+//		// Start the upload
+//		info, err := transloaditClient.StartAssembly(context.Background(), assembly)
+//		if err != nil {
+//			panic(err)
+//		}
+//		info, err = transloaditClient.WaitForAssembly(context.Background(), info)
+//		if err != nil {
+//			panic(err)
+//		}
+//		out_url := info.Results["encoded-video"][0].URL
+//		outputFile, err := os.Create(file)
+//		if err != nil {
+//			return
+//		}
+//		defer outputFile.Close()
+//
+//		response, err := http.Get(out_url)
+//		if err != nil {
+//			return 0, status, err
+//		} else if response.StatusCode != http.StatusOK {
+//			return 0, response.StatusCode, fmt.Errorf("status code %d", response.StatusCode)
+//		}
+//		defer response.Body.Close()
+//
+//		fileSize, err = io.Copy(outputFile, response.Body)
+//		if err != nil {
+//			fmt.Println("Error saving file:", err)
+//			return
+//		}
+//		return
+//	}
 func downloadToTemp(url string, file string) (fileSize int64, status int, err error) {
 	outputFile, err := os.Create(file)
 	if err != nil {
@@ -181,6 +183,8 @@ func getFilename(id string, desc string) string {
 	if len(normalize) <= remainingLen {
 		return prepend + normalize
 	}
+	suffix := "… "
+	remainingLen -= len(suffix)
 	descBytes := []byte(normalize)
 	pos := 0
 	for {
@@ -193,13 +197,15 @@ func getFilename(id string, desc string) string {
 		}
 		pos += nextPos
 	}
-	return prepend + string(descBytes[:pos])
+	return prepend + string(descBytes[:pos]) + suffix
 }
 
 func DownloadTikTok(input *common.PostCommand) (token string, filename string, err error) {
+	twmMutex.Lock()
 	twmRequestChannel <- input
 	tokData := <-twmResponseChannel
 	err = <-twmErrChannel
+	twmMutex.Unlock()
 	if err != nil || tokData == nil {
 		return
 	}
@@ -209,16 +215,28 @@ func DownloadTikTok(input *common.PostCommand) (token string, filename string, e
 	}
 	tmpFilename := fmt.Sprintf("tmp/%s.mp4", tokData.ID)
 	var size int64
-	if tokData.Duration > 20 {
+	if tokData.Duration > 30 {
 		input.HD = false
 	}
 	if input.HD {
-		size, _, err = downloadHDToTemp(tokData.HDPlay, tmpFilename, input.Rotation)
-		if err != nil {
-			defer os.Remove(tmpFilename)
-			return
+		// Test to see if hdplay is actually h264
+		var probeData *ffprobe.ProbeData
+		probeData, err = ffprobe.ProbeURL(context.Background(), tokData.HDPlay)
+		if probeData == nil {
+			input.HD = false
+		} else if probeData.FirstVideoStream().CodecName == "h264" {
+			// Treat hdplay like an SD video
+			input.HD = false
+			tokData.Play = tokData.HDPlay
+		} else {
+			size, err = downloadConverted(tokData.HDPlay, &tokData.ID, tmpFilename, input.Rotation)
+			if err != nil {
+				defer os.Remove(tmpFilename)
+				return
+			}
 		}
-	} else {
+	}
+	if !input.HD {
 		var status int
 		size, status, err = downloadToTemp(tokData.Play, tmpFilename)
 		if err != nil {
@@ -251,25 +269,25 @@ func DownloadTikTok(input *common.PostCommand) (token string, filename string, e
 	return res.imageID, filename, nil
 }
 
-func initTiktokDownloader() {
-	options := transloadit.DefaultConfig
-
-	var config struct {
-		TransloaditAPIKey    string `json:"transloadit_api_key"`
-		TransloaditAPISecret string `json:"transloadit_api_secret"`
-	}
-
-	configBytes, err := os.ReadFile("config.json")
-	if err == nil {
-		err = json.Unmarshal(configBytes, &config)
-		if err == nil {
-			options.AuthKey = config.TransloaditAPIKey
-			options.AuthSecret = config.TransloaditAPISecret
-		} else {
-			fmt.Println(err.Error())
-		}
-	}
-	transloaditClient = transloadit.NewClient(options)
+func init() {
+	//options := transloadit.DefaultConfig
+	//
+	//var config struct {
+	//	TransloaditAPIKey    string `json:"transloadit_api_key"`
+	//	TransloaditAPISecret string `json:"transloadit_api_secret"`
+	//}
+	//
+	//configBytes, err := os.ReadFile("config.json")
+	//if err == nil {
+	//	err = json.Unmarshal(configBytes, &config)
+	//	if err == nil {
+	//		options.AuthKey = config.TransloaditAPIKey
+	//		options.AuthSecret = config.TransloaditAPISecret
+	//	} else {
+	//		fmt.Println(err.Error())
+	//	}
+	//}
+	//transloaditClient = transloadit.NewClient(options)
 	twmRequestChannel = make(chan *common.PostCommand)
 	twmResponseChannel = make(chan *TWMTikTokData)
 	twmErrChannel = make(chan error)

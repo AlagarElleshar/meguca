@@ -24,11 +24,15 @@ function handleShortcut(event: KeyboardEvent) {
 		switch (event.key) {
 			case "w":
 			case "ArrowLeft":
-				navigatePost(true)
+				if (options.arrowKeysNavigate) {
+					navigatePost(true)
+				}
 				break
 			case "s":
 			case "ArrowRight":
-				navigatePost(false)
+				if (options.arrowKeysNavigate) {
+					navigatePost(false)
+				}
 				break
 			case "q":
 				if (page.thread) {
@@ -107,11 +111,43 @@ function navigateUp() {
 
 const postSelector = "article[id^=p]"
 
+function getArticleClosestToCenter(articles: Element[]): Element {
+	const windowHeight = window.innerHeight;
+	const windowWidth = window.innerWidth;
+	const centerX = windowWidth / 2;
+	const centerY = windowHeight / 2;
+
+	let closestArticle: Element = articles[0];
+	let minDistance = Infinity;
+
+	for (let i = 0; i < articles.length; i++) {
+		const article = articles[i];
+		const rect = article.getBoundingClientRect();
+		const articleCenterX = rect.left + rect.width / 2;
+		const articleCenterY = rect.top + rect.height / 2;
+
+		const distanceX = Math.abs(centerX - articleCenterX);
+		const distanceY = Math.abs(centerY - articleCenterY);
+		const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+		if (distance < minDistance) {
+			minDistance = distance;
+			closestArticle = article;
+		}
+	}
+
+	return closestArticle;
+}
+
 // move focus to next or previous visible post in document order.
 // starts with first post if none is selected via current url fragment
 function navigatePost(reverse: boolean) {
 	let all: Element[] = Array.from(document.querySelectorAll(postSelector))
-	let current: Element = document.querySelector(postSelector + ":target") || all[0]
+	let current: Element = document.querySelector(postSelector + ":target");
+
+	if (!current) {
+		current = getArticleClosestToCenter(all);
+	}
 	let currentIdx = all.indexOf(current)
 
 	while (current) {

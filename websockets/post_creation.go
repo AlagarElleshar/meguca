@@ -182,7 +182,10 @@ func CreatePost(
 	//}
 
 	// Assert thread is not locked
+	start := time.Now()
 	locked, err := db.CheckThreadLocked(op)
+	elapsed := time.Since(start)
+	log.Info("db.CheckThreadLocked took", elapsed)
 	switch {
 	case err != nil:
 		return
@@ -191,7 +194,10 @@ func CreatePost(
 		return
 	}
 
+	start = time.Now()
 	post, _, err = constructPost(req, conf, ip, op)
+	elapsed = time.Since(start)
+	log.Info("constructPost took", elapsed)
 	if err != nil {
 		return
 	}
@@ -200,6 +206,7 @@ func CreatePost(
 
 	// Must ensure image token usage is done atomically, as not to cause
 	// possible data races with unused image cleanup
+	start = time.Now()
 	err = db.InTransaction(false, func(tx *sql.Tx) (err error) {
 		err = db.InsertPost(tx, &post)
 		if err != nil {
@@ -215,6 +222,9 @@ func CreatePost(
 
 		return
 	})
+	elapsed = time.Since(start)
+	log.Info("Createpost InTransaction took", elapsed)
+
 	//if !hasImage && postCommand != nil {
 	//	handlePostCommand(post.ID, post.OP, postCommand)
 	//}
@@ -230,7 +240,9 @@ func (c *Client) insertPost(data []byte) (err error) {
 		return
 	}
 
+	start := time.Now()
 	needCaptcha, err := db.NeedCaptcha(c.captchaSession, c.ip)
+	log.Info("db.NeedCaptcha took ", time.Since(start))
 	if err != nil {
 		return
 	}
@@ -247,7 +259,10 @@ func (c *Client) insertPost(data []byte) (err error) {
 	req.Open = true
 
 	_, op, board := feeds.GetSync(c)
+
+	start = time.Now()
 	post, msg, err := CreatePost(op, board, c.ip, req)
+	log.Info("CreatePost took ", time.Since(start))
 	if err != nil {
 		return
 	}
@@ -260,7 +275,9 @@ func (c *Client) insertPost(data []byte) (err error) {
 	}
 
 	if post.Editing {
+		start = time.Now()
 		err = db.SetOpenBody(post.ID, []byte(post.Body))
+		log.Info("db.SetOpenBody took ", time.Since(start))
 		if err != nil {
 			return
 		}

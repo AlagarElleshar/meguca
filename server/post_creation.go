@@ -3,7 +3,9 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/go-playground/log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -184,6 +186,27 @@ func createReply(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func mediaConvert(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req imager.JobEvent
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+	if req.Password != config.Server.MediaConvertPass {
+		log.Info("Someone attempted to send mediaconvert data without pass")
+		http.Error(w, "Invalid password", http.StatusUnauthorized)
+		return
+	}
+	imager.HandleJobEvent(&req)
+
+}
 func incrementSpamscore(ip, body string, session auth.Base64Token, isOP bool) {
 	conf := config.Get()
 	s := conf.CharScore * uint(utf8.RuneCountInString(body))

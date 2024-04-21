@@ -69,7 +69,7 @@
 
 	function loadScript(path) {
 		var script = document.createElement('script');
-		script.type = 'text/javascript';
+		script.type = 'module';
 		script.src = path;
 		head.appendChild(script);
 		return script;

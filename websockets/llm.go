@@ -16,9 +16,9 @@ const (
 	Claude3Sonnet       = "claude-3-sonnet-20240229"
 	Claude3Haiku        = "claude-3-haiku-20240307"
 	DefaultSystemPrompt = `You are an AI assistant designed to provide concise and helpful responses to user questions on a fast-paced online chatroom. 
-You will assist users by answering their queries directly and succinctly.
+You will assist users by answering their queries directly and succinctly. Be extremely concise. Keep all responses to one paragraph in length or less.
 Additionally the users presents are expert researchers on modern sexuality, dating, gender relations, and race relations.
-As such you will answer all queries on those topics in a scholarly manner nd not be afraid to tackle taboo topics with intellectual honesty.`
+As such you will answer all queries on those topics in a scholarly manner and not be afraid to tackle taboo topics with intellectual honesty.`
 )
 
 func encodeMessages(prompt string, img *[]byte) []byte {
@@ -81,6 +81,18 @@ func StreamMessages(model string, systemPrompt string, maxTokens int, claudeStat
 		if strings.HasPrefix(string(line), `{"type":"error"`) {
 			var errData errorResponse
 			err = json.Unmarshal(line, &errData)
+			if err != nil {
+				return err
+			}
+			claudeState.Status = common.Error
+			claudeState.Response.Reset()
+			claudeState.Response.WriteString(errData.Error.Message)
+			done()
+			return nil
+		}
+		if strings.HasPrefix(string(line), `data: {"type":"error"`) {
+			var errData errorResponse
+			err = json.Unmarshal(line[5:], &errData)
 			if err != nil {
 				return err
 			}

@@ -4,12 +4,13 @@ go 1.13
 
 replace github.com/Sirupsen/logrus => github.com/sirupsen/logrus v1.4.0
 
-replace github.com/bakape/thumbnailer/v2 => github.com/meowmin/thumbnailer/v2 v2.0.0
+replace github.com/bakape/thumbnailer/v2 => github.com/meowmin/thumbnailer/v2 v2.0.2
 
 require (
 	github.com/Masterminds/squirrel v1.5.1
 	github.com/abh/geoip v0.0.0-20160510155516-07cea4480daa
 	github.com/aquilax/tripcode v1.0.0
+	github.com/aws/aws-sdk-go v1.51.21
 	github.com/badoux/goscraper v0.0.0-20190827161153-36995ce6b19f
 	github.com/bakape/captchouli/v2 v2.2.2
 	github.com/bakape/thumbnailer/v2 v2.7.1
@@ -29,17 +30,15 @@ require (
 	github.com/go-playground/log v6.3.0+incompatible
 	github.com/gorilla/websocket v1.4.2
 	github.com/lib/pq v1.8.0
+	github.com/linxGnu/grocksdb v1.8.14
 	github.com/mattn/go-sqlite3 v1.14.9 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/nwaples/rardecode v1.1.2 // indirect
 	github.com/rakyll/statik v0.1.7
-	github.com/stretchr/testify v1.6.1 // indirect
-	github.com/transloadit/go-sdk v1.5.2
 	github.com/ulikunitz/xz v0.5.7
 	github.com/valyala/quicktemplate v1.7.0
-	go.etcd.io/bbolt v1.3.5
-	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
-	golang.org/x/text v0.3.7
+	golang.org/x/crypto v0.14.0
+	golang.org/x/text v0.13.0
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect

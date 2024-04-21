@@ -29,6 +29,7 @@ const (
 	MessageClaudeDone
 	MessageClaudeError
 	MessageAttachTiktok
+	MessageTiktokState
 	MessageNekoTV
 )
 

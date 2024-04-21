@@ -68,12 +68,22 @@ type syncMessage struct {
 	Moderation map[uint64][]common.ModerationEntry `json:"moderation"`
 }
 
+type PendingTikToks uint8
+
+const (
+	None PendingTikToks = iota
+	Loading
+	Done
+	Error
+)
+
 type cachedPost struct {
-	HasImage  bool   `json:"has_image"`
-	Spoilered bool   `json:"spoilered"`
-	Closed    bool   `json:"closed"`
-	Time      int64  `json:"-"`
-	Body      string `json:"body"`
+	HasImage       bool           `json:"has_image"`
+	Spoilered      bool           `json:"spoilered"`
+	Closed         bool           `json:"closed"`
+	Time           int64          `json:"-"`
+	Body           string         `json:"body"`
+	PendingTikToks PendingTikToks `json:"pending_tiktoks"`
 }
 
 // Generate a message for synchronizing to the current status of the update

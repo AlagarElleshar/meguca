@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"github.com/go-playground/log"
 	"os"
+	"os/signal"
 	"regexp"
-	"sort"
+	"syscall"
 )
 
 var (
@@ -79,6 +80,7 @@ var (
 		"moe",
 		"moon",
 		"neko",
+		"neko_hd",
 		"ocean",
 		"rave",
 		"tavern",
@@ -100,23 +102,52 @@ var (
 )
 
 func init() {
-	// Read the manifest.json file
-	content, err := os.ReadFile("manifest.json")
+	reloadManifest()
+
+	// Create a channel to receive signals
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGHUP)
+
+	// Start a goroutine to listen for SIGHUP signals
+	go func() {
+		for range sigChan {
+			log.Info("Received SIGHUP signal, reloading manifest.json")
+			reloadManifest()
+			_ = Recompile()
+		}
+	}()
+}
+
+type webpackManifest struct {
+	MainJS   *string `json:"client/main.ts"`
+	StaticJS *string `json:"client/static/main.ts"`
+}
+
+func reloadManifest() {
+	// Open the manifest.json file
+	file, err := os.Open("manifest.json")
 	if err != nil {
-		log.Fatal("Error reading manifest.json:", err)
+		log.Fatal("Error opening manifest.json:", err)
+	}
+	defer file.Close()
+
+	// Create a JSON decoder
+	decoder := json.NewDecoder(file)
+
+	// Decode the JSON into the Manifest struct
+	var manifest webpackManifest
+	err = decoder.Decode(&manifest)
+	if err != nil {
+		log.Fatal("Error decoding manifest.json:", err)
 	}
 
-	// Parse the JSON content
-	var manifest map[string]string
-	err = json.Unmarshal(content, &manifest)
-	if err != nil {
-		log.Fatal("Error parsing manifest.json:", err)
+	// Update the global variables with the loaded values if they are present
+	if manifest.MainJS != nil && manifest.StaticJS != nil {
+		MainJS = *manifest.MainJS
+		StaticJS = *manifest.StaticJS
+		log.Info("Loaded manifest.json: ", MainJS, " ", StaticJS)
+	} else {
+		log.Error("Error loading manifest.json: main.js or static.js not found")
 	}
 
-	// Extract the values of main.js and static.js
-	MainJS = manifest["main.js"]
-	StaticJS = manifest["static.js"]
-	log.Info("Loaded manifest.json")
-	sort.Strings(Langs)
-	sort.Strings(Themes)
 }

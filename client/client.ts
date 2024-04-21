@@ -163,7 +163,7 @@ export default () => {
 					m.claude_state = claude
 				}
 				else if (m.claude_state.status == "done" || m.claude_state.status == "error"){
-					//Ignored
+					//Ignored done
 				}
 				else{
 					m.claude_state = claude
@@ -215,6 +215,17 @@ export default () => {
 		if(debug)
 			console.log(`>binary claude error: ${id} ${response}`)
 		handle(id,(m) => m.claudeError(response))
+	}
+	interface TiktokState {
+		id: number;
+		state: number;
+	}
+	handlers[message.tiktokState] = ({ id, state }: TiktokState) =>{
+		if(debug)
+			console.log(`>state tiktok ${id} ${state}`)
+		handle(id, m => {
+			m.view.setShowLoadingBar(state ==1)
+		})
 	}
 
 	interface StolenImage {

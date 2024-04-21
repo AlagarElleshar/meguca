@@ -129,7 +129,7 @@ func streambody(
 		}
 
 		c.state.successiveNewlines = 0
-		if p.Claude != nil && !claudeFound {
+		if p.Claude != nil && p.Claude.Response.Len() != 0 && !claudeFound {
 
 			matched, err := regexp.MatchString(`#claude\s\S.*`, l)
 			if err == nil && matched {
@@ -567,7 +567,7 @@ func (c *bodyContext) parseURL(bit string) {
 		c.string(`">`)
 		c.string(s)
 		c.string(`</a>`)
-	case strings.HasSuffix(s, ".flv"):
+	case strings.HasPrefix(s, "https://pull") && strings.Contains(s, ".flv"):
 		c.newTabLink(s, s)
 		attrs := map[string]string{
 			"type":          "button",

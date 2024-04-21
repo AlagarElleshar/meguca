@@ -49,6 +49,9 @@ export const specs: { [id: string]: OptionSpec } = {
 		default: false,
 		exec: toggleHeadStyle("work-mode", ".image-banner{display: none;}"),
 	},
+	arrowKeysNavigate: {
+		default:false,
+	},
 	// Image hover expansion
 	imageHover: {
 		default: true,

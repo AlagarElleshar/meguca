@@ -21,6 +21,7 @@ type PostState = {
 	spoilered: boolean
 	closed: boolean
 	body: string
+	pending_tiktoks: number
 }
 
 // Send a requests to the server to synchronise to the current page and
@@ -59,6 +60,7 @@ async function syncRecentPost(id: number, p: PostState) {
 		// Don't rerender post form text
 		model.inputBody = model.body = p.body
 		model.view.onInput()
+		model.view.setShowLoadingBar(p.pending_tiktoks == 1)
 		return
 	}
 
@@ -76,6 +78,7 @@ async function syncRecentPost(id: number, p: PostState) {
 		model.body = p.body
 	}
 	model.view.reparseBody()
+	model.view.setShowLoadingBar(p.pending_tiktoks == 1)
 }
 
 // Fetch a post not present on the client and render it
@@ -89,6 +92,7 @@ async function fetchUnclosed(post: Post) {
 	extend(post, await fetchPost(post.id))
 	post.propagateLinks()
 	post.view.render()
+	post.view.setShowLoadingBar(false)
 }
 
 async function fetchPost(id: number): Promise<PostData> {

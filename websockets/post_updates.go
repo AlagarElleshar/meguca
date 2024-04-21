@@ -14,6 +14,8 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"sync"
+	"time"
 	"unicode/utf8"
 
 	"github.com/bakape/meguca/common"
@@ -24,15 +26,17 @@ import (
 )
 
 var (
-	errNoPostOpen    = errors.New("no post open")
-	errEmptyPost     = errors.New("post body empty")
-	errTooManyLines  = errors.New("too many lines in post body")
-	errSpliceTooLong = errors.New("splice text too long")
-	errSpliceNOOP    = errors.New("splice NOOP")
-	errTextOnly      = errors.New("text only board")
-	errHasImage      = errors.New("post already has image")
-	preImageJson     = `{"type":"image","source":{"type":"base64","media_type":"image/webp","data":"`
-	postImageJson    = `"}}`
+	errNoPostOpen      = errors.New("no post open")
+	errEmptyPost       = errors.New("post body empty")
+	errTooManyLines    = errors.New("too many lines in post body")
+	errSpliceTooLong   = errors.New("splice text too long")
+	errSpliceNOOP      = errors.New("splice NOOP")
+	errTextOnly        = errors.New("text only board")
+	errHasImage        = errors.New("post already has image")
+	preImageJson       = `{"type":"image","source":{"type":"base64","media_type":"image/webp","data":"`
+	postImageJson      = `"}}`
+	pendingTiktoks     = map[uint64]feeds.PendingTikToks{}
+	pendingTiktokMutex = sync.Mutex{}
 )
 
 // Error created, when client supplies invalid splice coordinates to server
@@ -199,6 +203,11 @@ func (c *Client) backspace() error {
 	return c.updateBodyBinary(msg, 1)
 }
 
+func lastThreeDigitsMatch(num uint64) bool {
+	lastThreeDigits := num % 1000
+	return lastThreeDigits%111 == 0
+}
+
 // Close an open post and parse the last line, if needed.
 func (c *Client) closePost() (err error) {
 	if c.post.id == 0 {
@@ -211,8 +220,9 @@ func (c *Client) closePost() (err error) {
 	)
 	var claude *common.ClaudeState = nil
 	if c.post.len != 0 {
-		links, com, claude, postCommand, err = parser.ParseBody(c.post.body, c.post.board, c.post.op,
-			c.post.id, c.ip, false)
+		start := time.Now()
+		links, com, claude, postCommand, err = parser.ParseBody(c.post.body, c.post.board, c.post.op, c.post.id, c.ip, false)
+		log.Info("ParseBody took ", time.Since(start))
 		if err != nil {
 			return
 		}
@@ -222,48 +232,56 @@ func (c *Client) closePost() (err error) {
 				from = links[len(links)-1].ID
 				img  *common.Image
 			)
-			img, err = db.TransferImage(from, c.post.id, c.post.op)
-			if err != nil {
-				return
-			}
-			if img != nil {
-				c.incrementSpamScore(config.Get().ImageScore)
+			if !lastThreeDigitsMatch(from) {
 
-				var msg []byte
-				msg, err = common.EncodeMessage(
-					common.MessageStoleImageFrom,
-					from,
-				)
+				start := time.Now()
+				img, err = db.TransferImage(from, c.post.id, c.post.op)
+				log.Info("TransferImage took ", time.Since(start))
 				if err != nil {
 					return
 				}
-				c.feed.Send(msg)
+				if img != nil {
+					c.incrementSpamScore(config.Get().ImageScore)
 
-				msg, err = common.EncodeMessage(
-					common.MessageStoleImageTo,
-					struct {
-						ID    uint64        `json:"id"`
-						Image *common.Image `json:"image"`
-					}{
-						ID:    c.post.id,
-						Image: img,
-					},
-				)
-				if err != nil {
-					return
+					var msg []byte
+					msg, err = common.EncodeMessage(
+						common.MessageStoleImageFrom,
+						from,
+					)
+					if err != nil {
+						return
+					}
+					c.feed.Send(msg)
+
+					msg, err = common.EncodeMessage(
+						common.MessageStoleImageTo,
+						struct {
+							ID    uint64        `json:"id"`
+							Image *common.Image `json:"image"`
+						}{
+							ID:    c.post.id,
+							Image: img,
+						},
+					)
+					if err != nil {
+						return
+					}
+					c.feed.Send(msg)
 				}
-				c.feed.Send(msg)
 			}
 		}
 	}
 	claudeOk := true
 	if claude != nil {
+		start := time.Now()
 		claudeOk = db.CheckIfClaudeAllowed(c.ip)
+		log.Info("CheckIfClaudeAllowed took ", time.Since(start))
 		if !claudeOk {
 			claude.Status = common.Error
 			claude.Response.WriteString("Rate limit reached, try again later.")
 		}
 	}
+
 	cid, err := db.ClosePost(c.post.id, c.post.op, string(c.post.body), links, com, claude)
 	if err != nil {
 		return
@@ -272,7 +290,10 @@ func (c *Client) closePost() (err error) {
 		//Include thumbnail of post
 		id := c.post.id
 		feed := c.feed
+
+		start := time.Now()
 		imgSha1, err := db.GetPostSha1(id)
+		log.Info("GetPostSha1 took ", time.Since(start))
 		var image *[]byte = nil
 		if err == nil && imgSha1 != nil {
 			*imgSha1 += ".webp"
@@ -280,7 +301,10 @@ func (c *Client) closePost() (err error) {
 			cwd, _ := os.Getwd()
 			log.Info("CWD: ", cwd)
 			log.Info("img: ", file)
+
+			start := time.Now()
 			fileData, err := os.ReadFile(file)
+			log.Info("os.ReadFile took ", time.Since(start))
 			if err == nil {
 				size := len(preImageJson) + base64.StdEncoding.EncodedLen(len(fileData)) + len(postImageJson)
 				buf := make([]byte, size)
@@ -304,11 +328,15 @@ func (c *Client) closePost() (err error) {
 			func() {
 				isError := claude.Status == common.Error
 				feed.SendClaudeComplete(id, isError, &claude.Response)
+				start := time.Now()
 				db.UpdateClaude(cid, claude)
+				log.Info("UpdateClaude took ", time.Since(start))
 			})
 	}
 	if postCommand != nil {
+		start := time.Now()
 		hasImage, err := c.hasImage()
+		log.Info("hasImage took ", time.Since(start))
 		if err == nil && !hasImage {
 			//handlePostCommand(c.post.id, c.post.op, postCommand)
 		}
@@ -317,12 +345,26 @@ func (c *Client) closePost() (err error) {
 	return
 }
 
-func handlePostCommand(id uint64, op uint64, input *common.PostCommand) {
+func handlePostCommand(id uint64, op uint64, input *common.PostCommand, feed *feeds.Feed) {
+	result, ok := pendingTiktoks[id]
+	if ok && (result == feeds.Done || result == feeds.Loading) {
+		return
+	}
+	feed.UpdatePendingTiktokState(id, feeds.Loading)
+	pendingTiktokMutex.Lock()
+	pendingTiktoks[id] = feeds.Loading
+	pendingTiktokMutex.Unlock()
+
 	go func() {
+		log.Info("Proceeding with tiktok download")
 		token, filename, err := imager.DownloadTikTok(input)
 		if err != nil {
-			log.Error("Error downloading tiktok: ", input.Input)
+			log.Error("Error downloading tiktok: `", input.Input, "`")
 			log.Error("Error: ", err)
+			feed.UpdatePendingTiktokState(id, feeds.Error)
+			pendingTiktokMutex.Lock()
+			delete(pendingTiktoks, id)
+			pendingTiktokMutex.Unlock()
 			return
 		}
 		formatImageName(&filename)
@@ -331,17 +373,28 @@ func handlePostCommand(id uint64, op uint64, input *common.PostCommand) {
 		err = db.InTransaction(false, func(tx *sql.Tx) (err error) {
 			msg, err = db.InsertImage(tx, id, token, filename,
 				false)
+			if err == nil {
+				db.BumpThread(tx, op)
+			}
 			return
 		})
 		if err != nil {
 			log.Error("Error downloading tiktok: ", *input)
 			log.Error("Error: ", err)
+			feed.UpdatePendingTiktokState(id, feeds.Error)
+			pendingTiktokMutex.Lock()
+			delete(pendingTiktoks, id)
+			pendingTiktokMutex.Unlock()
 			return
 		}
 		feeds.SendIfExists(op, func(feed *feeds.Feed) error {
 			feed.InsertImage(op, false, common.PrependMessageType(common.MessageInsertImage, msg))
 			return nil
 		})
+		feed.UpdatePendingTiktokState(id, feeds.Done)
+		pendingTiktokMutex.Lock()
+		delete(pendingTiktoks, id)
+		pendingTiktokMutex.Unlock()
 
 		return
 	}()
