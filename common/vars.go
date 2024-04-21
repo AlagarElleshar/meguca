@@ -80,6 +80,7 @@ var (
 		"moe",
 		"moon",
 		"neko",
+		"neko_hd",
 		"ocean",
 		"rave",
 		"tavern",
