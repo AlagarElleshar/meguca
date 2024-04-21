@@ -22,7 +22,7 @@ endif
 all: client server
 
 client: client_vendor
-	$(webpack)
+	npm run build
 	$(gulp)
 
 client_deps:

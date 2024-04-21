@@ -11,30 +11,6 @@ const gulp = require('gulp'),
 // Dependency tasks for the default tasks
 const tasks = []
 
-// Client JS files
-// createTask("client", `client/**/*.ts`, src =>
-// 	src
-// 		.pipe(ts.createProject("client/tsconfig.json", {
-// 			typescript: require("typescript"),
-// 		})())
-// 		.on('error', handleError)
-// 		.pipe(gulp.dest('www/js'))
-// )
-
-// createTask("static", "static/*.ts", src =>
-// 	src
-// 		.pipe(ts.createProject("client/tsconfig.json", {
-// 			typescript: require("typescript"),
-// 		})())
-// 		.on("error", handleError)
-// 		.pipe(gulp.dest("www/js/static"))
-// )
-// createTask("client", `client/main.ts`, src =>
-// 	src
-// 		.pipe(webpack( require('./webpack.config.js') ))
-// 		.pipe(gulp.dest('www/js/'))
-// )
-
 // Various little scripts
 createTask('scripts', 'clientScripts/*.js', src =>
 	src

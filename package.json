@@ -5,10 +5,11 @@
   "main": "www/js/main.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/bakape/meguca.git"
+    "url": "git+https://github.com/bakape/meguca.git"
   },
   "devDependencies": {
     "@types/node": "^16.11.7",
+    "esbuild": "^0.20.2",
     "gulp": "^4.0.2",
     "gulp-clean-css": "^4.3.0",
     "gulp-less": "^5.0.0",
@@ -25,5 +26,19 @@
   },
   "dependencies": {
     "mpegts.js": "^1.7.3"
-  }
+  },
+  "description": "[![GoDoc](https://godoc.org/github.com/bakape/meguca?status.svg)](https://godoc.org/github.com/bakape/meguca) [![Build](https://github.com/bakape/shamichan/actions/workflows/build.yaml/badge.svg?branch=v6)](https://github.com/bakape/shamichan/actions/workflows/build.yaml)",
+  "bugs": {
+    "url": "https://github.com/bakape/meguca/issues"
+  },
+  "homepage": "https://github.com/bakape/meguca#readme",
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "scripts": {
+    "build": "node esbuild.config.js"
+  },
+  "keywords": [],
+  "author": ""
 }

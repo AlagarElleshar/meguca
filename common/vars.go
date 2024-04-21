@@ -118,8 +118,8 @@ func init() {
 }
 
 type webpackManifest struct {
-	MainJS   *string `json:"main.js"`
-	StaticJS *string `json:"static.js"`
+	MainJS   *string `json:"client/main.ts"`
+	StaticJS *string `json:"client/static/main.ts"`
 }
 
 func reloadManifest() {
