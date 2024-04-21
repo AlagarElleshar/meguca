@@ -7,10 +7,9 @@ let mpegtsjs = import("mpegts.js")
 
 
 let playerOpen = false;
-let currentURL = "";
 let player: Mpegts.Player;
 let playerConfig : Mpegts.Config = {
-    enableWorker: true,
+    enableWorker: false,
     liveBufferLatencyChasing: true,
     liveBufferLatencyMaxLatency: 2,
     liveBufferLatencyMinRemain: 1,
@@ -63,7 +62,6 @@ export async function playLive(url: string) {
         player.attachMediaElement(<HTMLMediaElement>videoElement);
         player.load();
         player.play();
-        currentURL = url;
     }
 }
 
