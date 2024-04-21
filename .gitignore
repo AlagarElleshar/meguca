@@ -37,5 +37,6 @@ debug.test
 db_*.db
 .mypy_cache/
 templates/*.html.go
+manifest.json
 /update_webpack.py
 /rdb.db/
