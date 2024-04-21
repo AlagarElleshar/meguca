@@ -27,7 +27,7 @@
     "test": "test"
   },
   "scripts": {
-    "build": "npm run build:css && npm run build:js",
+    "build": "node esbuild.config.js --css --js",
     "build:css": "node esbuild.config.js --css",
     "build:js": "node esbuild.config.js --js"
   },

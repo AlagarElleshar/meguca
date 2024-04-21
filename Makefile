@@ -6,7 +6,7 @@ export GO111MODULE=on
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
-	ROCKSDB_CFLAGS := $(shell pkg-config --cflags rocksdb liblz4 libzstd) -I/opt/homebrew/Cellar/snappy/1.1.10/include/
+	ROCKSDB_CFLAGS := $(shell pkg-config --cflags rocksdb liblz4 libzstd) -I/opt/homebrew/Cellar/snappy/1.1.10/include
 	ROCKSDB_LDFLAGS := $(shell pkg-config --libs rocksdb liblz4 libzstd) -L/opt/homebrew/Cellar/snappy/1.1.10/lib
 else ifeq ($(UNAME_S),Linux)
 	ROCKSDB_CFLAGS := -I$(HOME)/rocksdb/include
@@ -21,14 +21,11 @@ endif
 
 all: client server
 
-client: client_vendor
+client:
 	npm run build
 
 client_deps:
 	npm install --include=dev --progress false --depth 0
-
-client_vendor: client_deps
-	mkdir -p www/js/vendor
 
 css:
 	npm run build:css
