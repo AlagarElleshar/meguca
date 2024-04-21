@@ -56,13 +56,10 @@ async function doBuildJS() {
         outdir: 'www/js/scripts',
         bundle: false,
         minify: true,
-        sourcemap: false,
+        sourcemap: true,
         platform: 'browser',
         target: 'es2015',
     })
-        .then(() => console.log('Scripts built successfully'))
-        .catch(() => process.exit(1));
-
     await esbuild.build({
         entryPoints: [
             './client/main.ts',
@@ -72,6 +69,7 @@ async function doBuildJS() {
         bundle: true,
         sourcemap: true,
         splitting: true,
+        minify: true,
         format: 'esm',
         target: 'es2015',
         entryNames: '[name].[hash]',
