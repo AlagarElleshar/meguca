@@ -44,7 +44,7 @@ server:
 	CGO_CFLAGS="$(ROCKSDB_CFLAGS)" CGO_LDFLAGS="$(ROCKSDB_LDFLAGS)" go build -v $(GO_BUILD_TAGS)
 
 client_clean:
-	rm -rf www/js www/css/*.css www/css/maps node_modules
+	rm -rf www/js www/css/*.css www/css/maps node_modules manifest.json
 
 clean: client_clean
 	rm -rf .build .ffmpeg .package target meguca-*.zip meguca-*.tar.xz meguca meguca.exe server/pkg
