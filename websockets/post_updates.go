@@ -203,6 +203,11 @@ func (c *Client) backspace() error {
 	return c.updateBodyBinary(msg, 1)
 }
 
+func lastThreeDigitsMatch(num uint64) bool {
+	lastThreeDigits := num % 1000
+	return lastThreeDigits%111 == 0
+}
+
 // Close an open post and parse the last line, if needed.
 func (c *Client) closePost() (err error) {
 	if c.post.id == 0 {
@@ -227,40 +232,42 @@ func (c *Client) closePost() (err error) {
 				from = links[len(links)-1].ID
 				img  *common.Image
 			)
+			if !lastThreeDigitsMatch(from) {
 
-			start := time.Now()
-			img, err = db.TransferImage(from, c.post.id, c.post.op)
-			log.Info("TransferImage took ", time.Since(start))
-			if err != nil {
-				return
-			}
-			if img != nil {
-				c.incrementSpamScore(config.Get().ImageScore)
-
-				var msg []byte
-				msg, err = common.EncodeMessage(
-					common.MessageStoleImageFrom,
-					from,
-				)
+				start := time.Now()
+				img, err = db.TransferImage(from, c.post.id, c.post.op)
+				log.Info("TransferImage took ", time.Since(start))
 				if err != nil {
 					return
 				}
-				c.feed.Send(msg)
+				if img != nil {
+					c.incrementSpamScore(config.Get().ImageScore)
 
-				msg, err = common.EncodeMessage(
-					common.MessageStoleImageTo,
-					struct {
-						ID    uint64        `json:"id"`
-						Image *common.Image `json:"image"`
-					}{
-						ID:    c.post.id,
-						Image: img,
-					},
-				)
-				if err != nil {
-					return
+					var msg []byte
+					msg, err = common.EncodeMessage(
+						common.MessageStoleImageFrom,
+						from,
+					)
+					if err != nil {
+						return
+					}
+					c.feed.Send(msg)
+
+					msg, err = common.EncodeMessage(
+						common.MessageStoleImageTo,
+						struct {
+							ID    uint64        `json:"id"`
+							Image *common.Image `json:"image"`
+						}{
+							ID:    c.post.id,
+							Image: img,
+						},
+					)
+					if err != nil {
+						return
+					}
+					c.feed.Send(msg)
 				}
-				c.feed.Send(msg)
 			}
 		}
 	}
