@@ -529,7 +529,7 @@ function parseURL(bit: string): string {
             bit = escape(bit)
             return bit.link(bit)
         }
-        if(bit.endsWith(".flv")){
+        if (bit.startsWith("https://pull") && bit.includes(".flv")) {
             let link = newTabLink(bit, bit)
             let attrs = {
                 type : "button",

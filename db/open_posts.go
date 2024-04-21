@@ -48,6 +48,7 @@ func tryOpenRocksDB() (open bool, err error) {
 		opts := grocksdb.NewDefaultOptions()
 		opts.OptimizeForPointLookup(64)
 		opts.SetCreateIfMissing(true)
+		opts.SetCompression(grocksdb.NoCompression)
 		rocksDB, err = grocksdb.OpenDb(opts, "rdb.db")
 
 		atomic.StoreUint32(&rocksDBState, rocksDBOpen)
