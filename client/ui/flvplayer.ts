@@ -1,13 +1,8 @@
 import {importTemplate} from "../util";
 import Mpegts from "mpegts.js";
 
-// import mpegts from "mpegts.js";
-// This loads mpegts.js asynchronously
-let mpegtsjs = import("mpegts.js")
-
 
 let playerOpen = false;
-let currentURL = "";
 let player: Mpegts.Player;
 let playerConfig : Mpegts.Config = {
     enableWorker: true,
@@ -51,11 +46,10 @@ function destroyPlayer() {
 }
 
 export async function playLive(url: string) {
-    let mpegts = (await mpegtsjs).default
-    if (mpegts.getFeatureList().mseLivePlayback) {
+    if (Mpegts.getFeatureList().mseLivePlayback) {
         var videoElement = document.getElementById('flv-player');
         destroyPlayer()
-        player = mpegts.createPlayer({
+        player = Mpegts.createPlayer({
             type: 'flv',  // could also be mpegts, m2ts, flv
             isLive: true,
             url: url
@@ -63,7 +57,6 @@ export async function playLive(url: string) {
         player.attachMediaElement(<HTMLMediaElement>videoElement);
         player.load();
         player.play();
-        currentURL = url;
     }
 }
 
