@@ -23,7 +23,6 @@ all: client server
 
 client: client_vendor
 	npm run build
-	$(gulp)
 
 client_deps:
 	npm install --include=dev --progress false --depth 0
@@ -32,7 +31,10 @@ client_vendor: client_deps
 	mkdir -p www/js/vendor
 
 css:
-	$(gulp) css
+	npm run build:css
+
+js:
+	npm run build:js
 
 generate:
 	go generate ./...
