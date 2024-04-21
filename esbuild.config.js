@@ -72,7 +72,7 @@ async function doBuildJS() {
         minify: true,
         format: 'esm',
         target: 'es2015',
-        entryNames: '[name].[hash]',
+        entryNames: '[name]-[hash]',
         publicPath: '/assets/js/',
         metafile: true,
         plugins: [
