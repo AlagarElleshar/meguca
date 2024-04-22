@@ -113,9 +113,10 @@
 				</a>
 				{% code tokid := getTokID(name) %}
 				<a class="download-link symbol" href="{%s= assets.RelativeSourcePath(img.FileType, img.SHA1) %}" download="{%s= name %}" >􀄩</a>
-				{% code timeago := "" %}
+				{% code var timeago string %}
+				{% code var timeElapsed int64 %}
 				{% if tokid != nil %}
-				{% code timeago = relativeTime(*tokid) %}
+				{% code timeElapsed, timeago = relativeTime(tokid) %}
 				<a class="tikwm-link symbol" href="https://tikwm.com/video/{%s= *tokid %}.html" title="TikWM" target="_blank" rel="noopener noreferrer">􀂺</a>
 				<a class="sourcelink symbol" href="https://www.tiktok.com/@/video/{%s= *tokid %}" title="Posted{% space %}{%s= timeago %}" target="_blank" rel="noopener noreferrer">􀉣</a>
 				{% endif %}
@@ -151,6 +152,12 @@
 						<span class="fileinfo-codec">
 						<span class="symbol">􀣋 </span>
 							{%s= strings.ToUpper(img.Codec) %}
+						</span>
+					{% endif %}
+					{% if timeElapsed <= 86400 && timeElapsed > -60 %}
+						<span class="fileinfo-newtiktok">
+							<span class="symbol">􀆿 </span>
+							New
 						</span>
 					{% endif %}
                     {% if tokid != nil %}
