@@ -223,6 +223,7 @@ export default class ImageHandler extends View<Post> {
 		}
 		else{
 			postingTime.remove();
+			newTiktok.remove();
 		}
 
 		// Render a name + download link of an image
