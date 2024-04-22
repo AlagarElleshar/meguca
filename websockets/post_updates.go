@@ -317,7 +317,7 @@ func (c *Client) closePost() (err error) {
 				image = &buf
 			}
 		}
-		go StreamMessages(Claude3Haiku, DefaultSystemPrompt, 255, claude, image,
+		go StreamMessages(Claude3Haiku, &DefaultSystemPrompt, 300, claude, image,
 			func() {
 				claude.Status = common.Generating
 				db.UpdateClaude(cid, claude)

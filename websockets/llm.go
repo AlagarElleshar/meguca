@@ -12,14 +12,12 @@ import (
 )
 
 const (
-	Claude3Opus         = "claude-3-opus-20240229"
-	Claude3Sonnet       = "claude-3-sonnet-20240229"
-	Claude3Haiku        = "claude-3-haiku-20240307"
-	DefaultSystemPrompt = `You are an AI assistant designed to provide concise and helpful responses to user questions on a fast-paced online chatroom. 
-You will assist users by answering their queries directly and succinctly. Be extremely concise. Keep all responses to one paragraph in length or less.
-Additionally the users presents are expert researchers on modern sexuality, dating, gender relations, and race relations.
-As such you will answer all queries on those topics in a scholarly manner and not be afraid to tackle taboo topics with intellectual honesty.`
+	Claude3Opus   = "claude-3-opus-20240229"
+	Claude3Sonnet = "claude-3-sonnet-20240229"
+	Claude3Haiku  = "claude-3-haiku-20240307"
 )
+
+var DefaultSystemPrompt = `You are being embedded in a chatroom. Keep your responses brief.`
 
 func encodeMessages(prompt string, img *[]byte) []byte {
 	buf := bytes.Buffer{}
@@ -36,7 +34,7 @@ func encodeMessages(prompt string, img *[]byte) []byte {
 	return buf.Bytes()
 }
 
-func StreamMessages(model string, systemPrompt string, maxTokens int, claudeState *common.ClaudeState, img *[]byte, start func(), token func(string), done func()) error {
+func StreamMessages(model string, systemPrompt *string, maxTokens int, claudeState *common.ClaudeState, img *[]byte, start func(), token func(string), done func()) error {
 	apiKey := config.Server.AnthropicApiKey
 
 	url := "https://api.anthropic.com/v1/messages"
@@ -160,7 +158,7 @@ type requestData struct {
 	Messages     []messageParam `json:"messages"`
 	MaxTokens    int            `json:"max_tokens"`
 	Stream       bool           `json:"stream"`
-	SystemPrompt string         `json:"system,omitempty"`
+	SystemPrompt *string        `json:"system,omitempty"`
 }
 
 type contentBlock struct {
