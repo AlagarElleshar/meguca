@@ -125,7 +125,7 @@ export default class ImageHandler extends View<Post> {
 		el.insertBefore(sourceButton, downloadButton.nextSibling)
 
 		const now = Date.now() / 1000
-		let timeElapsed = Math.floor((now - unixTime) / 60)
+		let timeElapsed = now - unixTime
 		if( timeElapsed > 172800 || timeElapsed < -60){
 			newTiktok.remove()
 		}
