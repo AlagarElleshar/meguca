@@ -126,7 +126,7 @@ export default class ImageHandler extends View<Post> {
 
 		const now = Date.now() / 1000
 		let timeElapsed = Math.floor((now - unixTime) / 60)
-		if( timeElapsed > 86400 || timeElapsed < -60){
+		if( timeElapsed > 172800 || timeElapsed < -60){
 			newTiktok.remove()
 		}
 		let tikwmButton = document.createElement("a")
