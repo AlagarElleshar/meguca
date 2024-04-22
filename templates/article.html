@@ -154,13 +154,13 @@
 							{%s= strings.ToUpper(img.Codec) %}
 						</span>
 					{% endif %}
-					{% if timeElapsed <= 172800 && timeElapsed > -60 %}
+                    {% if tokid != nil %}
+						{% if timeElapsed <= 172800 && timeElapsed > -60 %}
 						<span class="fileinfo-newtiktok">
 							<span class="symbol">􀆿 </span>
 							New
 						</span>
-					{% endif %}
-                    {% if tokid != nil %}
+						{% endif %}
 						<span class="fileinfo-postingtime">
 						<span class="symbol">􀐫 </span>
 							{%s= timeago %}
