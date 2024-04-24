@@ -35,6 +35,7 @@ require (
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/nwaples/rardecode v1.1.2 // indirect
 	github.com/rakyll/statik v0.1.7
+	github.com/rivo/uniseg v0.4.7
 	github.com/ulikunitz/xz v0.5.7
 	github.com/valyala/quicktemplate v1.7.0
 	golang.org/x/crypto v0.14.0

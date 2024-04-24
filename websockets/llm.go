@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"github.com/bakape/meguca/common"
 	"github.com/bakape/meguca/config"
+	"github.com/go-playground/log"
 	"io"
 	"net/http"
 	"strings"
@@ -55,6 +56,7 @@ func StreamMessages(model string, systemPrompt *string, maxTokens int, claudeSta
 	if err != nil {
 		return err
 	}
+	log.Info("Claude Req: ", string(jsonBody))
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonBody))
 	if err != nil {
