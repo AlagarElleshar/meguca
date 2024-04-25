@@ -3,6 +3,7 @@ package parser
 
 import (
 	"bytes"
+	"github.com/rivo/uniseg"
 	"regexp"
 	"strconv"
 	"unicode"
@@ -164,21 +165,14 @@ func IsPrintable(r rune, multiline bool) error {
 
 // IsPrintableString checks, if all of s is printable.
 // Also accepts tabs, and newlines, if multiline = true.
-func IsPrintableString(s string, multiline bool) error {
-	for _, r := range []rune(s) {
-		if err := IsPrintable(r, multiline); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// IsPrintableRunes checks, if all of s is printable.
-// Also accepts tabs, and newlines, if multiline = true.
-func IsPrintableRunes(s []rune, multiline bool) error {
-	for _, r := range s {
-		if err := IsPrintable(r, multiline); err != nil {
-			return err
+func IsPrintableString(str string, multiline bool) error {
+	gr := uniseg.NewGraphemes(str)
+	for gr.Next() {
+		runes := gr.Runes()
+		if len(runes) == 1 {
+			if err := IsPrintable(runes[0], multiline); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
