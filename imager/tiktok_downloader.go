@@ -92,64 +92,6 @@ func rotateVideoFile(filename string, rotation int) error {
 	return nil
 }
 
-//	func downloadHDToTemp(url string, file string, rotation int) (fileSize int64, status int, err error) {
-//		assembly := transloadit.NewAssembly()
-//		//assembly.AddFile("video", url)
-//		assembly.AddStep("imported", map[string]interface{}{
-//			"robot": "/http/import",
-//			"url":   url,
-//		})
-//		encodeStep := map[string]interface{}{
-//			"use":          "imported",
-//			"robot":        "/video/encode",
-//			"ffmpeg_stack": "v6.0.0",
-//			"preset":       "hls-1080p",
-//			"ffmpeg": map[string]interface{}{
-//				"vcodec": "libx264",
-//				"crf":    20,
-//				"c:a":    "copy",
-//				"preset": "faster",
-//			},
-//			"width":  "${file.meta.width}",
-//			"height": "${file.meta.height}",
-//		}
-//		if rotation > 0 {
-//			encodeStep["rotate"] = rotation
-//		}
-//		assembly.AddStep("encoded-video", encodeStep)
-//		assembly.TemplateID = "4e4e97b7977b442a836041bf0dd3ba71"
-//
-//		// Start the upload
-//		info, err := transloaditClient.StartAssembly(context.Background(), assembly)
-//		if err != nil {
-//			panic(err)
-//		}
-//		info, err = transloaditClient.WaitForAssembly(context.Background(), info)
-//		if err != nil {
-//			panic(err)
-//		}
-//		out_url := info.Results["encoded-video"][0].URL
-//		outputFile, err := os.Create(file)
-//		if err != nil {
-//			return
-//		}
-//		defer outputFile.Close()
-//
-//		response, err := http.Get(out_url)
-//		if err != nil {
-//			return 0, status, err
-//		} else if response.StatusCode != http.StatusOK {
-//			return 0, response.StatusCode, fmt.Errorf("status code %d", response.StatusCode)
-//		}
-//		defer response.Body.Close()
-//
-//		fileSize, err = io.Copy(outputFile, response.Body)
-//		if err != nil {
-//			fmt.Println("Error saving file:", err)
-//			return
-//		}
-//		return
-//	}
 func downloadToTemp(url string, file string) (fileSize int64, status int, err error) {
 	outputFile, err := os.Create(file)
 	if err != nil {
