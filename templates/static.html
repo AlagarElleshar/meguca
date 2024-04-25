@@ -53,7 +53,6 @@ Boilerplate HTML for hover post previews on standalone pages
         </a>
     </figure>
 </template>
-<!--<script src="/assets/js/vendor/almond.js"></script>-->
 <script id="lang-data" type="application/json">
     {% code buf, _ := json.Marshal(ln.Common) %}
     {%z= buf %}
@@ -61,6 +60,7 @@ Boilerplate HTML for hover post previews on standalone pages
 <script id="webpack-location">
     var webpackStaticJSFile = "{%s= common.StaticJS %}";
 </script>
+<link rel="prefetch" href="{%s= common.StaticJS %}" as="script">
 <script src="/assets/js/scripts/staticLoader.js"></script>
 <body>
 <div id="hover-overlay"></div>

@@ -4,7 +4,7 @@
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/bakape/meguca.git"
+    "url": "https://github.com/meowmin/meguca.git"
   },
   "devDependencies": {
     "cssnano": "^6.1.2",
@@ -16,5 +16,5 @@
   "dependencies": {
     "mpegts.js": "^1.7.3"
   },
-  "homepage": "https://github.com/meowmin/meguca",
+  "homepage": "https://github.com/meowmin/meguca"
 }

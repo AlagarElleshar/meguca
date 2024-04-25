@@ -499,11 +499,6 @@
 			{% endcomment %}
 			$$$
 		</section>
-		{% comment %}
-			Dynamic module loader
-		{% endcomment %}
-<!--		<script src="/assets/js/vendor/almond.js"></script>-->
-<!--		<script src="/assets/js/main.js"></script>-->
 		<script id="lang-data" type="application/json">
 			{% code buf, _ := json.Marshal(ln.Common) %}
 			{%z= buf %}
@@ -515,6 +510,7 @@
 		<script id="webpack-location">
 		    var webpackMainJSFile = "{%s= common.MainJS %}";
 		</script>
+		<link rel="prefetch" href="{%s= common.MainJS %}" as="script">
 		<script src="/assets/js/scripts/loader.js"></script>
 	</body>
 {% endstripspace %}{% endfunc %}
