@@ -22,16 +22,16 @@ endif
 all: client server
 
 client: client_deps
-	npm run build
+	node esbuild.config.js
 
 client_deps:
 	npm install --include=dev --progress false --depth 0
 
 css:
-	npm run build:css
+	node esbuild.config.js --css
 
 js:
-	npm run build:js
+	node esbuild.config.js --js
 
 generate:
 	go generate ./...
