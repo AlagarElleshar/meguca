@@ -1,20 +1,18 @@
 import {importTemplate} from "../util";
 import Mpegts from "mpegts.js";
 
-// import mpegts from "mpegts.js";
-// This loads mpegts.js asynchronously
-let mpegtsjs = import("mpegts.js")
+let mpegts : typeof Mpegts = null;
+
+async function loadMpegtsjs(){
+    if (!mpegts) {
+        mpegts = (await import("mpegts.js")).default;
+    }
+    return mpegts;
+}
 
 
 let playerOpen = false;
-let currentURL = "";
 let player: Mpegts.Player;
-let playerConfig : Mpegts.Config = {
-    enableWorker: true,
-    liveBufferLatencyChasing: true,
-    liveBufferLatencyMaxLatency: 2,
-    liveBufferLatencyMinRemain: 1,
-}
 
 export function openFlvPlayer() {
     let cont = document.getElementById("flv-player-cont")
@@ -51,7 +49,13 @@ function destroyPlayer() {
 }
 
 export async function playLive(url: string) {
-    let mpegts = (await mpegtsjs).default
+    await loadMpegtsjs()
+    let playerConfig : Mpegts.Config = {
+        enableWorker: false,
+        liveBufferLatencyChasing: true,
+        liveBufferLatencyMaxLatency: 2,
+        liveBufferLatencyMinRemain: 1,
+    }
     if (mpegts.getFeatureList().mseLivePlayback) {
         var videoElement = document.getElementById('flv-player');
         destroyPlayer()
@@ -63,7 +67,6 @@ export async function playLive(url: string) {
         player.attachMediaElement(<HTMLMediaElement>videoElement);
         player.load();
         player.play();
-        currentURL = url;
     }
 }
 

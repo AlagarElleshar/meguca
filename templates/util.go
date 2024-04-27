@@ -77,17 +77,19 @@ func getTokID(filename string) *string {
 	return nil
 }
 
-func relativeTime(id string) string {
-	//convert id to int
-	then, _ := strconv.ParseInt(id, 10, 64)
+func relativeTime(id *string) (secondsElapsed int64, result string) {
+	// Convert id (pointed by `id`) to int
+	then, _ := strconv.ParseInt(*id, 10, 64)
 	then = then >> 32
 	now := time.Now().Unix()
-	timeElapsed := (now - then) / 60
+	secondsElapsed = now - then
+	timeElapsed := secondsElapsed / 60
 	isFuture := false
 
 	if timeElapsed < 1 {
 		if timeElapsed > -5 { // Assume to be client clock imprecision
-			return "just now"
+			result = "just now"
+			return
 		}
 		isFuture = true
 		timeElapsed = -timeElapsed
@@ -105,12 +107,14 @@ func relativeTime(id string) string {
 
 	for i, d := range divide {
 		if timeElapsed < threshold[i] {
-			return ago(timeElapsed, units[i][0], units[i][1], isFuture)
+			result = ago(timeElapsed, units[i][0], units[i][1], isFuture)
+			return
 		}
 		timeElapsed = timeElapsed / d
 	}
 
-	return ago(timeElapsed, units[4][0], units[4][1], isFuture)
+	result = ago(timeElapsed, units[4][0], units[4][1], isFuture)
+	return
 }
 
 // Renders "56 minutes ago" or "in 56 minutes" like relative time text

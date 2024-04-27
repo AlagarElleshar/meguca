@@ -21,6 +21,7 @@ const modLevelStrings = ["", "janitors", "moderators", "owners", "admin"];
 export default class PostView extends ImageHandler {
     #claudeResponse: HTMLElement | null;
     #loadingBarOn: boolean = false;
+    #timeRendered: boolean = false;
     constructor(model: Post, el: HTMLElement | null) {
         const attrs: ViewAttrs = { model }
         if (el) {
@@ -196,7 +197,7 @@ export default class PostView extends ImageHandler {
     }
 
     // Renders a time element. Can be either absolute or relative.
-    public renderTime() {
+    public renderTimeOnce() {
         const abs = this.readableTime()
         const rel = relativeTimeAbbreviated(this.model.time)
         const el = this.el.querySelector("time")
@@ -212,6 +213,48 @@ export default class PostView extends ImageHandler {
         if (currentText != newText) {
             el.textContent = newText
         }
+    }
+
+    public renderTime(recursive = false) {
+        this.renderTimeOnce()
+        if(!options.relativeTime){
+            return
+        }
+        if(this.#timeRendered && !recursive){
+            return
+        }
+
+        const currentTime = Date.now() / 1000;
+        let timeDelta = currentTime - this.model.time;
+
+        let intervalPeriod = 86400000
+        let nextInterval = null
+        if (timeDelta < 60) {
+            // 1 minute
+            intervalPeriod = 1000
+            nextInterval = 60000
+        } else if (timeDelta < 3600) {
+            // 1 hour
+            intervalPeriod = 60000
+            nextInterval = 3600000
+        } else if (timeDelta < 86400) {
+            // 1 day
+            intervalPeriod = 3600000
+            nextInterval = 86400000
+        }
+        let timeUntilInterval = intervalPeriod - (timeDelta * 1000) % intervalPeriod
+        setTimeout(() => {
+            this.renderTimeOnce()
+            let id = setInterval(() => {this.renderTimeOnce()}, intervalPeriod)
+            let timeUntilNextInterval = nextInterval - ((timeDelta * 1000) % nextInterval)
+            if(nextInterval) {
+                setTimeout(() => {
+                    clearInterval(id)
+                    this.renderTime(true)
+                }, timeUntilNextInterval)
+            }
+        },timeUntilInterval)
+
     }
 
     // Renders classic absolute timestamp
@@ -481,7 +524,7 @@ function updateTimeTooltip(event: MouseEvent) {
         return;
     }
 
-    view.renderTime();
+    view.renderTimeOnce();
 }
 
 on(document, "mouseover", updateTimeTooltip, {

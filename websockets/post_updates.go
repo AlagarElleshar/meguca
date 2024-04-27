@@ -74,7 +74,7 @@ type spliceMessage struct {
 // in the current line
 type spliceRequest struct {
 	spliceCoords
-	Text []rune
+	Text string
 }
 
 // Custom unmarshaling of string -> []rune
@@ -85,7 +85,7 @@ func (s *spliceRequest) UnmarshalJSON(buf []byte) error {
 	}
 	*s = spliceRequest{
 		spliceCoords: tmp.spliceCoords,
-		Text:         []rune(tmp.Text),
+		Text:         tmp.Text,
 	}
 	return nil
 }
@@ -94,7 +94,7 @@ func (s *spliceRequest) UnmarshalJSON(buf []byte) error {
 func (s spliceRequest) MarshalJSON() ([]byte, error) {
 	return json.Marshal(spliceRequestString{
 		spliceCoords: s.spliceCoords,
-		Text:         string(s.Text),
+		Text:         s.Text,
 	})
 }
 
@@ -117,7 +117,6 @@ func (c *Client) appendRune(data []byte) (err error) {
 	}
 
 	var char rune
-	//err = decodeMessage(data, &char)
 	char, runeLen := utf8.DecodeRune(data)
 	switch {
 	case err != nil || char == utf8.RuneError || runeLen != len(data):
@@ -317,7 +316,7 @@ func (c *Client) closePost() (err error) {
 				image = &buf
 			}
 		}
-		go StreamMessages(Claude3Haiku, DefaultSystemPrompt, 255, claude, image,
+		go StreamMessages(Claude3Haiku, &DefaultSystemPrompt, 300, claude, image,
 			func() {
 				claude.Status = common.Generating
 				db.UpdateClaude(cid, claude)
@@ -408,13 +407,12 @@ func (c *Client) spliceText(data []byte) error {
 		return nil
 	}
 
-	var req spliceRequest
 	//err := decodeMessage(data, &req)
 	//if err != nil {
 	//	return err
 	//}
-	decodeSpliceMessage(data, &req)
-	err := parser.IsPrintableRunes(req.Text, true)
+	req := decodeSpliceMessage(data)
+	err := parser.IsPrintableString(req.Text, true)
 	if err != nil {
 		return err
 	}
@@ -433,7 +431,7 @@ func (c *Client) spliceText(data []byte) error {
 					Start: req.Start,
 					Len:   req.Len,
 				},
-				Text: string(req.Text),
+				Text: req.Text,
 			},
 		}
 	case req.Len == 0 && len(req.Text) == 0:
@@ -450,14 +448,14 @@ func (c *Client) spliceText(data []byte) error {
 
 	var (
 		old = []rune(string(c.post.body))
-		end = append(req.Text, old[req.Start+req.Len:]...)
+		end = append([]rune(req.Text), old[req.Start+req.Len:]...)
 	)
 	c.post.len += -int(req.Len) + len(req.Text)
 	res := spliceMessage{
 		ID: c.post.id,
 		spliceRequestString: spliceRequestString{
 			spliceCoords: req.spliceCoords,
-			Text:         string(req.Text),
+			Text:         req.Text,
 		},
 	}
 
@@ -507,13 +505,14 @@ func encodeSpliceMessage(res spliceMessage) (msg []byte, err error) {
 	return msg, nil
 }
 
-func decodeSpliceMessage(data []byte, s *spliceRequest) {
+func decodeSpliceMessage(data []byte) (s spliceRequest) {
 	//Read two uints, then read the rest of the message as a string
 
 	//Read the first uint
 	s.Start = binary.LittleEndian.Uint16(data[:2])
 	s.Len = binary.LittleEndian.Uint16(data[2:4])
-	s.Text = []rune(string(data[4:]))
+	s.Text = string(data[4:])
+	return
 }
 
 // Insert and image into an existing open post

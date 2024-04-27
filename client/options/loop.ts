@@ -25,12 +25,12 @@ export default () => {
 	}
 }
 
-// Rerender time every minute, if relative time is set
-setInterval(() => {
-	if (options.relativeTime && !page.catalog) {
-		renderTime()
-	}
-}, 60000)
+// // Rerender time every minute, if relative time is set
+// setInterval(() => {
+// 	if (options.relativeTime && !page.catalog) {
+// 		renderTime()
+// 	}
+// }, 60000)
 
 // Loop over all posts after filtering with `test`
 function loopPosts(test: (post: Post) => boolean, fn: (post: Post) => void) {
