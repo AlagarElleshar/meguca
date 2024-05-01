@@ -11,6 +11,7 @@ import { OverlayNotification } from "./ui"
 import { setCookie }  from './util';
 import { debug } from "./state"
 import {protobufPackage, WebSocketMessage} from "./typings/messages";
+import {handleMessage} from "./nekotv/nekotv";
 
 // Message for splicing the contents of the current line
 export type SpliceResponse = {
@@ -261,5 +262,6 @@ export default () => {
 		let msg = WebSocketMessage.decode(new Uint8Array(message));
 		console.log(WebSocketMessage.toJSON(msg))
 		console.log(msg)
+		handleMessage(msg)
 	}
 }

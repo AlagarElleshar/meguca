@@ -1,7 +1,7 @@
 import YouTubePlayer from 'youtube-player';
 import {VideoItem} from "../typings/messages";
 
-class Youtube {
+export class Youtube {
     // private readonly player: Player;
     private readonly playerEl: HTMLElement = document.getElementById('#ytapiplayer');
     private video: HTMLElement;
@@ -82,6 +82,13 @@ class Youtube {
                 // },
             },
         });
+        this.youtube
+            // Play video is a Promise.
+            // 'playVideo' is queued and will execute as soon as player is ready.
+            .playVideo()
+            .then(function () {
+                console.log('Starting to play player1. It will take some time to buffer video before it starts playing.');
+            });
     }
 
     public removeVideo(): void {

@@ -27,10 +27,8 @@ export class VideoList {
     }
 
     public setItems(items: VideoItem[]): void {
-        this.clear();
-        for (const item of items) {
-            this.items.push(item);
-        }
+        this.items = items
+        this.pos = 0;
     }
 
     public setPos(i: number): void {

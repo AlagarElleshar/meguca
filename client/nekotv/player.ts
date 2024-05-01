@@ -1,140 +1,104 @@
+import {Youtube} from "./ytplayer";
 import {VideoList} from "./videolist";
-import options from "../options";
-import {tempNotify} from "../ui/notification";
+import {VideoItem} from "../typings/messages";
 
 export class Player {
-    public videoList: VideoList = new VideoList();
-    private ytPlayer : YT.Player;
-    private isYouTubeReady: boolean;
+    private player: Youtube = new Youtube();
+    private isLoaded = false;
+    private skipSetTime = false;
+    private skipSetRate = false;
+    public videoList = new VideoList();
 
-    private matchEmbed = /youtube\.com\/embed\/([A-z0-9_-]+)/;
-    private matchShorts = /youtube\.com\/shorts\/([A-z0-9_-]+)/;
-    private matchShort = /youtu\.be\/([A-z0-9_-]+)/;
-    private matchId = /youtube\.com.*v=([A-z0-9_-]+)/;
-
-    private extractVideoId(url: string): string {
-        if (this.matchId.test(url)) {
-            return url.match(this.matchId)[1];
-        }
-        if (this.matchShort.test(url)) {
-            return url.match(this.matchShort)[1];
-        }
-        if (this.matchShorts.test(url)) {
-            return url.match(this.matchShorts)[1];
-        }
-        if (this.matchEmbed.test(url)) {
-            return url.match(this.matchEmbed)[1];
-        }
-        return "";
-    }
-
-    public setNextItem(pos:number) {
+    public setNextItem(pos: number): void {
         this.videoList.setNextItem(pos);
     }
-    public setVideo(i:number){
-        let item = this.videoList.getItem(i);
-        this.videoList.setPos(i);
 
-    }
-    public initYouTubePlayer() {
-        console.log("Initialize YouTube player");
-        this.ytPlayer = new YT.Player("watch-video", {
-            playerVars: {
-                enablejsapi: 1,
-                iv_load_policy: 3,
-                playsinline: 1,
-                controls: 0,
-                disablekb: 1,
-                fs: 0,
-                modestbranding: 1,
-                rel: 0,
-                showinfo: 0,
-                origin: location.origin,
-            },
-            events: {
-                onReady: this.onPlayerReady,
-                onStateChange: this.onPlayerStateChange,
-            },
-        });
-        (window as any).ytplayer = this.ytPlayer;
-    }
-    public onPlayerReady() {
-        this.setPlayerVolume();
-        // if (state.muted) {
-        //     ytPlayer.mute();
+    // public toggleItemType(pos: number): void {
+    //     this.videoList.toggleItemType(pos);
+    // }
+
+    // private setPlayer(newPlayer: IPlayer): void {
+    //     if (this.player !== newPlayer) {
+    //         if (this.player !== null) {
+    //             JsApi.fireVideoRemoveEvents(this.videoList.currentItem);
+    //             this.player.removeVideo();
+    //         }
+    //     }
+    //     this.player = newPlayer;
+    // }
+
+    // public getVideoData(data: VideoDataRequest, callback: (data: VideoData) => void): void {
+    //     let player = this.players.find(player => player.isSupportedLink(data.url));
+    //     player = player ?? this.rawPlayer;
+    //     player.getVideoData(data, callback);
+    // }
+    //
+    // public isRawPlayerLink(url: string): boolean {
+    //     return !this.players.some(player => player.isSupportedLink(url));
+    // }
+
+    // public getIframeData(data: VideoDataRequest, callback: (data: VideoData) => void): void {
+    //     this.iframePlayer.getVideoData(data, callback);
+    // }
+
+    public setVideo(i: number): void {
+        const item = this.videoList.getItem(i);
+        // const currentPlayer = this.players.find(p => p.isSupportedLink(item.url));
+        //
+        // if (currentPlayer !== null) {
+        //     this.setPlayer(currentPlayer);
+        // } else if (item.isIframe) {
+        //     this.setPlayer(this.iframePlayer);
+        // } else {
+        //     this.setPlayer(this.rawPlayer);
         // }
 
-        this.isYouTubeReady = true;
+        this.videoList.setPos(i);
+        this.isLoaded = false;
 
-        const videoId = this.videoList.currentItem?.url ? this.extractVideoId(this.videoList.currentItem.url) : "";
-        if (!videoId) {
-            console.log("Init - no video to play");
-            return;
+        if (this.player !== null) {
+            this.player.loadVideo(item);
         }
+        // else {
+        //     this.onCanBePlayed();
+        // }
 
-        const currentTime = this.ytPlayer.getCurrentTime();
-        if (currentTime >= 1000) {
-            const seekTime = currentTime / 1000 + 1;
-            console.log("Load time", seekTime);
-            this.ytPlayer.loadVideoById(videoId, seekTime);
-        } else {
-            this.ytPlayer.loadVideoById(videoId);
-        }
-
-        setTimeout(() => {
-            if (this.ytPlayer.getPlayerState() === -1) {
-                this.ytPlayer.playVideo();
-                setTimeout(() => {
-                    if (this.ytPlayer.getPlayerState() === -1) {
-                        tempNotify(
-                            "Click here to play this thread's live-synced video (your browser requires a click before videos can play)",
-                            "",
-                            "click-to-play",
-                            60,
-                            () => {
-                                if (this.ytPlayer && this.ytPlayer.playVideo) {
-                                    this.ytPlayer.playVideo();
-                                }
-                            }
-                        );
-                    }
-                }, 1000);
-            }
-        }, 2000);
+        // JsApi.fireVideoChangeEvents(item);
     }
-    public setPlayerVolume() {
-        if (this.ytPlayer && this.ytPlayer.setVolume) {
-            this.ytPlayer.setVolume(options.watchVolume);
-        }
+
+    public changeVideoSrc(src: string): void {
+        if (this.player === null) return;
+        const item = this.videoList.currentItem;
+        if (item === undefined) return;
+
+        this.player.loadVideo({
+            url: src,
+            title: item.title,
+            author: item.author,
+            duration: item.duration,
+            subs: item.subs,
+            isTemp: item.isTemp,
+            isIframe: item.isIframe
+        });
     }
-    public onSync(currentTime: number){
 
-        const playerTime = this.ytPlayer.getCurrentTime();
-        const timeDifference = Math.abs(playerTime * 1000 - currentTime);
-
-        if (currentTime < 500 && timeDifference < 1600) {
-            console.error("Jankiness detected");
-        } else if (timeDifference > 1600) {
-            let seekTime = Math.floor((currentTime + 100) / 1000);
-            if (Math.floor(this.ytPlayer.getCurrentTime()) === seekTime) {
-                console.log("Seek time incremented");
-                seekTime += 1;
-            }
-            this.ytPlayer.seekTo(seekTime, true);
-            console.log("Seek time", seekTime);
-            console.log("Time out of sync - seeking");
+    public removeVideo(): void {
+        // JsApi.fireVideoRemoveEvents(this.videoList.currentItem);
+        if (this.player !== null) {
+            this.player.removeVideo();
         }
     }
 
-    private onPlayerStateChange() {
 
+    public addVideoItem(item: VideoItem, atEnd: boolean): void {
+        this.videoList.addItem(item, atEnd);
     }
-    public removeItem(url:string) {
-        var index = this.videoList.findIndex(item => item.url == url);
 
-        if (index == -1) return;
+    public removeItem(url: string): void {
+        const index = this.videoList.findIndex(item => item.url === url);
+        if (index === -1) return;
 
-        let isCurrent = this.videoList.currentItem.url == url;
+        const isCurrent = this.videoList.currentItem?.url === url;
         this.videoList.removeItem(index);
 
         if (isCurrent && this.videoList.length > 0) {
@@ -142,17 +106,110 @@ export class Player {
         }
     }
 
-    skipVideo(url: string) {
-        var pos = this.videoList.findIndex(function(item) {
-            return item.url == url;
-        });
-        if(pos == -1) {
-            return;
-        }
+    public skipItem(url: string): void {
+        const pos = this.videoList.findIndex(item => item.url === url);
+        if (pos === -1) return;
+
         this.videoList.setPos(pos);
-        if(this.videoList.items.length == 0) {
-            return;
-        }
+        this.videoList.skipItem();
+
+        if (this.videoList.length === 0) return;
         this.setVideo(this.videoList.pos);
+    }
+
+    public getItems(): VideoItem[] {
+        return this.videoList.getItems();
+    }
+
+    public setItems(list: VideoItem[], pos?: number): void {
+        const currentUrl = this.videoList.pos >= this.videoList.length ? '' : this.videoList.currentItem?.url;
+        this.clearItems();
+
+        if (list.length === 0) return;
+        for (const video of list) {
+            this.addVideoItem(video, true);
+        }
+
+        if (pos !== undefined) {
+            this.videoList.setPos(pos);
+        }
+
+        if (currentUrl !== this.videoList.currentItem?.url) {
+            this.setVideo(this.videoList.pos);
+        }
+    }
+
+    public clearItems(): void {
+        this.videoList.clear();
+    }
+
+    public refresh(): void {
+        if (this.videoList.length === 0) return;
+        const time = this.getTime();
+        this.removeVideo();
+        this.setVideo(this.videoList.pos);
+    }
+
+    public isListEmpty(): boolean {
+        return this.videoList.length === 0;
+    }
+
+    public itemsLength(): number {
+        return this.videoList.length;
+    }
+
+    public getItemPos(): number {
+        return this.videoList.pos;
+    }
+
+    public hasVideo(): boolean {
+        return this.player !== null;
+    }
+
+    public getDuration(): number {
+        if (this.videoList.pos >= this.videoList.length) return 0;
+        return this.videoList.currentItem?.duration ?? 0;
+    }
+
+    public isVideoLoaded(): boolean {
+        return this.player?.isVideoLoaded() ?? false;
+    }
+
+    public play(): void {
+        if (this.player === null) return;
+        if (!this.player.isVideoLoaded()) return;
+        this.player.play();
+    }
+
+    public pause(): void {
+        if (this.player === null) return;
+        if (!this.player.isVideoLoaded()) return;
+        this.player.pause();
+    }
+
+    public getTime(): number {
+        if (this.player === null) return 0;
+        if (!this.player.isVideoLoaded()) return 0;
+        return this.player.getTime();
+    }
+
+    public setTime(time: number, isLocal = true): void {
+        if (this.player === null) return;
+        if (!this.player.isVideoLoaded()) return;
+        this.skipSetTime = isLocal;
+        this.player.setTime(time);
+    }
+
+    public getPlaybackRate(): number {
+        if (this.player === null) return 1;
+        if (!this.player.isVideoLoaded()) return 1;
+        return this.player.getPlaybackRate();
+    }
+
+    public setPlaybackRate(rate: number, isLocal = true): void {
+        if (this.player === null) return;
+        if (!this.player.isVideoLoaded()) return;
+        this.skipSetRate = isLocal;
+        this.player.setPlaybackRate(rate);
     }
 }
