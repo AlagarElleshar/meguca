@@ -1,4 +1,5 @@
 import { message, sendBinary } from "../connection";
+import { escape } from "../util"
 import {
     ConnectedEvent,
     WebSocketMessage,
@@ -30,10 +31,11 @@ export let vidEl: HTMLVideoElement;
 export let watchStatus: HTMLElement;
 export let currentSource: string;
 export let watchDiv: HTMLElement;
-let isOpen = false;
+let nekoTV = document.getElementById("banner-nekotv");
+let isOpen : boolean;
+let isPlaylistVisible = false;
 
 export function initNekoTV() {
-    let nekoTV = document.getElementById("banner-nekotv");
     if (!nekoTV) {
         return;
     }
@@ -44,11 +46,21 @@ export function initNekoTV() {
     vidEl = document.getElementById('watch-video') as HTMLVideoElement;
     watchStatus = document.getElementById('status-watch')!;
     watchDiv = document.getElementById("watch-panel");
+    let lastVal = localStorage.getItem('neko-tv')
+    if (lastVal) {
+        isOpen = lastVal === 't';
+    } else {
+        isOpen = false;
+    }
+    updateNekoTVIcon()
     nekoTV.addEventListener("click", () => {
         isOpen = !isOpen;
+        localStorage.setItem('neko-tv', isOpen ? 't' : 'f');
+        updateNekoTVIcon()
         if (isOpen) {
             sendBinary(new Uint8Array([message.nekoTV]));
             showWatchPanel();
+            showPlaylist()
         } else {
             hideWatchPanel();
         }
@@ -116,6 +128,15 @@ export function initNekoTV() {
 //         socket.connSM.on(3, subscribeToWatchFeed);
 //     }
 // }
+
+function updateNekoTVIcon(){
+    if (isOpen) {
+        nekoTV.innerText = '􀵨';
+    } else {
+        nekoTV.innerText = '􁋞';
+    }
+
+}
 export function showWatchPanel() {
 
     watchDiv.style.display = 'block';
@@ -125,10 +146,28 @@ export function showWatchPanel() {
 export function hideWatchPanel() {
     watchDiv.classList.add('hide-watch-panel');
 }
+export function showPlaylist() {
+    playlistDiv.style.display = 'block';
+}
+
+export function hidePlaylist() {
+    playlistDiv.style.display = 'none';
+}
+
+export function togglePlaylist() {
+    isPlaylistVisible = !isPlaylistVisible;
+    if (isPlaylistVisible) {
+        showPlaylist();
+    } else {
+        hidePlaylist();
+    }
+}
+
 
 function handleConnectedEvent(connectedEvent: ConnectedEvent) {
     player.setItems(connectedEvent.videoList,connectedEvent.itemPos)
     handleSetTimeEvent(connectedEvent.getTime)
+    updatePlaylist()
 }
 
 function handleAddVideoEvent(addVideoEvent: AddVideoEvent) {
@@ -136,6 +175,7 @@ function handleAddVideoEvent(addVideoEvent: AddVideoEvent) {
     if (player.itemsLength() === 1) {
         player.setVideo(0);
     }
+    updatePlaylist()
 }
 
 function handleRemoveVideoEvent(removeVideoEvent: RemoveVideoEvent) {
@@ -143,11 +183,13 @@ function handleRemoveVideoEvent(removeVideoEvent: RemoveVideoEvent) {
     if (player.isListEmpty()) {
         player.pause();
     }
+    updatePlaylist()
 }
 
 function handleSkipVideoEvent(skipVideoEvent: SkipVideoEvent) {
     player.skipItem(skipVideoEvent.url);
     if (player.isListEmpty()) player.pause();
+    updatePlaylist()
 }
 
 function handlePauseEvent(pauseEvent: PauseEvent) {
@@ -168,35 +210,47 @@ function handlePlayEvent(playEvent: PlayEvent) {
 }
 
 function handleGetTimeEvent(getTimeEvent: GetTimeEvent) {
+    console.log('Handling GetTimeEvent:', getTimeEvent);
     const paused = getTimeEvent.paused ?? false;
     const rate = getTimeEvent.rate ?? 1;
 
     if (player.getPlaybackRate() !== rate) {
+        console.log('Updating playback rate to:', rate);
         player.setPlaybackRate(rate);
     }
 
-    const synchThreshold = 1600;
+    const synchThreshold = 1.6;
     const newTime = getTimeEvent.time;
     const time = player.getTime();
 
+    console.log('Current time:', time);
+    console.log('New time:', newTime);
+
     if (!player.isVideoLoaded()) {
+        console.log('Video not loaded');
         // player.forceSyncNextTick = false;
     }
     if (player.getDuration() <= time + synchThreshold) {
+        console.log('Video near end, skipping synchronization');
         return;
     }
     if (!paused) {
+        console.log('Playing video');
         player.play();
     } else {
+        console.log('Pausing video');
         player.pause();
     }
     // player.setPauseIndicator(!paused);
     if (Math.abs(time - newTime) < synchThreshold) {
+        console.log('Time difference within threshold, skipping synchronization');
         return;
     }
     if (!paused) {
+        console.log('Synchronizing time to:', newTime + 0.5);
         player.setTime(newTime + 0.5);
     } else {
+        console.log('Synchronizing time to:', newTime);
         player.setTime(newTime);
     }
 }
@@ -244,6 +298,7 @@ function handleClearPlaylistEvent(clearPlaylistEvent: ClearPlaylistEvent) {
     if (player.isListEmpty()) {
         player.pause();
     }
+    updatePlaylist()
 }
 
 export function handleMessage(message: WebSocketMessage) {
@@ -281,5 +336,73 @@ export function handleMessage(message: WebSocketMessage) {
         handleClearPlaylistEvent(message.clearPlaylistEvent);
     } else {
         console.error("Invalid WebSocketMessage received");
+    }
+}
+function truncateWithEllipsis(e, t) {
+    return e.length <= t ? e : e.substring(0, t) + "…"
+}
+export function secondsToTimeExact(totalSeconds: number): string {
+    totalSeconds = Math.floor(totalSeconds);
+
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds - hours * 3600) / 60);
+    const seconds = Math.round(totalSeconds - hours * 3600 - minutes * 60);
+
+    let formattedTime: string;
+
+    if (hours) {
+        formattedTime = `${hours}:${padWithZero(minutes)}:${padWithZero(seconds)}`;
+    } else if (minutes) {
+        formattedTime = `${minutes}:${padWithZero(seconds)}`;
+    } else {
+        formattedTime = `00:${padWithZero(seconds)}`;
+    }
+
+    return formattedTime;
+}
+
+function padWithZero(value: number): string {
+    return value < 10 ? `0${value}` : value.toString();
+}
+export function updatePlaylist() {
+    if (player.isListEmpty()) {
+        return;
+    }
+
+    // updatePlaylistStatus();
+
+    const playlistItems: HTMLLIElement[] = [];
+
+    for (const video of player.videoList.items) {
+        const li = document.createElement('li');
+        li.classList.add('watch-playlist-entry');
+
+        let videoTerm = '';
+        if (video.url && !video.url.startsWith('https')) {
+            videoTerm = escape(truncateWithEllipsis(video.url, 25));
+        }
+
+        const argLength = video.title ? video.title.length : 0;
+        const videoTitle = escape(truncateWithEllipsis(video.title, 55 - Math.min(argLength, 25)));
+
+        li.innerHTML = `
+      <span class="watch-video-term">${videoTerm}</span>
+      <a class="watch-video-title" target="_blank" href="${video.url}" title="${escape(video.title)}">
+        ${videoTitle}
+      </a>
+      <span class="watch-video-time">
+        <span class="watch-player-time"></span>
+        <span class="watch-player-dur">${secondsToTimeExact(video.duration)}</span>
+      </span>
+    `;
+
+        playlistItems.push(li);
+    }
+
+    playlistOl.replaceChildren(...playlistItems);
+
+    if (!isOpen) {
+        document.body.classList.add('watch');
+        isOpen = true;
     }
 }

@@ -260,8 +260,10 @@ export default () => {
 		setCookie(key, value, 30)
 	handlers[message.nekoTV] = (message : ArrayBuffer) => {
 		let msg = WebSocketMessage.decode(new Uint8Array(message));
-		console.log(WebSocketMessage.toJSON(msg))
-		console.log(msg)
+		if (!msg.getTimeEvent) {
+			console.log(WebSocketMessage.toJSON(msg))
+			console.log(msg)
+		}
 		handleMessage(msg)
 	}
 }

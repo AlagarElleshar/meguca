@@ -106,7 +106,7 @@ function onMessage(data: string | ArrayBuffer, extracted: boolean) {
 	if (data instanceof ArrayBuffer) {
 		let view = new Uint8Array(data)
 		let msgType = view[data.byteLength - 1]
-		if (debug) {
+		if (debug && msgType !== message.nekoTV) {
 			console.log("> binary message: ", view);
 		}
 		handlers[msgType](data.slice(0,data.byteLength - 1))

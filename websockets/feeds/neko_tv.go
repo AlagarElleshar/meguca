@@ -172,6 +172,7 @@ func (f *NekoTVFeed) SkipVideo() {
 	}
 
 	f.videoList.SkipItem()
+	f.videoTimer.SetTime(0)
 	msg := pb.WebSocketMessage{MessageType: &pb.WebSocketMessage_SkipVideoEvent{SkipVideoEvent: &pb.SkipVideoEvent{
 		Url: currentItem.Url,
 	}}}

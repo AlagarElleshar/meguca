@@ -1,17 +1,10 @@
-import YouTubePlayer from 'youtube-player';
 import {VideoItem} from "../typings/messages";
+import {tempNotify} from "../ui/notification";
 
 export class Youtube {
-    // private readonly player: Player;
     private readonly playerEl: HTMLElement = document.getElementById('#ytapiplayer');
-    private video: HTMLElement;
-    private youtube: YouTubePlayer;
+    private player: YT.Player;
     private isLoaded = false;
-
-    // constructor(main: Main, player: Player) {
-    //     this.main = main;
-    //     this.player = player;
-    // }
 
     public isSupportedLink(url: string): boolean {
         return this.extractVideoId(url) !== '';
@@ -37,16 +30,24 @@ export class Youtube {
         }
         return '';
     }
+    public initMediaPlayer() {
+        if (!isYouTubeScriptLoaded && watchEnabled()) {
+            watchDiv.classList.remove("hidden");
+            head.appendChild(youTubeScript);
+            console.log("Load YouTube player script");
+            isYouTubeScriptLoaded = true;
+        }
+    }
 
     public loadVideo(item: VideoItem): void {
-        if (this.youtube) {
-            this.youtube.loadVideoById(this.extractVideoId(item.url));
+        if (this.player) {
+            this.player.loadVideoById(this.extractVideoId(item.url));
             return;
         }
 
         this.isLoaded = false;
 
-        this.youtube = YouTubePlayer("watch-video", {
+        this.player = new YT.Player('watch-video', {
             videoId: this.extractVideoId(item.url),
             playerVars: {
                 autoplay: 1,
@@ -58,49 +59,41 @@ export class Youtube {
             events: {
                 onReady: () => {
                     this.isLoaded = true;
-                    this.youtube.pauseVideo();
+                    this.player.playVideo();
+                    console.log("player state", this.player.getPlayerState())
+                    setTimeout(() => {
+                        console.log("player state", this.player.getPlayerState())
+                        if (this.player.getPlayerState() === -1) {
+                            this.player.playVideo();
+                            setTimeout(() => {
+                                console.log("player state", this.player.getPlayerState())
+                                if (this.player.getPlayerState() === -1) {
+                                    tempNotify(
+                                        "Click here to play this thread's live-synced video (your browser requires a click before videos can play)",
+                                        "",
+                                        "click-to-play",
+                                        60,
+                                        () => {
+                                            if (this.player && this.player.playVideo) {
+                                                this.player.playVideo();
+                                            }
+                                        }
+                                    );
+                                }
+                            }, 1000);
+                        }
+                    }, 2000);
                 },
-                // onStateChange: (event) => {
-                //     switch (event.data) {
-                //         case YouTubePlayer.PlayerState.UNSTARTED:
-                //             this.player.onCanBePlayed();
-                //             break;
-                //         case YouTubePlayer.PlayerState.ENDED:
-                //         case YouTubePlayer.PlayerState.PLAYING:
-                //             this.player.onPlay();
-                //             break;
-                //         case YouTubePlayer.PlayerState.PAUSED:
-                //             this.player.onPause();
-                //             break;
-                //         case YouTubePlayer.PlayerState.BUFFERING:
-                //             this.player.onSetTime();
-                //             break;
-                //     }
-                // },
-                // onPlaybackRateChange: () => {
-                //     this.player.onRateChange();
-                // },
             },
         });
-        this.youtube
-            // Play video is a Promise.
-            // 'playVideo' is queued and will execute as soon as player is ready.
-            .playVideo()
-            .then(function () {
-                console.log('Starting to play player1. It will take some time to buffer video before it starts playing.');
-            });
     }
 
     public removeVideo(): void {
-        if (!this.video) return;
+        if (!this.player) return;
 
         this.isLoaded = false;
-        this.youtube.destroy();
-        this.youtube = null;
-        if (this.playerEl.contains(this.video)) {
-            this.playerEl.removeChild(this.video);
-        }
-        this.video = null;
+        this.player.destroy();
+        this.player = null;
     }
 
     public isVideoLoaded(): boolean {
@@ -108,26 +101,26 @@ export class Youtube {
     }
 
     public play(): void {
-        this.youtube.playVideo();
+        this.player.playVideo();
     }
 
     public pause(): void {
-        this.youtube.pauseVideo();
+        this.player.pauseVideo();
     }
 
     public getTime(): number {
-        return this.youtube.getCurrentTime();
+        return this.player.getCurrentTime();
     }
 
     public setTime(time: number): void {
-        this.youtube.seekTo(time, true);
+        this.player.seekTo(time, true);
     }
 
     public getPlaybackRate(): number {
-        return this.youtube.getPlaybackRate();
+        return this.player.getPlaybackRate();
     }
 
     public setPlaybackRate(rate: number): void {
-        this.youtube.setPlaybackRate(rate);
+        this.player.setPlaybackRate(rate);
     }
 }
