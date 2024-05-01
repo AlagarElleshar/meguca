@@ -10,6 +10,7 @@ import { getPostName } from "./options"
 import { OverlayNotification } from "./ui"
 import { setCookie }  from './util';
 import { debug } from "./state"
+import {protobufPackage, WebSocketMessage} from "./typings/messages";
 
 // Message for splicing the contents of the current line
 export type SpliceResponse = {
@@ -256,4 +257,9 @@ export default () => {
 
 	handlers[message.setCookie] = ({ key, value }: CookieMessage) =>
 		setCookie(key, value, 30)
+	handlers[message.nekoTV] = (message : ArrayBuffer) => {
+		let msg = WebSocketMessage.decode(new Uint8Array(message));
+		console.log(WebSocketMessage.toJSON(msg))
+		console.log(msg)
+	}
 }

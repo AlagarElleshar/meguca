@@ -19,6 +19,7 @@ import initModeration from "./mod"
 import { persistMessages } from "./options"
 import { watchThread } from './page/thread_watcher';
 import initFlvPlayer from "./ui/flvplayer";
+import {initNekoTV} from "./nekotv/nekotv";
 
 
 // Load all stateful modules in dependency order
@@ -80,6 +81,7 @@ async function start() {
 	initUI()
 	initModeration()
 	initFlvPlayer()
+	initNekoTV()
 }
 
 start().catch(err => {

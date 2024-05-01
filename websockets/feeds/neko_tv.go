@@ -1,20 +1,25 @@
 package feeds
 
 import (
-	common "github.com/bakape/meguca/common"
+	"errors"
+	"github.com/bakape/meguca/common"
 	"github.com/bakape/meguca/pb"
 	"github.com/bakape/meguca/websockets/feeds/nekotv"
+	"github.com/go-playground/log"
 	"github.com/golang/protobuf/proto"
+	"strconv"
+	"strings"
 	"sync"
+	"time"
 )
 
 type NekoTVFeed struct {
 	baseFeed
-	videoTimer  *nekotv.VideoTimer
-	videoList   *nekotv.VideoList
-	thread      uint64
-	clientCount uint32
-	mu          sync.Mutex
+	videoTimer *nekotv.VideoTimer
+	videoList  *nekotv.VideoList
+	thread     uint64
+	mu         sync.Mutex
+	isRunning  bool
 }
 
 func NewNekoTVFeed() *NekoTVFeed {
@@ -27,19 +32,54 @@ func NewNekoTVFeed() *NekoTVFeed {
 }
 
 func (f *NekoTVFeed) start(thread uint64) (err error) {
+	log.Info("Starting NekoTV feed")
 	f.thread = thread
+	f.isRunning = true
 
 	go func() {
 		for {
 			select {
 			case c := <-f.add:
 				f.addClient(c)
-				f.clientCount += 1
 				f.sendConnectedMessage(c)
+				log.Info("Client added")
 			case c := <-f.remove:
 				f.removeClient(c)
-				f.clientCount -= 1
 			}
+		}
+	}()
+	go func() {
+		for {
+			f.mu.Lock()
+			log.Info("Loop")
+			log.Info(f.videoTimer.GetTime())
+			item, err := f.videoList.CurrentItem()
+			if err != nil {
+				f.mu.Unlock()
+				time.Sleep(1000 * time.Millisecond)
+				continue
+			}
+			maxTime := item.Duration
+			if f.videoTimer.GetTime() > maxTime {
+				f.videoTimer.Pause()
+				f.videoTimer.SetTime(maxTime)
+				skipUrl := item.Url
+				time.AfterFunc(500*time.Millisecond, func() {
+					if f.videoList.Length() == 0 {
+						return
+					}
+					currentItem, err := f.videoList.CurrentItem()
+					if err != nil || currentItem.Url != skipUrl {
+						return
+					}
+					f.SkipVideo()
+				})
+				f.mu.Unlock()
+				continue
+			}
+			f.mu.Unlock()
+			f.SendTimeSyncMessage()
+			time.Sleep(1000 * time.Millisecond)
 		}
 	}()
 
@@ -51,7 +91,10 @@ func (e *NekoTVFeed) GetCurrentState() pb.ServerState {
 		VideoList:      e.videoList.GetItems(),
 		IsPlaylistOpen: true,
 		ItemPos:        0,
-		Timer:          nil,
+		Timer: &pb.Timer{
+			Time:   e.videoTimer.GetTime(),
+			Paused: e.videoTimer.IsPaused(),
+		},
 	}
 }
 
@@ -62,16 +105,24 @@ func (f *NekoTVFeed) sendConnectedMessage(c common.Client) {
 		IsPlaylistOpen: false,
 		GetTime:        f.videoTimer.GetTimeData(),
 	}
-	data, err := proto.Marshal(&conMessage)
+	wsMessage := pb.WebSocketMessage{MessageType: &pb.WebSocketMessage_ConnectedEvent{ConnectedEvent: &conMessage}}
+	data, err := proto.Marshal(&wsMessage)
+	data = append(data, uint8(common.MessageNekoTV))
 	if err != nil {
 		return
 	}
 	c.SendBinary(data)
+	log.Info("Sent connected message to client.")
 }
 
 func (f *NekoTVFeed) AddVideo(v *pb.VideoItem, atEnd bool) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
+	if f.videoList.Exists(func(item *pb.VideoItem) bool {
+		return item.Url == v.Url
+	}) {
+		return
+	}
 	f.videoList.AddItem(v, atEnd)
 	msg := pb.WebSocketMessage{MessageType: &pb.WebSocketMessage_AddVideoEvent{AddVideoEvent: &pb.AddVideoEvent{
 		Item:  v,
@@ -80,6 +131,9 @@ func (f *NekoTVFeed) AddVideo(v *pb.VideoItem, atEnd bool) {
 	data, _ := proto.Marshal(&msg)
 	data = append(data, uint8(common.MessageNekoTV))
 	f.sendToAllBinary(data)
+	if f.videoList.Length() == 1 {
+		f.videoTimer.Start()
+	}
 }
 
 // RemoveVideo removes a video from the playlist
@@ -104,7 +158,7 @@ func (f *NekoTVFeed) RemoveVideo(url string) {
 }
 
 // SkipVideo skips to the next video in the playlist
-func (f *NekoTVFeed) SkipVideo(url string) {
+func (f *NekoTVFeed) SkipVideo() {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 
@@ -113,13 +167,13 @@ func (f *NekoTVFeed) SkipVideo(url string) {
 	}
 
 	currentItem, err := f.videoList.CurrentItem()
-	if err != nil || currentItem.Url != url {
+	if err != nil {
 		return
 	}
 
 	f.videoList.SkipItem()
 	msg := pb.WebSocketMessage{MessageType: &pb.WebSocketMessage_SkipVideoEvent{SkipVideoEvent: &pb.SkipVideoEvent{
-		Url: url,
+		Url: currentItem.Url,
 	}}}
 	data, _ := proto.Marshal(&msg)
 	data = append(data, uint8(common.MessageNekoTV))
@@ -127,7 +181,7 @@ func (f *NekoTVFeed) SkipVideo(url string) {
 }
 
 // Pause pauses the current video
-func (f *NekoTVFeed) Pause(time float32) {
+func (f *NekoTVFeed) Pause() {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 
@@ -135,10 +189,9 @@ func (f *NekoTVFeed) Pause(time float32) {
 		return
 	}
 
-	f.videoTimer.SetTime(time)
 	f.videoTimer.Pause()
 	msg := pb.WebSocketMessage{MessageType: &pb.WebSocketMessage_PauseEvent{PauseEvent: &pb.PauseEvent{
-		Time: time,
+		Time: f.videoTimer.GetTime(),
 	}}}
 	data, _ := proto.Marshal(&msg)
 	data = append(data, uint8(common.MessageNekoTV))
@@ -146,7 +199,7 @@ func (f *NekoTVFeed) Pause(time float32) {
 }
 
 // Play plays the current video or resumes if paused
-func (f *NekoTVFeed) Play(time float32) {
+func (f *NekoTVFeed) Play() {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 
@@ -154,7 +207,7 @@ func (f *NekoTVFeed) Play(time float32) {
 		return
 	}
 
-	f.videoTimer.SetTime(time)
+	time := f.videoTimer.GetTime()
 	f.videoTimer.Play()
 	msg := pb.WebSocketMessage{MessageType: &pb.WebSocketMessage_PlayEvent{PlayEvent: &pb.PlayEvent{
 		Time: time,
@@ -211,4 +264,113 @@ func (f *NekoTVFeed) SendTimeSyncMessage() {
 	data, _ := proto.Marshal(&msg)
 	data = append(data, uint8(common.MessageNekoTV))
 	f.sendToAllBinary(data)
+}
+func parseTimestamp(timestamp string) (time float32, err error) {
+	if strings.Contains(timestamp, ":") {
+		parts := strings.Split(timestamp, ":")
+		if len(parts) == 2 {
+			var minutes int
+			minutes, err = strconv.Atoi(parts[0])
+			if err != nil {
+				return
+			}
+			time = float32(minutes * 60)
+			var seconds float64
+			seconds, err = strconv.ParseFloat(parts[1], 32)
+			time += float32(seconds)
+			return
+		} else if len(parts) == 3 {
+			var hours int
+			hours, err = strconv.Atoi(parts[0])
+			if err != nil {
+				return
+			}
+			time = float32(hours * 60 * 60)
+			var minutes int
+			minutes, err = strconv.Atoi(parts[0])
+			if err != nil {
+				return
+			}
+			time += float32(minutes * 60)
+			var seconds float64
+			seconds, err = strconv.ParseFloat(parts[1], 32)
+			time += float32(seconds)
+			return
+		} else {
+			err = errors.New("invalid timestamp")
+			return
+		}
+	}
+	var seconds float64
+	seconds, err = strconv.ParseFloat(timestamp, 32)
+	time = float32(seconds)
+	return
+}
+
+//func HandleMediaCommand(thread uint64, c *common.MediaCommand) {
+//	ntv := GetNekoTVFeed(thread)
+//	switch c.Type {
+//	case common.AddVideo:
+//		videoData, err := nekotv.GetVideoData(c.Args)
+//		if err != nil {
+//			ntv.AddVideo(&videoData, false)
+//		}
+//		break
+//	case common.RemoveVideo:
+//		ntv.RemoveVideo(c.Args)
+//	case common.SkipVideo:
+//		ntv.SkipVideo()
+//	case common.Pause:
+//		ntv.Pause()
+//	case common.Play:
+//		ntv.Play()
+//	case common.SetTime:
+//		time, err := parseTimestamp(c.Args)
+//		if err != nil {
+//			ntv.SetTime(time)
+//		}
+//	case common.ClearPlaylist:
+//		ntv.ClearPlaylist()
+//	}
+//}
+
+func HandleMediaCommand(thread uint64, c *common.MediaCommand) {
+	ntv := GetNekoTVFeed(thread)
+	switch c.Type {
+	case common.AddVideo:
+		log.Info("Adding video to the playlist")
+		videoData, err := nekotv.GetVideoData(c.Args)
+		if err == nil {
+			log.Infof("Video data retrieved: %v", videoData)
+			ntv.AddVideo(&videoData, true)
+		} else {
+			log.Errorf("Failed to get video data: %v", err)
+		}
+		break
+	case common.RemoveVideo:
+		log.Infof("Removing video from the playlist: %s", c.Args)
+		ntv.RemoveVideo(c.Args)
+	case common.SkipVideo:
+		log.Info("Skipping to the next video")
+		ntv.SkipVideo()
+	case common.Pause:
+		log.Info("Pausing the video playback")
+		ntv.Pause()
+	case common.Play:
+		log.Info("Resuming the video playback")
+		ntv.Play()
+	case common.SetTime:
+		log.Infof("Setting video playback time to: %s", c.Args)
+		time, err := parseTimestamp(c.Args)
+		if err != nil {
+			log.Errorf("Failed to parse timestamp: %v", err)
+		} else {
+			ntv.SetTime(time)
+		}
+	case common.ClearPlaylist:
+		log.Info("Clearing the video playlist")
+		ntv.ClearPlaylist()
+	default:
+		log.Warnf("Unknown media command type: %v", c.Type)
+	}
 }

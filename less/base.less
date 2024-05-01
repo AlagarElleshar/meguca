@@ -517,8 +517,87 @@ iframe[src^="https://www.youtube"] {
 
 }
 
-
 @font-face {
 	font-family: "Symbols";
 	src: url("/assets/css/TCSymbols.ttf") format("truetype");
+}
+
+
+#status-watch {
+	color: #a0a5a69c
+}
+
+#status-watch:hover {
+	color: #e5e7e7c4
+}
+
+#status-watch:active {
+	color: #dee3e3e6
+}
+
+#watch-video {
+	width: 38vw;
+	height: 52vh;
+	pointer-events: none;
+	cursor: not-allowed
+}
+
+@media screen and (max-width: 700px) {
+	#watch-video {
+		width:32vw;
+		height: 18vh
+	}
+}
+
+.watch-video-time {
+	float: right;
+	padding-left: 10px
+}
+
+.watch-video-term {
+	float: left;
+	padding-right: 10px;
+	font-style: italic;
+	color: rgba(188,178,178,.934);
+	font-family: monospace
+}
+
+#watch-playlist {
+	display: none
+}
+
+#watch-playlist a {
+	color: #a6a6ae
+}
+
+#watch-playlist a:hover {
+	color: #b7b7c5
+}
+
+.watch-playlist-entry::marker {
+	font-family: monospace;
+	color: rgba(121,124,125,.907)
+}
+
+#watch-panel {
+	margin-left: auto;
+	padding: .2em;
+	background-color: var(--watch-bg);
+	border: .5px solid var(--watch-border);
+	border-bottom-width: 0!important;
+	padding-bottom: 0;
+	z-index: 2147483646
+}
+
+.hide-watch-panel {
+	opacity: 0!important
+}
+
+body.watch img.embed-thumb {
+	display: none
+}
+
+#watch-player {
+	cursor: not-allowed;
+	user-select: none
 }

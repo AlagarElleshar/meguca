@@ -48,12 +48,12 @@ func (t *VideoTimer) Play() {
 	}
 }
 
-func (t *VideoTimer) GetTime() float32 {
-	if t.startTime.IsZero() {
+func (vt *VideoTimer) GetTime() float32 {
+	if vt.startTime.IsZero() {
 		return 0
 	}
-	elapsed := time.Since(t.startTime).Seconds()
-	result := elapsed - t.rateTime().Seconds() + float64(t.rateTime())/float64(t.rate) - t.pauseTime().Seconds()
+	time := time.Since(vt.startTime)
+	result := time.Seconds() - vt.rateTime().Seconds() + vt.rateTime().Seconds()*float64(vt.rate) - vt.pauseTime().Seconds()
 	return float32(result)
 }
 
@@ -81,20 +81,19 @@ func (t *VideoTimer) SetRate(rate float32) {
 	t.rate = rate
 }
 
-func (t *VideoTimer) pauseTime() time.Duration {
-	if t.pauseStartTime.IsZero() {
+func (vt *VideoTimer) pauseTime() time.Duration {
+	if vt.pauseStartTime.IsZero() {
 		return 0
 	}
-	return time.Since(t.pauseStartTime) - t.rateTime()
+	return time.Since(vt.pauseStartTime)
 }
 
-func (t *VideoTimer) rateTime() time.Duration {
-	if t.rateStartTime.IsZero() {
+func (vt *VideoTimer) rateTime() time.Duration {
+	if vt.rateStartTime.IsZero() {
 		return 0
 	}
-	return time.Since(t.rateStartTime) - t.pauseTime()
+	return time.Since(vt.rateStartTime) - vt.pauseTime()
 }
-
 func (t *VideoTimer) GetTimeData() *pb.GetTimeEvent {
 	return &pb.GetTimeEvent{
 		Time:   t.GetTime(),

@@ -7,7 +7,6 @@ import (
 	"errors"
 	"github.com/bakape/meguca/common"
 	"github.com/bakape/meguca/db"
-	"github.com/bakape/meguca/websockets"
 	"sync"
 )
 
@@ -99,18 +98,12 @@ func SubscribeToMeguTV(c common.Client) (err error) {
 	return
 }
 
-func HandleNekoTV(c *websockets.Client) (err error) {
+func HandleNekoTV(c common.Client) (err error) {
 	feeds.mu.Lock()
-	defer feeds.mu.Unlock()
 	_, thread, _ := GetSync(c)
-	ntv, ok := feeds.nekotvFeeds[thread]
-	if !ok {
-		ntv = NewNekoTVFeed()
-		ntv.init()
-		feeds.nekotvFeeds[thread] = ntv
-		ntv.start(thread)
-	}
-	ntv.sendConnectedMessage(c)
+	feeds.mu.Unlock()
+	ntv := GetNekoTVFeed(thread)
+	ntv.add <- c
 	return
 }
 
@@ -193,6 +186,21 @@ func Init() (err error) {
 	return db.Listen("post_moderated", func(msg string) (err error) {
 		return handlePostModeration(msg)
 	})
+}
+
+func GetNekoTVFeed(id uint64) (f *NekoTVFeed) {
+	feeds.mu.RLock()
+	feed, ok := feeds.nekotvFeeds[id]
+	feeds.mu.RUnlock()
+	if ok {
+		return feed
+	}
+	newFeed := NewNekoTVFeed()
+	newFeed.start(id)
+	feeds.mu.Lock()
+	defer feeds.mu.Unlock()
+	feeds.nekotvFeeds[id] = newFeed
+	return newFeed
 }
 
 // Separate function for testing

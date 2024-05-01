@@ -254,6 +254,7 @@
 					<b id="sync-counter" class="act hide-empty banner-float svg-link noscript-hide" title="{%s= ln.UI["syncCount"] %}"></b>
 					<b id="thread-post-counters" class="act hide-empty banner-float svg-link noscript-hide" title="{%s= ln.Common.UI["postsImages"] %}"></b>
 					<span id="banner-extensions" class="hide-empty banner-float svg-link noscript-hide"></span>
+					<a id="banner-nekotv" class="banner-float noscript-hide symbol" title="NekoTV">􀵨</a>
 					<a id="banner-feedback" href="https://tellonym.me/meowmin2" target="_blank" class="banner-float svg-link noscript-hide" title="{%s= ln.UI["feedback"] %}" rel="noreferrer noopener">
 						<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8">
 							<path d="M0 0v1l4 2 4-2v-1h-8zm0 2v4h8v-4l-4 2-4-2z" transform="translate(0 1)" />
@@ -414,6 +415,14 @@
 					<tbody>
 					</tbody>
 					</table>
+				</div>
+				<div id="watch-panel" class="modal glass hidden hide-watch-panel">
+					<div id="watch-player">
+						<div id="watch-video"></div>
+					</div>
+<!--					<div id="watch-playlist"><span id="watch-playlist-status"></span>-->
+<!--						<ol id="watch-playlist-entries"></ol>-->
+<!--					</div>-->
 				</div>
 				{% comment %}
 					Moderation panel

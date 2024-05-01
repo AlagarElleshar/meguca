@@ -94,11 +94,11 @@ var (
 	CommandRegexp = regexp.MustCompile(
 		`^#(flip|\d*d\d+|8ball|pyu|pcount|sw(?:\d+:)?\d+:\d+(?:[+-]\d+)?|autobahn)$`,
 	)
-	DiceRegexp        = regexp.MustCompile(`(\d*)d(\d+)`)
-	ClaudeRegexp      = regexp.MustCompile(`(?m)^#claude (\S.*?)$`)
-	PostCommandRegexp = regexp.MustCompile(`(?m)^#post(hd)? (\S.*?)(?:\s(-?\d+))?\s*?$`)
-	MainJS            string
-	StaticJS          string
+	DiceRegexp     = regexp.MustCompile(`(\d*)d(\d+)`)
+	ClaudeRegexp   = regexp.MustCompile(`(?m)^#claude (\S.*?)$`)
+	MediaComRegexp = regexp.MustCompile(`(?m)^\.(?:(addvideo|removevideo|settime)\s+(\S+)|(skipvideo|pause|play|clearplaylist))$`)
+	MainJS         string
+	StaticJS       string
 )
 
 func init() {
