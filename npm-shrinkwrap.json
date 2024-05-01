@@ -10,7 +10,8 @@
       "license": "AGPL-3.0",
       "dependencies": {
         "mpegts.js": "^1.7.3",
-        "ts-proto": "^1.172.0"
+        "ts-proto": "^1.172.0",
+        "youtube-player": "^5.6.0"
       },
       "devDependencies": {
         "@types/youtube": "^0.0.50",
@@ -907,6 +908,22 @@
       "integrity": "sha512-aylIc7Z9y4yzHYAJNuESG3hfhC+0Ibp/MAMiaOZgNv4pmEdFyfZhhhny4MNiAfWdBQ1RQ2mfDWmM1x8SvGyp8g==",
       "dev": true
     },
+    "node_modules/debug": {
+      "version": "4.3.4",
+      "resolved": "https://registry.npmjs.org/debug/-/debug-4.3.4.tgz",
+      "integrity": "sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==",
+      "dependencies": {
+        "ms": "2.1.2"
+      },
+      "engines": {
+        "node": ">=6.0"
+      },
+      "peerDependenciesMeta": {
+        "supports-color": {
+          "optional": true
+        }
+      }
+    },
     "node_modules/detect-libc": {
       "version": "1.0.3",
       "resolved": "https://registry.npmjs.org/detect-libc/-/detect-libc-1.0.3.tgz",
@@ -1186,6 +1203,11 @@
         "url": "https://github.com/sponsors/antonk52"
       }
     },
+    "node_modules/load-script": {
+      "version": "1.0.0",
+      "resolved": "https://registry.npmjs.org/load-script/-/load-script-1.0.0.tgz",
+      "integrity": "sha512-kPEjMFtZvwL9TaZo0uZ2ml+Ye9HUMmPwbYRJ324qF9tqMejwykJ5ggTyvzmrbBeapCAbk98BSbTeovHEEP1uCA=="
+    },
     "node_modules/lodash.memoize": {
       "version": "4.1.2",
       "resolved": "https://registry.npmjs.org/lodash.memoize/-/lodash.memoize-4.1.2.tgz",
@@ -1277,6 +1299,11 @@
         "es6-promise": "^4.2.5",
         "webworkify-webpack": "^2.1.5"
       }
+    },
+    "node_modules/ms": {
+      "version": "2.1.2",
+      "resolved": "https://registry.npmjs.org/ms/-/ms-2.1.2.tgz",
+      "integrity": "sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w=="
     },
     "node_modules/nanoid": {
       "version": "3.3.7",
@@ -1922,6 +1949,11 @@
         "url": "https://github.com/sponsors/isaacs"
       }
     },
+    "node_modules/sister": {
+      "version": "3.0.2",
+      "resolved": "https://registry.npmjs.org/sister/-/sister-3.0.2.tgz",
+      "integrity": "sha512-p19rtTs+NksBRKW9qn0UhZ8/TUI9BPw9lmtHny+Y3TinWlOa9jWh9xB0AtPSdmOy49NJJJSSe0Ey4C7h0TrcYA=="
+    },
     "node_modules/source-map-js": {
       "version": "1.2.0",
       "resolved": "https://registry.npmjs.org/source-map-js/-/source-map-js-1.2.0.tgz",
@@ -2258,6 +2290,16 @@
       },
       "engines": {
         "node": ">=8"
+      }
+    },
+    "node_modules/youtube-player": {
+      "version": "5.6.0",
+      "resolved": "https://registry.npmjs.org/youtube-player/-/youtube-player-5.6.0.tgz",
+      "integrity": "sha512-x95fBbxV7eZ1ZsFtMLMcSGX0Jb/GPPj69RsooyEDVa9bzvvNZ4d5VjnBVBYoY85008VefkLvtaV+b+l38R/LMQ==",
+      "dependencies": {
+        "debug": "^4.3.4",
+        "load-script": "^1.0.0",
+        "sister": "^3.0.0"
       }
     }
   },
@@ -2802,6 +2844,14 @@
         }
       }
     },
+    "debug": {
+      "version": "4.3.4",
+      "resolved": "https://registry.npmjs.org/debug/-/debug-4.3.4.tgz",
+      "integrity": "sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==",
+      "requires": {
+        "ms": "2.1.2"
+      }
+    },
     "detect-libc": {
       "version": "1.0.3",
       "resolved": "https://registry.npmjs.org/detect-libc/-/detect-libc-1.0.3.tgz",
@@ -3009,6 +3059,11 @@
       "integrity": "sha512-O18pf7nyvHTckunPWCV1XUNXU1piu01y2b7ATJ0ppkUkk8ocqVWBrYjJBCwHDjD/ZWcfyrA0P4gKhzWGi5EINQ==",
       "dev": true
     },
+    "load-script": {
+      "version": "1.0.0",
+      "resolved": "https://registry.npmjs.org/load-script/-/load-script-1.0.0.tgz",
+      "integrity": "sha512-kPEjMFtZvwL9TaZo0uZ2ml+Ye9HUMmPwbYRJ324qF9tqMejwykJ5ggTyvzmrbBeapCAbk98BSbTeovHEEP1uCA=="
+    },
     "lodash.memoize": {
       "version": "4.1.2",
       "resolved": "https://registry.npmjs.org/lodash.memoize/-/lodash.memoize-4.1.2.tgz",
@@ -3079,6 +3134,11 @@
         "es6-promise": "^4.2.5",
         "webworkify-webpack": "^2.1.5"
       }
+    },
+    "ms": {
+      "version": "2.1.2",
+      "resolved": "https://registry.npmjs.org/ms/-/ms-2.1.2.tgz",
+      "integrity": "sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w=="
     },
     "nanoid": {
       "version": "3.3.7",
@@ -3492,6 +3552,11 @@
       "integrity": "sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==",
       "dev": true
     },
+    "sister": {
+      "version": "3.0.2",
+      "resolved": "https://registry.npmjs.org/sister/-/sister-3.0.2.tgz",
+      "integrity": "sha512-p19rtTs+NksBRKW9qn0UhZ8/TUI9BPw9lmtHny+Y3TinWlOa9jWh9xB0AtPSdmOy49NJJJSSe0Ey4C7h0TrcYA=="
+    },
     "source-map-js": {
       "version": "1.2.0",
       "resolved": "https://registry.npmjs.org/source-map-js/-/source-map-js-1.2.0.tgz",
@@ -3728,6 +3793,16 @@
             "ansi-regex": "^5.0.1"
           }
         }
+      }
+    },
+    "youtube-player": {
+      "version": "5.6.0",
+      "resolved": "https://registry.npmjs.org/youtube-player/-/youtube-player-5.6.0.tgz",
+      "integrity": "sha512-x95fBbxV7eZ1ZsFtMLMcSGX0Jb/GPPj69RsooyEDVa9bzvvNZ4d5VjnBVBYoY85008VefkLvtaV+b+l38R/LMQ==",
+      "requires": {
+        "debug": "^4.3.4",
+        "load-script": "^1.0.0",
+        "sister": "^3.0.0"
       }
     }
   }

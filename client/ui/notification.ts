@@ -68,3 +68,61 @@ export class OverlayNotification extends View<null> {
 		}
 	}
 }
+
+export class NewOverlayNotification extends View<null> {
+	constructor(header: string | null, subheader: string, text: string, type: string, onClose?: () => void) {
+		super({
+			el: util.importTemplate("notification").firstChild as HTMLElement,
+		});
+
+		const closeHandler = onClose ? () => {
+			onClose();
+			this.remove();
+		} : () => this.remove();
+
+		this.on("click", closeHandler);
+		this.el.classList.add(`notification-${type}`);
+
+		const textElement = this.el.querySelector("b");
+		textElement.innerHTML = text;
+
+		if (header) {
+			const headerElement = document.createElement("div");
+			headerElement.classList.add("notification-header");
+			headerElement.textContent = header;
+			textElement.parentElement.prepend(headerElement);
+		}
+
+		const modalOverlay = document.getElementById("modal-overlay");
+		let lastNotification: HTMLElement | undefined;
+
+		for (let i = modalOverlay.children.length - 1; i >= 0; i--) {
+			const child = modalOverlay.children[i];
+			if (child.classList.contains("notification")) {
+				lastNotification = child as HTMLElement;
+				break;
+			}
+		}
+
+		if (lastNotification) {
+			lastNotification.after(this.el);
+		} else {
+			modalOverlay.prepend(this.el);
+		}
+	}
+}
+
+export function notify(header: string | null, text: string, type: string, onClose?: () => void) {
+	new NewOverlayNotification(header, "", text, type, onClose);
+}
+
+export function notifySubheader(header: string | null, subheader: string, text: string, type: string, onClose?: () => void) {
+	new NewOverlayNotification(header, subheader, text, type, onClose);
+}
+
+export function tempNotify(header: string | null, text: string, type: string, duration: number, onClose?: () => void) {
+	const notification = new NewOverlayNotification(header, "", text, type, onClose);
+	setTimeout(() => {
+		notification.remove();
+	}, 1000 * duration);
+}
