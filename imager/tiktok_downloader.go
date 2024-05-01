@@ -17,6 +17,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode"
 )
 
 type TWMTikTokData struct {
@@ -115,31 +116,43 @@ func downloadToTemp(url string, file string) (fileSize int64, status int, err er
 	return
 }
 
-func getFilename(id string, desc string) string {
-	if len(desc) == 0 {
-		return id
+func getFilename(videoID string, caption string) string {
+	if len(caption) == 0 {
+		return videoID
 	}
-	prepend := id + " "
-	remainingLen := 200 - len(prepend)
-	normalize := norm.NFC.String(desc)
-	if len(normalize) <= remainingLen {
-		return prepend + normalize
+
+	idPrefix := videoID + " "
+	maxFilenameLength := 200
+	remainingLength := maxFilenameLength - len(idPrefix)
+
+	normalizedCaption := strings.Map(func(r rune) rune {
+		if unicode.IsSpace(r) {
+			return ' '
+		}
+		return r
+	}, norm.NFC.String(caption))
+	if len(normalizedCaption) <= remainingLength {
+		return idPrefix + normalizedCaption
 	}
-	suffix := "… "
-	remainingLen -= len(suffix)
-	descBytes := []byte(normalize)
-	pos := 0
+
+	truncationSuffix := "… "
+	remainingLength -= len(truncationSuffix)
+
+	captionBytes := []byte(normalizedCaption)
+	truncationPosition := 0
 	for {
-		nextPos := norm.NFC.NextBoundary(descBytes[pos:], false)
-		if nextPos == -1 {
+		nextBoundaryPosition := norm.NFC.NextBoundary(captionBytes[truncationPosition:], false)
+		if nextBoundaryPosition == -1 {
 			break
 		}
-		if nextPos > remainingLen {
+		if nextBoundaryPosition+truncationPosition > remainingLength {
 			break
 		}
-		pos += nextPos
+		truncationPosition += nextBoundaryPosition
 	}
-	return prepend + string(descBytes[:pos]) + suffix
+
+	truncatedCaption := string(captionBytes[:truncationPosition])
+	return idPrefix + strings.TrimSpace(truncatedCaption) + truncationSuffix
 }
 
 func DownloadTikTok(input *common.PostCommand) (token string, filename string, err error) {
