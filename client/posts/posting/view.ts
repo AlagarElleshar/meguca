@@ -244,6 +244,10 @@ export default class FormView extends PostView {
         if (oldBody) {
             this.model.body = oldBody
         }
+        let attachForm = this.el.querySelector(".attach-tiktok-form")
+        if (attachForm) {
+            attachForm.remove()
+        }
     }
 
     // Clean up on form removal
