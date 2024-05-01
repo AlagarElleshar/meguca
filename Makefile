@@ -22,7 +22,7 @@ endif
 all: client server
 
 client: client_deps
-	node esbuild.config.js
+	node esbuild.config.js --css --js
 
 client_deps:
 	npm install --include=dev --progress false --depth 0
