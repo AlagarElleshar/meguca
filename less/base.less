@@ -447,6 +447,10 @@ iframe[src^="https://www.youtube"] {
 		font-size: 120%;
 	}
 }
+#banner-icons {
+	display: inline-flex;
+	gap: 2px
+}
 
 .sourcelink {
 	font-family: Symbols;
@@ -519,7 +523,7 @@ iframe[src^="https://www.youtube"] {
 
 @font-face {
 	font-family: "Symbols";
-	src: url("/assets/css/TCSymbols.ttf") format("truetype");
+	src: url("/assets/css/symbols.woff2") format("woff2");
 }
 
 
@@ -582,8 +586,8 @@ iframe[src^="https://www.youtube"] {
 #watch-panel {
 	margin-left: auto;
 	padding: .2em;
-	background-color: var(--watch-bg);
-	border: .5px solid var(--watch-border);
+	background-color: #202225;
+	border: .5px solid #21242c;
 	border-bottom-width: 0!important;
 	padding-bottom: 0;
 	z-index: 2147483646
