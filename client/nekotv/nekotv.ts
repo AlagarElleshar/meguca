@@ -87,6 +87,7 @@ export function showWatchPanel() {
 
 export function hideWatchPanel() {
     watchDiv.classList.add('hide-watch-panel');
+    watchDiv.style.display = 'hidden';
 }
 export function showPlaylist() {
     playlistDiv.style.display = 'block';
@@ -309,8 +310,7 @@ function padWithZero(value: number): string {
 }
 export function updatePlaylist() {
     if (player.isListEmpty()) {
-        hideWatchPanel()
-        player.stopVideo()
+        removePlayer()
         return;
     }
 
@@ -372,7 +372,7 @@ export function subscribeToWatchFeed() {
 
 export function removePlayer() {
     if (player) {
-        player.stopVideo();
+        player.player.player.stopVideo()
     }
     hideWatchPanel();
     // stopPlayerTimeInterval();

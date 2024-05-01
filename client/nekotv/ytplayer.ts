@@ -1,13 +1,14 @@
 import {VideoItem} from "../typings/messages";
 import {tempNotify} from "../ui/notification";
 import {isNekoTVOpen, watchDiv} from "./nekotv";
+import options from "../options";
 
 const youTubeScript = document.createElement("script");
 youTubeScript.src = "https://www.youtube.com/iframe_api";
 
 export class Youtube {
     private readonly playerEl: HTMLElement = document.getElementById('#ytapiplayer');
-    private player: YT.Player;
+    public player: YT.Player;
     private isLoaded = false;
     private isYouTubeScriptLoaded: boolean;
 
@@ -67,6 +68,7 @@ export class Youtube {
             events: {
                 onReady: () => {
                     this.isLoaded = true;
+                    this.setPlayerVolume()
                     this.player.playVideo();
                     console.log("player state", this.player.getPlayerState())
                     setTimeout(() => {
@@ -130,5 +132,15 @@ export class Youtube {
 
     public setPlaybackRate(rate: number): void {
         this.player.setPlaybackRate(rate);
+    }
+
+    public setPlayerVolume() {
+        if (this.player && this.player.setVolume) {
+            this.player.setVolume(options.watchVolume);
+        }
+    }
+
+    getVideo() {
+
     }
 }

@@ -44,18 +44,18 @@ func (f *NekoTVFeed) start(thread uint64) (err error) {
 				f.sendConnectedMessage(c)
 				log.Info("Client added")
 			case c := <-f.remove:
-				f.removeClient(c)
+				delete(f.clients, c)
 			}
 		}
 	}()
 	go func() {
 		for {
-			f.mu.Lock()
+
 			log.Info("Loop")
 			log.Info(f.videoTimer.GetTime())
 			item, err := f.videoList.CurrentItem()
 			if err != nil {
-				f.mu.Unlock()
+
 				time.Sleep(1000 * time.Millisecond)
 				continue
 			}
@@ -74,10 +74,10 @@ func (f *NekoTVFeed) start(thread uint64) (err error) {
 					}
 					f.SkipVideo()
 				})
-				f.mu.Unlock()
+
 				continue
 			}
-			f.mu.Unlock()
+
 			f.SendTimeSyncMessage()
 			time.Sleep(1000 * time.Millisecond)
 		}
@@ -116,8 +116,7 @@ func (f *NekoTVFeed) sendConnectedMessage(c common.Client) {
 }
 
 func (f *NekoTVFeed) AddVideo(v *pb.VideoItem, atEnd bool) {
-	f.mu.Lock()
-	defer f.mu.Unlock()
+
 	if f.videoList.Exists(func(item *pb.VideoItem) bool {
 		return item.Url == v.Url
 	}) {
@@ -138,8 +137,6 @@ func (f *NekoTVFeed) AddVideo(v *pb.VideoItem, atEnd bool) {
 
 // RemoveVideo removes a video from the playlist
 func (f *NekoTVFeed) RemoveVideo(url string) {
-	f.mu.Lock()
-	defer f.mu.Unlock()
 
 	index := f.videoList.FindIndex(func(item *pb.VideoItem) bool {
 		return item.Url == url
@@ -159,8 +156,6 @@ func (f *NekoTVFeed) RemoveVideo(url string) {
 
 // SkipVideo skips to the next video in the playlist
 func (f *NekoTVFeed) SkipVideo() {
-	f.mu.Lock()
-	defer f.mu.Unlock()
 
 	if f.videoList.Length() == 0 {
 		return
@@ -183,8 +178,6 @@ func (f *NekoTVFeed) SkipVideo() {
 
 // Pause pauses the current video
 func (f *NekoTVFeed) Pause() {
-	f.mu.Lock()
-	defer f.mu.Unlock()
 
 	if f.videoList.Length() == 0 {
 		return
@@ -201,8 +194,6 @@ func (f *NekoTVFeed) Pause() {
 
 // Play plays the current video or resumes if paused
 func (f *NekoTVFeed) Play() {
-	f.mu.Lock()
-	defer f.mu.Unlock()
 
 	if f.videoList.Length() == 0 {
 		return
@@ -220,8 +211,6 @@ func (f *NekoTVFeed) Play() {
 
 // SetTime sets the current playback time
 func (f *NekoTVFeed) SetTime(time float32) {
-	f.mu.Lock()
-	defer f.mu.Unlock()
 
 	if f.videoList.Length() == 0 {
 		return
@@ -250,8 +239,7 @@ func (f *NekoTVFeed) UpdatePlaylist() {
 
 // ClearPlaylist clears the playlist
 func (f *NekoTVFeed) ClearPlaylist() {
-	f.mu.Lock()
-	defer f.mu.Unlock()
+
 	f.videoList.Clear()
 	f.videoTimer.Stop()
 	msg := pb.WebSocketMessage{MessageType: &pb.WebSocketMessage_ClearPlaylistEvent{ClearPlaylistEvent: &pb.ClearPlaylistEvent{}}}

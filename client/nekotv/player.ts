@@ -212,7 +212,4 @@ export class Player {
         this.skipSetRate = isLocal;
         this.player.setPlaybackRate(rate);
     }
-
-    public stopVideo() {
-    }
 }
