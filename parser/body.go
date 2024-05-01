@@ -132,19 +132,19 @@ func ParseBody(body []byte, board string, thread uint64, id uint64, ip string, i
 			cmdStr = string(m[3])
 		}
 		switch cmdStr {
-		case "addvideo":
+		case "play":
 			mediaCommand.Type = common.AddVideo
-		case "removevideo":
+		case "remove":
 			mediaCommand.Type = common.RemoveVideo
-		case "skipvideo":
+		case "skip":
 			mediaCommand.Type = common.SkipVideo
 		case "pause":
 			mediaCommand.Type = common.Pause
-		case "play":
+		case "unpause":
 			mediaCommand.Type = common.Play
-		case "settime":
+		case "seek":
 			mediaCommand.Type = common.SetTime
-		case "clearplaylist":
+		case "clear":
 			mediaCommand.Type = common.ClearPlaylist
 		default:
 			mediaCommand.Type = common.NoMediaCommand

@@ -96,7 +96,7 @@ var (
 	)
 	DiceRegexp     = regexp.MustCompile(`(\d*)d(\d+)`)
 	ClaudeRegexp   = regexp.MustCompile(`(?m)^#claude (\S.*?)$`)
-	MediaComRegexp = regexp.MustCompile(`(?m)^\.(?:(addvideo|removevideo|settime)\s+(\S+)|(skipvideo|pause|play|clearplaylist))$`)
+	MediaComRegexp = regexp.MustCompile(`(?m)^\.(?:(play|remove|seek)\s+(\S+)|(seek|pause|unpause|clear))$`)
 	MainJS         string
 	StaticJS       string
 )
