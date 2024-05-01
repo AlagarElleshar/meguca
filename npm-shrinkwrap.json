@@ -9,6 +9,7 @@
       "version": "1.1.8",
       "license": "AGPL-3.0",
       "dependencies": {
+        "@types/youtube-player": "^5.5.11",
         "mpegts.js": "^1.7.3",
         "ts-proto": "^1.172.0",
         "youtube-player": "^5.6.0"
@@ -499,6 +500,11 @@
       "resolved": "https://registry.npmjs.org/@types/youtube/-/youtube-0.0.50.tgz",
       "integrity": "sha512-d4GpH4uPYp9W07kc487tiq6V/EUHl18vZWFMbQoe4Sk9LXEWzFi/BMf9x7TI4m7/j7gU3KeX8H6M8aPBgykeLw==",
       "dev": true
+    },
+    "node_modules/@types/youtube-player": {
+      "version": "5.5.11",
+      "resolved": "https://registry.npmjs.org/@types/youtube-player/-/youtube-player-5.5.11.tgz",
+      "integrity": "sha512-pM41CDBqJqBmTeJWnF7NOGz82IQoYOhqzMYXv5vKCXBqGiYSLldxMtpCk6KAEtADTy49S45AriYaCaZyeUX38Q=="
     },
     "node_modules/ansi-regex": {
       "version": "6.0.1",
@@ -2565,6 +2571,11 @@
       "resolved": "https://registry.npmjs.org/@types/youtube/-/youtube-0.0.50.tgz",
       "integrity": "sha512-d4GpH4uPYp9W07kc487tiq6V/EUHl18vZWFMbQoe4Sk9LXEWzFi/BMf9x7TI4m7/j7gU3KeX8H6M8aPBgykeLw==",
       "dev": true
+    },
+    "@types/youtube-player": {
+      "version": "5.5.11",
+      "resolved": "https://registry.npmjs.org/@types/youtube-player/-/youtube-player-5.5.11.tgz",
+      "integrity": "sha512-pM41CDBqJqBmTeJWnF7NOGz82IQoYOhqzMYXv5vKCXBqGiYSLldxMtpCk6KAEtADTy49S45AriYaCaZyeUX38Q=="
     },
     "ansi-regex": {
       "version": "6.0.1",

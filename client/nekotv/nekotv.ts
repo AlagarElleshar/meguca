@@ -1,25 +1,25 @@
-import { message, sendBinary } from "../connection";
-import { escape } from "../util"
+import {connEvent, connSM, connState, message, sendBinary} from "../connection";
+import {escape} from "../util"
 import {
-    ConnectedEvent,
-    WebSocketMessage,
     AddVideoEvent,
-    RemoveVideoEvent,
-    SkipVideoEvent,
+    ClearPlaylistEvent,
+    ConnectedEvent,
+    DumpEvent,
+    GetTimeEvent,
     PauseEvent,
     PlayEvent,
-    GetTimeEvent,
-    SetTimeEvent,
-    SetRateEvent,
-    RewindEvent,
     PlayItemEvent,
+    RemoveVideoEvent,
+    RewindEvent,
     SetNextItemEvent,
-    UpdatePlaylistEvent,
+    SetRateEvent,
+    SetTimeEvent,
+    SkipVideoEvent,
     TogglePlaylistLockEvent,
-    DumpEvent,
-    ClearPlaylistEvent,
+    UpdatePlaylistEvent,
+    WebSocketMessage,
 } from "../typings/messages";
-import { Player } from "./player";
+import {Player} from "./player";
 
 let player: Player;
 
@@ -34,6 +34,8 @@ export let watchDiv: HTMLElement;
 let nekoTV = document.getElementById("banner-nekotv");
 let isOpen : boolean;
 let isPlaylistVisible = false;
+let subscribeMessage = new Uint8Array([1,message.nekoTV]).buffer
+let unsubMessage = new Uint8Array([0,message.nekoTV]).buffer
 
 export function initNekoTV() {
     if (!nekoTV) {
@@ -50,84 +52,25 @@ export function initNekoTV() {
     if (lastVal) {
         isOpen = lastVal === 't';
     } else {
-        isOpen = false;
+        isOpen = true;
     }
     updateNekoTVIcon()
+    if (isOpen){
+        connSM.once(connState.synced,subscribeToWatchFeed)
+    }
     nekoTV.addEventListener("click", () => {
         isOpen = !isOpen;
         localStorage.setItem('neko-tv', isOpen ? 't' : 'f');
         updateNekoTVIcon()
-        if (isOpen) {
-            sendBinary(new Uint8Array([message.nekoTV]));
-            showWatchPanel();
-            showPlaylist()
-        } else {
-            hideWatchPanel();
-        }
+        togglePlayer()
     });
     player = new Player()
 
 }
-// export function initWatch() {
-//     if (watchEnabled()) {
-//         playlistDiv = document.getElementById('watch-playlist') as HTMLDivElement;
-//         playlistOl = document.getElementById('watch-playlist-entries') as HTMLOListElement;
-//         playerDiv = document.getElementById('watch-player') as HTMLDivElement;
-//         playlistStatus = document.getElementById('watch-playlist-status')!;
-//         vidEl = document.getElementById('watch-video') as HTMLVideoElement;
-//         watchStatus = document.getElementById('status-watch')!;
-//
-//         embedFunctions = {
-//             [mediaSource.YouTube]: embedYouTube,
-//         };
-//
-//         handlers[message.watchData] = watchMessageHandler;
-//
-//         watchStatus.addEventListener('mouseover', () => {
-//             if (fullTitle) {
-//                 watchStatus.textContent = fullTitle;
-//                 showPlaylist();
-//             }
-//         }, {passive: true});
-//
-//         watchStatus.addEventListener('mouseout', () => {
-//             if (!isPlaylistVisible) {
-//                 watchStatus.textContent = truncatedTitle;
-//                 hidePlaylist();
-//             }
-//         }, {passive: true});
-//
-//         watchStatus.addEventListener('click', (e) => {
-//             isPlaylistVisible = !isPlaylistVisible;
-//             if (isPlaylistVisible) {
-//                 showPlaylist();
-//             } else {
-//                 hidePlaylist();
-//             }
-//             e.preventDefault();
-//         });
-//
-//         watchDiv.addEventListener('mouseover', () => {
-//             bodyClassList.add('player-hovered');
-//             if (!localStorage.watchTipShown) {
-//                 tempNotify(
-//                     'Live-Synced Video Player Tips',
-//                     'Press &quot;<code class="tip-highlight">Alt+W</code>&quot; (<code class="tip-highlight">W</code> = &quot;watch&quot;) to hide/show the video player.<br><br>Press &quot;<code class="tip-highlight">Alt+M</code>&quot; (<code class="tip-highlight">M</code> = &quot;mute&quot;) to mute/unmute audio for the video player (and any other audio on the site). Click the &quot;Settings&quot; gear icon in the top-right to adjust the volume.<br><br>Hover over the video title in the top-right to show the current playlist. Click the video title to toggle persistent display of the playlist, or press &quot;<code class="tip-highlight">Alt+L</code>&quot; (<code class="tip-highlight">L</code> = play&quot;list&quot;).',
-//                     'watch-tips',
-//                     90
-//                 );
-//                 localStorage.watchTipShown = '1';
-//             }
-//         }, {passive: true});
-//
-//         watchDiv.addEventListener('mouseout', () => {
-//             bodyClassList.remove('player-hovered');
-//         }, {passive: true});
-//
-//         // @ts-ignore
-//         socket.connSM.on(3, subscribeToWatchFeed);
-//     }
-// }
+
+export function isNekoTVOpen() {
+    return isOpen;
+}
 
 function updateNekoTVIcon(){
     if (isOpen) {
@@ -138,7 +81,6 @@ function updateNekoTVIcon(){
 
 }
 export function showWatchPanel() {
-
     watchDiv.style.display = 'block';
     watchDiv.classList.remove('hide-watch-panel');
 }
@@ -172,7 +114,7 @@ function handleConnectedEvent(connectedEvent: ConnectedEvent) {
 
 function handleAddVideoEvent(addVideoEvent: AddVideoEvent) {
     player.videoList.addItem(addVideoEvent.item, addVideoEvent.atEnd);
-    if (player.itemsLength() === 1) {
+    if (player.videoList.length == 1) {
         player.setVideo(0);
     }
     updatePlaylist()
@@ -182,6 +124,7 @@ function handleRemoveVideoEvent(removeVideoEvent: RemoveVideoEvent) {
     player.removeItem(removeVideoEvent.url);
     if (player.isListEmpty()) {
         player.pause();
+        hideWatchPanel();
     }
     updatePlaylist()
 }
@@ -366,10 +309,13 @@ function padWithZero(value: number): string {
 }
 export function updatePlaylist() {
     if (player.isListEmpty()) {
+        hideWatchPanel()
+        player.stopVideo()
         return;
     }
 
     // updatePlaylistStatus();
+    showWatchPanel()
 
     const playlistItems: HTMLLIElement[] = [];
 
@@ -402,7 +348,32 @@ export function updatePlaylist() {
     playlistOl.replaceChildren(...playlistItems);
 
     if (!isOpen) {
-        document.body.classList.add('watch');
         isOpen = true;
     }
+}
+
+export function togglePlayer() {
+    if (isOpen) {
+        subscribeToWatchFeed();
+    }
+    else {
+        unsubscribeFromWatchFeed();
+    }
+}
+
+export function unsubscribeFromWatchFeed() {
+    removePlayer();
+    sendBinary(unsubMessage)
+}
+
+export function subscribeToWatchFeed() {
+    sendBinary(subscribeMessage)
+}
+
+export function removePlayer() {
+    if (player) {
+        player.stopVideo();
+    }
+    hideWatchPanel();
+    // stopPlayerTimeInterval();
 }

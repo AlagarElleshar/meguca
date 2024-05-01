@@ -3,7 +3,7 @@ import {VideoList} from "./videolist";
 import {VideoItem} from "../typings/messages";
 
 export class Player {
-    private player: Youtube = new Youtube();
+    public player: Youtube = new Youtube();
     private isLoaded = false;
     private skipSetTime = false;
     private skipSetRate = false;
@@ -211,5 +211,8 @@ export class Player {
         if (!this.player.isVideoLoaded()) return;
         this.skipSetRate = isLocal;
         this.player.setPlaybackRate(rate);
+    }
+
+    public stopVideo() {
     }
 }

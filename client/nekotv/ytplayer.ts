@@ -1,10 +1,15 @@
 import {VideoItem} from "../typings/messages";
 import {tempNotify} from "../ui/notification";
+import {isNekoTVOpen, watchDiv} from "./nekotv";
+
+const youTubeScript = document.createElement("script");
+youTubeScript.src = "https://www.youtube.com/iframe_api";
 
 export class Youtube {
     private readonly playerEl: HTMLElement = document.getElementById('#ytapiplayer');
     private player: YT.Player;
     private isLoaded = false;
+    private isYouTubeScriptLoaded: boolean;
 
     public isSupportedLink(url: string): boolean {
         return this.extractVideoId(url) !== '';
@@ -31,11 +36,11 @@ export class Youtube {
         return '';
     }
     public initMediaPlayer() {
-        if (!isYouTubeScriptLoaded && watchEnabled()) {
+        if (!this.isYouTubeScriptLoaded && isNekoTVOpen()) {
             watchDiv.classList.remove("hidden");
-            head.appendChild(youTubeScript);
+            document.head.appendChild(youTubeScript);
             console.log("Load YouTube player script");
-            isYouTubeScriptLoaded = true;
+            this.isYouTubeScriptLoaded = true;
         }
     }
 
@@ -43,6 +48,9 @@ export class Youtube {
         if (this.player) {
             this.player.loadVideoById(this.extractVideoId(item.url));
             return;
+        }
+        if (!this.isYouTubeScriptLoaded){
+            this.initMediaPlayer();
         }
 
         this.isLoaded = false;

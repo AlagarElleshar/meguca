@@ -98,12 +98,17 @@ func SubscribeToMeguTV(c common.Client) (err error) {
 	return
 }
 
-func HandleNekoTV(c common.Client) (err error) {
+func HandleNekoTV(c common.Client, data []byte) (err error) {
 	feeds.mu.Lock()
 	_, thread, _ := GetSync(c)
 	feeds.mu.Unlock()
 	ntv := GetNekoTVFeed(thread)
-	ntv.add <- c
+	if data[0] == 0 {
+		ntv.remove <- c
+		return
+	} else if data[0] == 1 {
+		ntv.add <- c
+	}
 	return
 }
 
