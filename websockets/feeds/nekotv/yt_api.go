@@ -2,6 +2,7 @@ package nekotv
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/bakape/meguca/config"
 	"github.com/bakape/meguca/pb"
@@ -10,7 +11,6 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
-	"time"
 )
 
 var (
@@ -115,12 +115,13 @@ func GetVideoData(url string) (videoItem pb.VideoItem, err error) {
 		title := item.Snippet.Title
 		duration := convertTime(item.ContentDetails.Duration)
 		if duration == 0 {
-			videoItem = pb.VideoItem{
-				Duration: float32((99 * time.Hour) / time.Second),
-				Title:    title,
-				Url:      fmt.Sprintf(`<iframe src="https://www.youtube.com/embed/%s" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`, id),
-				IsIframe: true,
-			}
+			//videoItem = pb.VideoItem{
+			//	Duration: float32((99 * time.Hour) / time.Second),
+			//	Title:    title,
+			//	Url:      fmt.Sprintf(`<iframe src="https://www.youtube.com/embed/%s" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`, id),
+			//	IsIframe: true,
+			//}
+			err = errors.New("Livestreams not supported yet")
 			return
 		}
 		videoItem = pb.VideoItem{
@@ -131,4 +132,35 @@ func GetVideoData(url string) (videoItem pb.VideoItem, err error) {
 		return
 	}
 	return
+}
+
+type SponsorBlock []struct {
+	Segment []float32 `json:"segment"`
+}
+
+func GetSponsorBlock(videoID string) ([]SponsorBlock, error) {
+	url := fmt.Sprintf("https://sponsor.ajay.app/api/skipSegments?videoID=%s", videoID)
+
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("API request failed with status code: %d", resp.StatusCode)
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var sponsorBlock []SponsorBlock
+	err = json.Unmarshal(body, &sponsorBlock)
+	if err != nil {
+		return nil, err
+	}
+
+	return sponsorBlock, nil
 }

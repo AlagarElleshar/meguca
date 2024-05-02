@@ -24,7 +24,6 @@ message Timer {
 
 message ServerState {
   repeated VideoItem video_list = 1;
-  bool is_playlist_open = 2;
   int32 item_pos = 3;
   Timer timer = 5;
 }

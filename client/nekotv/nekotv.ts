@@ -20,6 +20,7 @@ import {
     WebSocketMessage,
 } from "../typings/messages";
 import {Player} from "./player";
+import {ytPlayer} from "./ytplayer";
 
 let player: Player;
 
@@ -87,7 +88,7 @@ export function showWatchPanel() {
 
 export function hideWatchPanel() {
     watchDiv.classList.add('hide-watch-panel');
-    watchDiv.style.display = 'hidden';
+    watchDiv.style.display = 'none';
 }
 export function showPlaylist() {
     playlistDiv.style.display = 'block';
@@ -371,8 +372,8 @@ export function subscribeToWatchFeed() {
 }
 
 export function removePlayer() {
-    if (player) {
-        player.player.player.stopVideo()
+    if (ytPlayer) {
+        ytPlayer.stopVideo()
     }
     hideWatchPanel();
     // stopPlayerTimeInterval();

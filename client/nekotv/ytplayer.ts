@@ -5,10 +5,10 @@ import options from "../options";
 
 const youTubeScript = document.createElement("script");
 youTubeScript.src = "https://www.youtube.com/iframe_api";
+export let ytPlayer: YT.Player;
 
 export class Youtube {
     private readonly playerEl: HTMLElement = document.getElementById('#ytapiplayer');
-    public player: YT.Player;
     private isLoaded = false;
     private isYouTubeScriptLoaded: boolean;
 
@@ -42,12 +42,15 @@ export class Youtube {
             document.head.appendChild(youTubeScript);
             console.log("Load YouTube player script");
             this.isYouTubeScriptLoaded = true;
+            options.onChange("audioVolume", (vol) => {
+                this.setPlayerVolume();
+            });
         }
     }
 
     public loadVideo(item: VideoItem): void {
-        if (this.player) {
-            this.player.loadVideoById(this.extractVideoId(item.url));
+        if (ytPlayer) {
+            ytPlayer.loadVideoById(this.extractVideoId(item.url));
             return;
         }
         if (!this.isYouTubeScriptLoaded){
@@ -56,7 +59,7 @@ export class Youtube {
 
         this.isLoaded = false;
 
-        this.player = new YT.Player('watch-video', {
+        ytPlayer = new YT.Player('watch-video', {
             videoId: this.extractVideoId(item.url),
             playerVars: {
                 autoplay: 1,
@@ -69,23 +72,23 @@ export class Youtube {
                 onReady: () => {
                     this.isLoaded = true;
                     this.setPlayerVolume()
-                    this.player.playVideo();
-                    console.log("player state", this.player.getPlayerState())
+                    ytPlayer.playVideo();
+                    console.log("player state", ytPlayer.getPlayerState())
                     setTimeout(() => {
-                        console.log("player state", this.player.getPlayerState())
-                        if (this.player.getPlayerState() === -1) {
-                            this.player.playVideo();
+                        console.log("player state", ytPlayer.getPlayerState())
+                        if (ytPlayer.getPlayerState() === -1) {
+                            ytPlayer.playVideo();
                             setTimeout(() => {
-                                console.log("player state", this.player.getPlayerState())
-                                if (this.player.getPlayerState() === -1) {
+                                console.log("player state", ytPlayer.getPlayerState())
+                                if (ytPlayer.getPlayerState() === -1) {
                                     tempNotify(
                                         "Click here to play this thread's live-synced video (your browser requires a click before videos can play)",
                                         "",
                                         "click-to-play",
                                         60,
                                         () => {
-                                            if (this.player && this.player.playVideo) {
-                                                this.player.playVideo();
+                                            if (ytPlayer && ytPlayer.playVideo) {
+                                                ytPlayer.playVideo();
                                             }
                                         }
                                     );
@@ -99,11 +102,11 @@ export class Youtube {
     }
 
     public removeVideo(): void {
-        if (!this.player) return;
+        if (!ytPlayer) return;
 
         this.isLoaded = false;
-        this.player.destroy();
-        this.player = null;
+        ytPlayer.destroy();
+        ytPlayer = null;
     }
 
     public isVideoLoaded(): boolean {
@@ -111,32 +114,35 @@ export class Youtube {
     }
 
     public play(): void {
-        this.player.playVideo();
+        ytPlayer.playVideo();
     }
 
     public pause(): void {
-        this.player.pauseVideo();
+        ytPlayer.pauseVideo();
     }
 
     public getTime(): number {
-        return this.player.getCurrentTime();
+        return ytPlayer.getCurrentTime();
     }
 
     public setTime(time: number): void {
-        this.player.seekTo(time, true);
+        ytPlayer.seekTo(time, true);
     }
 
     public getPlaybackRate(): number {
-        return this.player.getPlaybackRate();
+        return ytPlayer.getPlaybackRate();
     }
 
     public setPlaybackRate(rate: number): void {
-        this.player.setPlaybackRate(rate);
+        ytPlayer.setPlaybackRate(rate);
     }
 
-    public setPlayerVolume() {
-        if (this.player && this.player.setVolume) {
-            this.player.setVolume(options.watchVolume);
+    public setPlayerVolume(volume:number=null) {
+        if (ytPlayer && ytPlayer.setVolume) {
+            if(!volume){
+                volume = options.audioVolume;
+            }
+            ytPlayer.setVolume(volume);
         }
     }
 

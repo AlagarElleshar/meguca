@@ -32,7 +32,7 @@ func NewNekoTVFeed() *NekoTVFeed {
 }
 
 func (f *NekoTVFeed) start(thread uint64) (err error) {
-	log.Info("Starting NekoTV feed")
+	log.Info("Starting NekoTV feed for thread ", thread)
 	f.thread = thread
 	f.isRunning = true
 
@@ -44,22 +44,26 @@ func (f *NekoTVFeed) start(thread uint64) (err error) {
 				f.sendConnectedMessage(c)
 				log.Info("Client added")
 			case c := <-f.remove:
-				delete(f.clients, c)
+				if f.removeClient(c) {
+					f.isRunning = false
+					log.Info("shutting down feed for thread ", thread)
+					return
+				}
 			}
 		}
 	}()
 	go func() {
 		for {
-
-			log.Info("Loop")
-			log.Info(f.videoTimer.GetTime())
+			if !f.isRunning {
+				return
+			}
 			item, err := f.videoList.CurrentItem()
 			if err != nil {
 
 				time.Sleep(1000 * time.Millisecond)
 				continue
 			}
-			maxTime := item.Duration
+			maxTime := item.Duration - 0.01
 			if f.videoTimer.GetTime() > maxTime {
 				f.videoTimer.Pause()
 				f.videoTimer.SetTime(maxTime)
@@ -166,8 +170,13 @@ func (f *NekoTVFeed) SkipVideo() {
 		return
 	}
 
-	f.videoList.SkipItem()
+	finished := f.videoList.SkipItem()
 	f.videoTimer.SetTime(0)
+	if !finished {
+		f.Play()
+	} else {
+		f.ClearPlaylist()
+	}
 	msg := pb.WebSocketMessage{MessageType: &pb.WebSocketMessage_SkipVideoEvent{SkipVideoEvent: &pb.SkipVideoEvent{
 		Url: currentItem.Url,
 	}}}
@@ -296,35 +305,13 @@ func parseTimestamp(timestamp string) (time float32, err error) {
 	return
 }
 
-//func HandleMediaCommand(thread uint64, c *common.MediaCommand) {
-//	ntv := GetNekoTVFeed(thread)
-//	switch c.Type {
-//	case common.AddVideo:
-//		videoData, err := nekotv.GetVideoData(c.Args)
-//		if err != nil {
-//			ntv.AddVideo(&videoData, false)
-//		}
-//		break
-//	case common.RemoveVideo:
-//		ntv.RemoveVideo(c.Args)
-//	case common.SkipVideo:
-//		ntv.SkipVideo()
-//	case common.Pause:
-//		ntv.Pause()
-//	case common.Play:
-//		ntv.Play()
-//	case common.SetTime:
-//		time, err := parseTimestamp(c.Args)
-//		if err != nil {
-//			ntv.SetTime(time)
-//		}
-//	case common.ClearPlaylist:
-//		ntv.ClearPlaylist()
-//	}
-//}
-
 func HandleMediaCommand(thread uint64, c *common.MediaCommand) {
-	ntv := GetNekoTVFeed(thread)
+	feeds.mu.RLock()
+	ntv, ok := feeds.nekotvFeeds[thread]
+	feeds.mu.RUnlock()
+	if !ok {
+		return
+	}
 	switch c.Type {
 	case common.AddVideo:
 		log.Info("Adding video to the playlist")

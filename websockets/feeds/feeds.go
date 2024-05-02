@@ -99,15 +99,38 @@ func SubscribeToMeguTV(c common.Client) (err error) {
 }
 
 func HandleNekoTV(c common.Client, data []byte) (err error) {
+	//Add user to nekotv
 	feeds.mu.Lock()
-	_, thread, _ := GetSync(c)
-	feeds.mu.Unlock()
-	ntv := GetNekoTVFeed(thread)
-	if data[0] == 0 {
-		ntv.remove <- c
+	defer feeds.mu.Unlock()
+	synced, thread, _ := GetSync(c)
+	if !synced {
 		return
-	} else if data[0] == 1 {
-		ntv.add <- c
+	}
+	nekoTVFeed, ok := feeds.nekotvFeeds[thread]
+	if data[0] == 1 {
+		if ok {
+			nekoTVFeed.add <- c
+		} else {
+			var locked bool
+			locked, err = db.CheckThreadLocked(thread)
+			if err != nil {
+				return
+			}
+			if !locked {
+				newFeed := NewNekoTVFeed()
+				feeds.nekotvFeeds[thread] = newFeed
+				newFeed.start(thread)
+				newFeed.add <- c
+			}
+		}
+	} else if data[0] == 0 {
+		if ok {
+			nekoTVFeed.remove <- c
+			rem := <-nekoTVFeed.remove
+			if rem != nil {
+				delete(feeds.nekotvFeeds, thread)
+			}
+		}
 	}
 	return
 }
@@ -119,7 +142,6 @@ func removeFromFeed(id uint64, board string, c common.Client) {
 
 	if feed := feeds.feeds[id]; feed != nil {
 		feed.remove <- c
-		// If the feed sends a non-nil, it means it closed
 		if nil != <-feed.remove {
 			delete(feeds.feeds, feed.id)
 		}
