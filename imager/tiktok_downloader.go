@@ -220,6 +220,7 @@ func DownloadTikTok(input *common.PostCommand) (token string, filename string, e
 	res := <-requestThumbnailing(tmpFile, filename, int(size), &tokData.Author.UniqueID)
 	if res.err != nil {
 		err = res.err
+		return
 	}
 	return res.imageID, filename, nil
 }
