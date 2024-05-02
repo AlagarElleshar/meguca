@@ -71,6 +71,7 @@ export class Youtube {
             events: {
                 onReady: () => {
                     this.isLoaded = true;
+                    ytPlayer.unMute()
                     this.setPlayerVolume()
                     ytPlayer.playVideo();
                     console.log("player state", ytPlayer.getPlayerState())
