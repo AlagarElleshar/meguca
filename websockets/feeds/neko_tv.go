@@ -3,6 +3,7 @@ package feeds
 import (
 	"errors"
 	"github.com/bakape/meguca/common"
+	"github.com/bakape/meguca/db"
 	"github.com/bakape/meguca/pb"
 	"github.com/bakape/meguca/websockets/feeds/nekotv"
 	"github.com/go-playground/log"
@@ -35,6 +36,14 @@ func (f *NekoTVFeed) start(thread uint64) (err error) {
 	log.Info("Starting NekoTV feed for thread ", thread)
 	f.thread = thread
 	f.isRunning = true
+	state, dbErr := db.GetNekoTVState(thread)
+	if dbErr == nil {
+		if state.Timer != nil {
+			f.videoList.SetItems(state.VideoList)
+			f.videoList.SetPos(int(state.ItemPos))
+			f.videoTimer.FromProto(state.Timer)
+		}
+	}
 
 	go func() {
 		for {
@@ -90,16 +99,16 @@ func (f *NekoTVFeed) start(thread uint64) (err error) {
 	return
 }
 
-func (e *NekoTVFeed) GetCurrentState() pb.ServerState {
-	return pb.ServerState{
-		VideoList:      e.videoList.GetItems(),
-		IsPlaylistOpen: true,
-		ItemPos:        0,
-		Timer: &pb.Timer{
-			Time:   e.videoTimer.GetTime(),
-			Paused: e.videoTimer.IsPaused(),
-		},
+func (e *NekoTVFeed) GetCurrentState() *pb.ServerState {
+	return &pb.ServerState{
+		VideoList: e.videoList.GetItems(),
+		ItemPos:   int32(e.videoList.Pos),
+		Timer:     e.videoTimer.ToProto(),
 	}
+}
+
+func (f *NekoTVFeed) WriteStateToDb() {
+	db.SetNekoTVState(f.thread, f.GetCurrentState())
 }
 
 func (f *NekoTVFeed) sendConnectedMessage(c common.Client) {
@@ -137,6 +146,7 @@ func (f *NekoTVFeed) AddVideo(v *pb.VideoItem, atEnd bool) {
 	if f.videoList.Length() == 1 {
 		f.videoTimer.Start()
 	}
+	f.WriteStateToDb()
 }
 
 // RemoveVideo removes a video from the playlist
@@ -156,6 +166,7 @@ func (f *NekoTVFeed) RemoveVideo(url string) {
 	data, _ := proto.Marshal(&msg)
 	data = append(data, uint8(common.MessageNekoTV))
 	f.sendToAllBinary(data)
+	f.WriteStateToDb()
 }
 
 // SkipVideo skips to the next video in the playlist
@@ -199,6 +210,7 @@ func (f *NekoTVFeed) Pause() {
 	data, _ := proto.Marshal(&msg)
 	data = append(data, uint8(common.MessageNekoTV))
 	f.sendToAllBinary(data)
+	f.WriteStateToDb()
 }
 
 // Play plays the current video or resumes if paused
@@ -216,6 +228,7 @@ func (f *NekoTVFeed) Play() {
 	data, _ := proto.Marshal(&msg)
 	data = append(data, uint8(common.MessageNekoTV))
 	f.sendToAllBinary(data)
+	f.WriteStateToDb()
 }
 
 // SetTime sets the current playback time
@@ -232,6 +245,7 @@ func (f *NekoTVFeed) SetTime(time float32) {
 	data, _ := proto.Marshal(&msg)
 	data = append(data, uint8(common.MessageNekoTV))
 	f.sendToAllBinary(data)
+	f.WriteStateToDb()
 }
 
 // UpdatePlaylist updates the playlist
@@ -244,6 +258,7 @@ func (f *NekoTVFeed) UpdatePlaylist() {
 	data, _ := proto.Marshal(&msg)
 	data = append(data, uint8(common.MessageNekoTV))
 	f.sendToAllBinary(data)
+	f.WriteStateToDb()
 }
 
 // ClearPlaylist clears the playlist
@@ -255,6 +270,7 @@ func (f *NekoTVFeed) ClearPlaylist() {
 	data, _ := proto.Marshal(&msg)
 	data = append(data, uint8(common.MessageNekoTV))
 	f.sendToAllBinary(data)
+	f.WriteStateToDb()
 }
 
 func (f *NekoTVFeed) SendTimeSyncMessage() {

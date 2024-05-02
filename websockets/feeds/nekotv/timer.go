@@ -2,6 +2,7 @@ package nekotv
 
 import (
 	"github.com/bakape/meguca/pb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
 )
 
@@ -100,4 +101,22 @@ func (t *VideoTimer) GetTimeData() *pb.GetTimeEvent {
 		Paused: t.IsPaused(),
 		Rate:   t.GetRate(),
 	}
+}
+
+func (t *VideoTimer) ToProto() *pb.VideoTimer {
+	return &pb.VideoTimer{
+		IsStarted:      t.isStarted,
+		StartTime:      timestamppb.New(t.startTime),
+		PauseStartTime: timestamppb.New(t.pauseStartTime),
+		RateStartTime:  timestamppb.New(t.rateStartTime),
+		Rate:           t.rate,
+	}
+}
+
+func (t *VideoTimer) FromProto(pb *pb.VideoTimer) {
+	t.isStarted = pb.IsStarted
+	t.startTime = pb.StartTime.AsTime()
+	t.pauseStartTime = pb.PauseStartTime.AsTime()
+	t.rateStartTime = pb.RateStartTime.AsTime()
+	t.rate = pb.Rate
 }
