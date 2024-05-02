@@ -79,8 +79,8 @@ github.com/mattn/go-runewidth v0.0.7/go.mod h1:H031xJmbD/WCDINGzjvQ9THkh0rPKHF+m
 github.com/mattn/go-sqlite3 v1.14.5/go.mod h1:WVKg1VTActs4Qso6iwGbiFih2UIHo0ENGwNd0Lj+XmI=
 github.com/mattn/go-sqlite3 v1.14.9 h1:10HX2Td0ocZpYEjhilsuo6WWtUqttj2Kb0KtD86/KYA=
 github.com/mattn/go-sqlite3 v1.14.9/go.mod h1:NyWgC/yNuGj7Q9rpYnZvas74GogHl5/Z4A/KQRfk6bU=
-github.com/meowmin/thumbnailer/v2 v2.0.2 h1:dNzLkvRjcQf8axA6GAeBvKAeW/Ae8+4p2hiai+QaiFQ=
-github.com/meowmin/thumbnailer/v2 v2.0.2/go.mod h1:3vkcCNg68q8cpm/qbRvVL+5+2R/Fu7vq+r4asmZ3n14=
+github.com/meowmin/thumbnailer/v2 v2.0.3 h1:+dAkOKhMMrCu2SXpYJ3OdpDKKtd5z9gRS5bFpDVuGv4=
+github.com/meowmin/thumbnailer/v2 v2.0.3/go.mod h1:3vkcCNg68q8cpm/qbRvVL+5+2R/Fu7vq+r4asmZ3n14=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e h1:fD57ERR4JtEqsWbfPhv4DMiApHyliiK5xCTNVSPiaAs=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e/go.mod h1:zD1mROLANZcx1PVRCS0qkT7pwLkGfwJo4zjcN/Tysno=
 github.com/nwaples/rardecode v1.1.0/go.mod h1:5DzqNKiOdpKKBH87u8VlvAnPZMXcGRhxWkRpHbbfGS0=
