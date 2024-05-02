@@ -57,6 +57,8 @@ func (c *Client) runHandlerBinary(typ common.MessageType, msg []byte) error {
 		return c.backspace()
 	case common.MessageAttachTiktok:
 		return c.attachTiktok(data)
+	case common.MessageNekoTV:
+		return feeds.HandleNekoTV(c, data)
 	default:
 		return errInvalidPayload(msg)
 	}

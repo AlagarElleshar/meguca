@@ -40,6 +40,7 @@ type ServerConfigs struct {
 	AnthropicApiKey      string  `json:"anthropic_api_key"`
 	MediaConvertPass     string  `json:"media_convert_pass"`
 	DefaultGeneralThread *string `json:"default_general_thread"`
+	YoutubeApiKey        *string `json:"youtube_api_key"`
 }
 
 // Load configs from JSON or defaults, if none present

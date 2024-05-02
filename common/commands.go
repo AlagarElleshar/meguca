@@ -229,3 +229,21 @@ func (c *Command) UnmarshalJSON(data []byte) error {
 	}
 	return err
 }
+
+type MediaCommandType int
+
+const (
+	NoMediaCommand MediaCommandType = iota
+	AddVideo
+	RemoveVideo
+	SkipVideo
+	Pause
+	Play
+	SetTime
+	ClearPlaylist
+)
+
+type MediaCommand struct {
+	Type MediaCommandType
+	Args string
+}

@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"github.com/rivo/uniseg"
 	"regexp"
-	"strconv"
 	"unicode"
 
 	"github.com/bakape/meguca/common"
@@ -24,7 +23,7 @@ func init() {
 
 // ParseBody parses the entire post text body for commands and links.
 // internal: function was called by automated upkeep task
-func ParseBody(body []byte, board string, thread uint64, id uint64, ip string, internal bool) (links []common.Link, com []common.Command, claude *common.ClaudeState, postCommand *common.PostCommand, err error) {
+func ParseBody(body []byte, board string, thread uint64, id uint64, ip string, internal bool) (links []common.Link, com []common.Command, claude *common.ClaudeState, postCommand *common.PostCommand, mediaCommand common.MediaCommand, err error) {
 	err = IsPrintableString(string(body), true)
 	if err != nil {
 		if internal {
@@ -124,26 +123,34 @@ func ParseBody(body []byte, board string, thread uint64, id uint64, ip string, i
 			bytes.Buffer{},
 		}
 	}
-	m = common.PostCommandRegexp.FindSubmatch(body)
+	m = common.MediaComRegexp.FindSubmatch(body)
 	if m != nil {
-		postCom := common.PostCommand{}
-		postCommand = &postCom
-		postCom.Input = string(m[2])
-		rotation := m[3]
-		postCom.HD = m[1] != nil
-		if rotation != nil {
-			rotationVal, err := strconv.ParseInt(string(rotation), 10, 64)
-			if err == nil {
-				rotationVal = (rotationVal / 90) % 4
-				if rotationVal < 0 {
-					rotationVal += 4
-				}
-				rotationVal *= 90
-				postCom.Rotation = int(rotationVal)
-			}
+		var cmdStr string
+		if m[1] != nil {
+			cmdStr = string(m[1])
+		} else if m[3] != nil {
+			cmdStr = string(m[3])
 		}
+		switch cmdStr {
+		case "play":
+			mediaCommand.Type = common.AddVideo
+		case "remove":
+			mediaCommand.Type = common.RemoveVideo
+		case "skip":
+			mediaCommand.Type = common.SkipVideo
+		case "pause":
+			mediaCommand.Type = common.Pause
+		case "unpause":
+			mediaCommand.Type = common.Play
+		case "seek":
+			mediaCommand.Type = common.SetTime
+		case "clear":
+			mediaCommand.Type = common.ClearPlaylist
+		default:
+			mediaCommand.Type = common.NoMediaCommand
+		}
+		mediaCommand.Args = string(m[2])
 	}
-
 	return
 }
 

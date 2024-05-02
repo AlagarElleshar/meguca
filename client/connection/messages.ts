@@ -18,6 +18,7 @@ export const enum message {
 	claudeError,
 	attachTiktok,
 	tiktokState,
+	nekoTV,
 
 	// >= 30 are miscellaneous and do not write to post models
 	synchronise = 30,

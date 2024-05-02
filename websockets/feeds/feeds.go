@@ -13,8 +13,9 @@ import (
 // Contains and manages all active update feeds
 var feeds = feedMap{
 	// 64 len map to avoid some possible reallocation as the server starts
-	feeds:   make(map[uint64]*Feed, 64),
-	tvFeeds: make(map[string]*tvFeed, 64),
+	feeds:       make(map[uint64]*Feed, 64),
+	tvFeeds:     make(map[string]*tvFeed, 64),
+	nekotvFeeds: make(map[uint64]*NekoTVFeed, 64),
 }
 
 // Export to avoid circular dependency
@@ -25,9 +26,10 @@ func init() {
 
 // Container for managing client<->update-feed assignment and interaction
 type feedMap struct {
-	feeds   map[uint64]*Feed
-	tvFeeds map[string]*tvFeed
-	mu      sync.RWMutex
+	feeds       map[uint64]*Feed
+	tvFeeds     map[string]*tvFeed
+	mu          sync.RWMutex
+	nekotvFeeds map[uint64]*NekoTVFeed
 }
 
 // Add client to feed and send it the current status of the feed for
@@ -96,6 +98,43 @@ func SubscribeToMeguTV(c common.Client) (err error) {
 	return
 }
 
+func HandleNekoTV(c common.Client, data []byte) (err error) {
+	//Add user to nekotv
+	feeds.mu.Lock()
+	defer feeds.mu.Unlock()
+	synced, thread, _ := GetSync(c)
+	if !synced {
+		return
+	}
+	nekoTVFeed, ok := feeds.nekotvFeeds[thread]
+	if data[0] == 1 {
+		if ok {
+			nekoTVFeed.add <- c
+		} else {
+			var locked bool
+			locked, err = db.CheckThreadLocked(thread)
+			if err != nil {
+				return
+			}
+			if !locked {
+				newFeed := NewNekoTVFeed()
+				feeds.nekotvFeeds[thread] = newFeed
+				newFeed.start(thread)
+				newFeed.add <- c
+			}
+		}
+	} else if data[0] == 0 {
+		if ok {
+			nekoTVFeed.remove <- c
+			rem := <-nekoTVFeed.remove
+			if rem != nil {
+				delete(feeds.nekotvFeeds, thread)
+			}
+		}
+	}
+	return
+}
+
 // Remove client from a subscribed feed
 func removeFromFeed(id uint64, board string, c common.Client) {
 	feeds.mu.Lock()
@@ -103,7 +142,6 @@ func removeFromFeed(id uint64, board string, c common.Client) {
 
 	if feed := feeds.feeds[id]; feed != nil {
 		feed.remove <- c
-		// If the feed sends a non-nil, it means it closed
 		if nil != <-feed.remove {
 			delete(feeds.feeds, feed.id)
 		}
@@ -175,6 +213,21 @@ func Init() (err error) {
 	return db.Listen("post_moderated", func(msg string) (err error) {
 		return handlePostModeration(msg)
 	})
+}
+
+func GetNekoTVFeed(id uint64) (f *NekoTVFeed) {
+	feeds.mu.RLock()
+	feed, ok := feeds.nekotvFeeds[id]
+	feeds.mu.RUnlock()
+	if ok {
+		return feed
+	}
+	newFeed := NewNekoTVFeed()
+	newFeed.start(id)
+	feeds.mu.Lock()
+	defer feeds.mu.Unlock()
+	feeds.nekotvFeeds[id] = newFeed
+	return newFeed
 }
 
 // Separate function for testing

@@ -256,8 +256,9 @@
 					<b id="thread-post-counters" class="act hide-empty banner-float svg-link noscript-hide" title="{%s= ln.Common.UI["postsImages"] %}"></b>
 					<span id="banner-extensions" class="hide-empty banner-float svg-link noscript-hide"></span>
 					<span id="banner-icons">
+						<a id="banner-nekotv" class="banner-float noscript-hide symbol" title="NekoTV">􀵨</a>
 						<a id="banner-feedback" href="https://tellonym.me/meowmin2" target="_blank" class="banner-float noscript-hide symbol" title="{%s= ln.UI["feedback"] %}" rel="noreferrer noopener">􀍖</a>
-						<a id="banner-FAQ" class="banner-float noscript-hide symbol" title="{%s= ln.UI["FAQ"] %}">􀁜</a>
+						<a id="banner-FAQ" class="banner-float noscript-hide symbol" title="{%s= ln.UI["FAQ"] %}">􁊇</a>
 						<a id="banner-account" class="banner-float symbol noscript-hide" title="{%s= ln.UI["account"] %}">􀯠</a>
 						<a id="banner-identity" class="banner-float symbol noscript-hide" title="{%s= ln.UI["identity"] %}">􀉪</a>
 						<a id="banner-options" class="banner-float symbol noscript-hide" title="{%s= ln.UI["options"] %}">􀣌</a>
@@ -394,6 +395,14 @@
 					</tbody>
 					</table>
 				</div>
+				<div id="watch-panel" class="modal glass hidden show hide-watch-panel">
+					<div id="watch-player">
+						<div id="watch-video"></div>
+					</div>
+					<div id="watch-playlist"><span id="watch-playlist-status"></span>
+						<ol id="watch-playlist-entries"></ol>
+					</div>
+				</div>
 				{% comment %}
 					Moderation panel
 				{% endcomment %}
@@ -495,5 +504,6 @@
 		    var webpackMainJSFile = "{%s= common.MainJS %}";
 		</script>
 		<script src="/assets/js/scripts/loader.js"></script>
+		<script src="https://www.youtube.com/iframe_api"></script>
 	</body>
 {% endstripspace %}{% endfunc %}
