@@ -74,8 +74,10 @@ export function isNekoTVOpen() {
 function updateNekoTVIcon(){
     if (isOpen) {
         nekoTV.innerText = '􀵨';
+        nekoTV.title = 'NekoTV: Enabled'
     } else {
         nekoTV.innerText = '􁋞';
+        nekoTV.title = 'NekoTV: Disabled'
     }
 
 }
