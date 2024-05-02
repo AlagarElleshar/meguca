@@ -102,7 +102,7 @@ const defaultFAQ = `Supported upload file types are JPEG, PNG, APNG, WEBM, MP3, 
 #sw24:30 #sw2:24:30 #sw24:30+30 #sw24:30-30 - "Syncwatch" synchronized time counter
 #steal - steal the image of the first post linked; does not work on OPs
 #claude [prompt] - Generates text from a large language model named Claude
-<hr>NekoWatch commands:
+<hr>NekoWatch commands (WIP, Only regular YouTube URLs are supported for now):
 .play [URL]    - Queue a video
 .remove [URL]  - Remove a video from queue 
 .clear         - Clears playlist
