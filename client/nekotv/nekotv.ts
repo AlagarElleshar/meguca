@@ -350,9 +350,16 @@ export function updatePlaylist() {
 
     const playlistItems: HTMLLIElement[] = [];
 
-    for (const video of player.videoList.items) {
+    const currentItemPos = player.getItemPos();
+
+    for (let i = 0; i < player.videoList.items.length; i++) {
+        const video = player.videoList.items[i];
         const li = document.createElement('li');
         li.classList.add('watch-playlist-entry');
+
+        if (i === currentItemPos) {
+            li.classList.add('selected');
+        }
 
         let videoTerm = '';
         if (video.url && !video.url.startsWith('https')) {
@@ -363,19 +370,18 @@ export function updatePlaylist() {
         const videoTitle = escape(truncateWithEllipsis(video.title, 55 - Math.min(argLength, 25)));
 
         li.innerHTML = `
-      <span class="watch-video-term">${videoTerm}</span>
-      <a class="watch-video-title" target="_blank" href="${video.url}" title="${escape(video.title)}">
-        ${videoTitle}
-      </a>
-      <span class="watch-video-time">
-        <span class="watch-player-time"></span>
-        <span class="watch-player-dur">${secondsToTimeExact(video.duration)}</span>
-      </span>
-    `;
+  <span class="watch-video-term">${videoTerm}</span>
+  <a class="watch-video-title" target="_blank" href="${video.url}" title="${escape(video.title)}">
+    ${videoTitle}
+  </a>
+  <span class="watch-video-time">
+    <span class="watch-player-time"></span>
+    <span class="watch-player-dur">${secondsToTimeExact(video.duration)}</span>
+  </span>
+`;
 
         playlistItems.push(li);
     }
-
     playlistOl.replaceChildren(...playlistItems);
 
     if (!isOpen) {

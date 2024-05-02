@@ -567,7 +567,23 @@ iframe[src^="https://www.youtube"] {
 }
 
 #watch-playlist {
-	display: none
+	display: none;
+
+	ul {
+		list-style-type: none;
+		padding-left: 1em;
+	}
+
+	li::before {
+		font-family: monospace;
+		content: "-";
+		margin-right: 0.5em;
+	}
+
+	li.selected::before {
+		content: ">";
+		color: #00ff00;
+	}
 }
 
 #watch-playlist a {
