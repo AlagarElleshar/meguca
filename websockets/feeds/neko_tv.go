@@ -7,7 +7,7 @@ import (
 	"github.com/bakape/meguca/pb"
 	"github.com/bakape/meguca/websockets/feeds/nekotv"
 	"github.com/go-playground/log"
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 	"strconv"
 	"strings"
 	"sync"

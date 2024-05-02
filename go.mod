@@ -27,7 +27,6 @@ require (
 	github.com/go-playground/ansi v2.1.0+incompatible // indirect
 	github.com/go-playground/errors v3.3.0+incompatible // indirect
 	github.com/go-playground/log v6.3.0+incompatible
-	github.com/golang/protobuf v1.5.0
 	github.com/gorilla/websocket v1.4.2
 	github.com/lib/pq v1.8.0
 	github.com/linxGnu/grocksdb v1.8.14
