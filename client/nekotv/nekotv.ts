@@ -32,6 +32,7 @@ export let vidEl: HTMLVideoElement;
 export let watchStatus: HTMLElement;
 export let currentSource: string;
 export let watchDiv: HTMLElement;
+let playerTimeInterval: NodeJS.Timeout | null = null;
 let nekoTV = document.getElementById("banner-nekotv");
 let isOpen : boolean;
 let isPlaylistVisible = false;
@@ -96,6 +97,7 @@ export function showPlaylist() {
 
 export function hidePlaylist() {
     playlistDiv.style.display = 'none';
+    stopPlayerTimeInterval();
 }
 
 export function togglePlaylist() {
@@ -107,6 +109,30 @@ export function togglePlaylist() {
     }
 }
 
+
+export function updatePlayerTime() {
+    if (!playlistOl || !playlistOl.firstElementChild || !ytPlayer || !ytPlayer.getCurrentTime) {
+        console.log('Skipping updatePlayerTime');
+        return;
+    }
+
+    let playerTime: number | undefined = null;
+    playerTime = ytPlayer.getCurrentTime();
+
+    if (playerTime === undefined) {
+        console.error('Player time undefined');
+        return;
+    }
+
+    playlistOl.children[player.getItemPos()].querySelector('.watch-player-time')!.innerHTML = `${secondsToTimeExact(playerTime)} / `;
+}
+
+function stopPlayerTimeInterval() {
+    if (playerTimeInterval) {
+        clearInterval(playerTimeInterval);
+        playerTimeInterval = null;
+    }
+}
 
 function handleConnectedEvent(connectedEvent: ConnectedEvent) {
     player.setItems(connectedEvent.videoList,connectedEvent.itemPos)
@@ -313,6 +339,10 @@ export function updatePlaylist() {
     if (player.isListEmpty()) {
         removePlayer()
         return;
+    }
+    if (!playerTimeInterval) {
+        updatePlayerTime();
+        playerTimeInterval = setInterval(updatePlayerTime, 1000);
     }
 
     // updatePlaylistStatus();
