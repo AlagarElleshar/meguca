@@ -103,8 +103,11 @@ const defaultFAQ = `Supported upload file types are JPEG, PNG, APNG, WEBM, MP3, 
 #steal - steal the image of the first post linked; does not work on OPs
 #claude [prompt] - Generates text from a large language model named Claude
 <hr>NekoWatch commands:
-.play [URL] .remove [URL] .seek [time]
-.pause .unpause .skip .clear`
+.play [URL]    - Queue a video
+.remove [URL]  - Remove a video from queue 
+.clear         - Clears playlist
+.skip          - Skip current video
+.pause .unpause - Self-explanatory`
 
 // Generate /all/ board configs
 func init() {
