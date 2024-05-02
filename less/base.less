@@ -575,9 +575,10 @@ iframe[src^="https://www.youtube"] {
 	}
 
 	li::before {
-		font-family: monospace;
 		content: "-";
 		margin-right: 0.5em;
+		font-family: monospace;
+		color: rgba(121,124,125,.907)
 	}
 
 	li.selected::before {
@@ -592,11 +593,6 @@ iframe[src^="https://www.youtube"] {
 
 #watch-playlist a:hover {
 	color: #b7b7c5
-}
-
-.watch-playlist-entry::marker {
-	font-family: monospace;
-	color: rgba(121,124,125,.907)
 }
 
 #watch-panel {
