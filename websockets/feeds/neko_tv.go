@@ -56,6 +56,7 @@ func (f *NekoTVFeed) start(thread uint64) (err error) {
 				if f.removeClient(c) {
 					f.isRunning = false
 					log.Info("shutting down feed for thread ", thread)
+					db.DeleteNekoTVValue(f.thread)
 					return
 				}
 			}
@@ -270,7 +271,7 @@ func (f *NekoTVFeed) ClearPlaylist() {
 	data, _ := proto.Marshal(&msg)
 	data = append(data, uint8(common.MessageNekoTV))
 	f.sendToAllBinary(data)
-	f.WriteStateToDb()
+	db.DeleteNekoTVValue(f.thread)
 }
 
 func (f *NekoTVFeed) SendTimeSyncMessage() {

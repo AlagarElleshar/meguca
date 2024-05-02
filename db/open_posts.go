@@ -14,46 +14,64 @@ import (
 )
 
 const (
-	rocksDBNotOpened = iota //  Not opened yet in this server instance
-	rocksDBOpen             // Opened and ready fort operation
+	rocksDBNotOpened = iota // Not opened yet in this server instance
+	rocksDBOpen             // Opened and ready for operation
 	rocksDBClosed           // Closed for graceful restart
 )
 
 var (
-	// Current state of BoltDB database.
+	// Current state of RocksDB database.
 	// Should only be accessed using atomic operations.
 	rocksDBState uint32
 
-	// Ensures boltdb is opened only once
+	// Ensures RocksDB is opened only once
 	rocksDBOnce  sync.Once
 	writeOptions = grocksdb.NewDefaultWriteOptions()
 	readOptions  = grocksdb.NewDefaultReadOptions()
+
+	// Column family handles
+	openBodyCF    *grocksdb.ColumnFamilyHandle
+	nekoTVStateCF *grocksdb.ColumnFamilyHandle
 )
 
 // Close DB and release resources
 func Close() (err error) {
-	if atomic.LoadUint32(&rocksDBState) != rocksDBOpen {
+	if atomic.LoadUint32(&rocksDBState) == rocksDBOpen {
 		atomic.StoreUint32(&rocksDBState, rocksDBClosed)
+		openBodyCF.Destroy()
+		nekoTVStateCF.Destroy()
 		rocksDB.Close()
 	}
 	return
 }
 
-// Need to drop any incoming requests, when Db is closed during graceful restart
+// Need to drop any incoming requests, when DB is closed during graceful restart
 func rocksDBisOpen() bool {
 	return atomic.LoadUint32(&rocksDBState) == rocksDBOpen
 }
 
-// Open boltdb, only when needed. This helps preventing conflicts on swapping
+// Open RocksDB, only when needed. This helps prevent conflicts on swapping
 // the database accessing process during graceful restarts.
-// If boltdb has already been closed, return open=false.
+// If RocksDB has already been closed, return open=false.
 func tryOpenRocksDB() (open bool, err error) {
 	rocksDBOnce.Do(func() {
 		opts := grocksdb.NewDefaultOptions()
 		opts.OptimizeForPointLookup(64)
 		opts.SetCreateIfMissing(true)
 		opts.SetCompression(grocksdb.NoCompression)
-		rocksDB, err = grocksdb.OpenDb(opts, "rdb.db")
+		opts.SetCreateIfMissingColumnFamilies(true)
+
+		// Define column family names
+		cfNames := []string{"default", "open_body", "nekotv_state"}
+
+		// Open the DB with column families
+		db, cfHandles, err := grocksdb.OpenDbColumnFamilies(opts, "rdb.db", cfNames, []*grocksdb.Options{opts, opts, opts})
+		if err != nil {
+			return
+		}
+		rocksDB = db
+		openBodyCF = cfHandles[1]
+		nekoTVStateCF = cfHandles[2]
 
 		atomic.StoreUint32(&rocksDBState, rocksDBOpen)
 		return
@@ -74,11 +92,11 @@ func SetOpenBody(id uint64, body []byte) (err error) {
 	}
 
 	buf := encodeUint64(id)
-	err = rocksDB.Put(writeOptions, buf[:], body)
+	err = rocksDB.PutCF(writeOptions, openBodyCF, buf[:], body)
 	return
 }
 
-// Encode uint64 for storage in BoltDB without heap allocations
+// Encode uint64 for storage in RocksDB without heap allocations
 func encodeUint64(i uint64) [8]byte {
 	var buf [8]byte
 	binary.LittleEndian.PutUint64(buf[:], i)
@@ -101,7 +119,7 @@ func GetOpenBody(id uint64) (body string, err error) {
 	}
 
 	buf := encodeUint64(id)
-	bodySlice, err := rocksDB.Get(readOptions, buf[:])
+	bodySlice, err := rocksDB.GetCF(readOptions, openBodyCF, buf[:])
 	if err != nil {
 		return
 	}
@@ -117,7 +135,7 @@ func deleteOpenPostBody(id uint64) (err error) {
 	}
 
 	buf := encodeUint64(id)
-	return rocksDB.Delete(writeOptions, buf[:])
+	return rocksDB.DeleteCF(writeOptions, openBodyCF, buf[:])
 }
 
 // Inject open post bodies from the embedded database into the posts
@@ -150,7 +168,7 @@ func cleanUpOpenPostBodies() (err error) {
 
 	// Read IDs of all post bodies
 	var ids []uint64
-	it := rocksDB.NewIterator(readOptions)
+	it := rocksDB.NewIteratorCF(readOptions, openBodyCF)
 	defer it.Close()
 	for it.SeekToFirst(); it.Valid(); it.Next() {
 		// Get the key
@@ -201,7 +219,7 @@ func cleanUpOpenPostBodies() (err error) {
 			return
 		}
 		for _, id := range toDelete {
-			err = rocksDB.Delete(writeOptions, encodeUint64Heap(id))
+			err = deleteOpenPostBody(id)
 			if err != nil {
 				return
 			}
@@ -210,22 +228,14 @@ func cleanUpOpenPostBodies() (err error) {
 	})
 }
 
-// encodeUint64ForNekoTV encodes uint64 for storage in RocksDB with the first bit set to 1
-func encodeUint64ForNekoTV(i uint64) []byte {
-	i |= 1 << 63 // Set the first bit to 1
-	buf := make([]byte, 8)
-	binary.LittleEndian.PutUint64(buf[:], i)
-	return buf
-}
-
 func GetNekoTVState(id uint64) (state pb.ServerState, err error) {
 	ok, err := tryOpenRocksDB()
 	if err != nil || !ok {
 		return
 	}
 
-	buf := encodeUint64ForNekoTV(id)
-	value, err := rocksDB.Get(readOptions, buf[:])
+	buf := encodeUint64(id)
+	value, err := rocksDB.GetCF(readOptions, nekoTVStateCF, buf[:])
 	if err != nil {
 		return
 	}
@@ -244,13 +254,13 @@ func SetNekoTVState(id uint64, state *pb.ServerState) (err error) {
 		return
 	}
 
-	buf := encodeUint64ForNekoTV(id)
+	buf := encodeUint64(id)
 	value, err := proto.Marshal(state)
 	if err != nil {
 		return
 	}
 
-	err = rocksDB.Put(writeOptions, buf[:], value)
+	err = rocksDB.PutCF(writeOptions, nekoTVStateCF, buf[:], value)
 	log.Info("Set: ", string(jso))
 	return
 }
@@ -262,8 +272,8 @@ func DeleteNekoTVValue(id uint64) (err error) {
 		return
 	}
 
-	buf := encodeUint64ForNekoTV(id)
-	err = rocksDB.Delete(writeOptions, buf[:])
+	buf := encodeUint64(id)
+	err = rocksDB.DeleteCF(writeOptions, nekoTVStateCF, buf[:])
 	return
 }
 
@@ -276,22 +286,18 @@ func cleanUpNekoTVValues() (err error) {
 
 	// Read IDs of all NekoTV values
 	var ids []uint64
-	it := rocksDB.NewIterator(readOptions)
+	it := rocksDB.NewIteratorCF(readOptions, nekoTVStateCF)
 	defer it.Close()
 	for it.SeekToFirst(); it.Valid(); it.Next() {
 		// Get the key
 		key := it.Key()
 		defer key.Free()
 
-		// Check if the first bit is set to 1
-		if key.Data()[0]&0x80 == 0x80 {
-			// Convert the key to uint64
-			keyUint64 := binary.LittleEndian.Uint64(key.Data())
-			keyUint64 &^= 1 << 63 // Unset the first bit
+		// Convert the key to uint64
+		keyUint64 := binary.LittleEndian.Uint64(key.Data())
 
-			// Append the key to the keys slice
-			ids = append(ids, keyUint64)
-		}
+		// Append the key to the keys slice
+		ids = append(ids, keyUint64)
 	}
 
 	if err = it.Err(); err != nil {

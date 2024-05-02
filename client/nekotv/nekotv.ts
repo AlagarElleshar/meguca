@@ -56,9 +56,7 @@ export function initNekoTV() {
         isOpen = true;
     }
     updateNekoTVIcon()
-    if (isOpen){
-        connSM.once(connState.synced,subscribeToWatchFeed)
-    }
+    connSM.on(connState.synced,subscribeToWatchFeed)
     nekoTV.addEventListener("click", () => {
         isOpen = !isOpen;
         localStorage.setItem('neko-tv', isOpen ? 't' : 'f');
@@ -368,7 +366,7 @@ export function unsubscribeFromWatchFeed() {
 }
 
 export function subscribeToWatchFeed() {
-    sendBinary(subscribeMessage)
+    if (isOpen) sendBinary(subscribeMessage)
 }
 
 export function removePlayer() {
