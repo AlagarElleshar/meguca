@@ -41,6 +41,7 @@ var (
 		"image/png":                     common.PNG,
 		"image/gif":                     common.GIF,
 		"image/webp":                    common.WEBP,
+		"image/avif":                    common.AVIF,
 		mimePDF:                         common.PDF,
 		"video/webm":                    common.WEBM,
 		"application/ogg":               common.OGG,
@@ -477,6 +478,9 @@ func processFile(f multipart.File, filename string, img *common.ImageCommon, tik
 
 	if isImage && img.Codec == "mjpeg" {
 		img.Codec = "jpeg"
+	}
+	if isImage && img.Codec == "av1" {
+		img.Codec = "avif"
 	}
 	// Some media has retardedly long meta strings. Just truncate them, instead
 	// of rejecting. Must ensure it's still valid unicode after trancation,
