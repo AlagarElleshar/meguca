@@ -619,6 +619,8 @@ iframe[src^="https://www.youtube"] {
 	border-radius: 10px;
 	position: relative;
 	box-shadow: 0 0 6px 0px rgba(0, 0, 0, 0.5);
+	flex-direction: column;
+	overflow-y: hidden;
 }
 
 .watch-video-time {
@@ -648,6 +650,10 @@ body.watch img.embed-thumb {
 	.player-controls {
 		display: block;
 	}
+}
+
+#watch-playlist {
+	overflow-y: visible;
 }
 
 #watch-panel:hover > #watch-playlist {

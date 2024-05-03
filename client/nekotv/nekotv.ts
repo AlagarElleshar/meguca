@@ -138,7 +138,7 @@ function updateNekoTVIcon(){
 
 }
 export function showWatchPanel() {
-    watchDiv.style.display = 'block';
+    watchDiv.style.display = 'flex';
     watchDiv.classList.remove('hide-watch-panel');
 }
 
