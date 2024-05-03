@@ -11,6 +11,8 @@ export class Youtube {
     private readonly playerEl: HTMLElement = document.getElementById('#ytapiplayer');
     private isLoaded = false;
     private isYouTubeScriptLoaded: boolean;
+    private isIFrameReady: boolean = false;
+    private videoToLoad: VideoItem|null = null;
 
     public isSupportedLink(url: string): boolean {
         return this.extractVideoId(url) !== '';
@@ -42,22 +44,30 @@ export class Youtube {
             document.head.appendChild(youTubeScript);
             console.log("Load YouTube player script");
             this.isYouTubeScriptLoaded = true;
-            options.onChange("audioVolume", (vol) => {
-                this.setPlayerVolume();
-            });
+            // @ts-ignore
+            window.onYouTubeIframeAPIReady = () => {
+                this.isIFrameReady = true;
+                if(this.videoToLoad != null){
+                    this.loadVideo(this.videoToLoad);
+                    this.videoToLoad = null;
+                }
+            }
         }
     }
 
-    public loadVideo(item: VideoItem): void {
+    public loadVideo(item: VideoItem)  {
         if (ytPlayer) {
             ytPlayer.loadVideoById(this.extractVideoId(item.url));
             return;
         }
-        if (!this.isYouTubeScriptLoaded){
+
+        if (!this.isYouTubeScriptLoaded) {
             this.initMediaPlayer();
         }
-
-        this.isLoaded = false;
+        if (!this.isIFrameReady) {
+            this.videoToLoad = item;
+            return;
+        }
 
         ytPlayer = new YT.Player('watch-video', {
             videoId: this.extractVideoId(item.url),
@@ -71,21 +81,20 @@ export class Youtube {
             events: {
                 onReady: () => {
                     this.isLoaded = true;
-                    if(isNekoTVMuted()){
+                    if (isNekoTVMuted()) {
                         ytPlayer.mute();
-                    }
-                    else {
+                    } else {
                         ytPlayer.unMute();
                     }
-                    this.setPlayerVolume()
+                    this.setPlayerVolume();
                     ytPlayer.playVideo();
-                    console.log("player state", ytPlayer.getPlayerState())
+                    console.log("player state", ytPlayer.getPlayerState());
                     setTimeout(() => {
-                        console.log("player state", ytPlayer.getPlayerState())
+                        console.log("player state", ytPlayer.getPlayerState());
                         if (ytPlayer.getPlayerState() === -1) {
                             ytPlayer.playVideo();
                             setTimeout(() => {
-                                console.log("player state", ytPlayer.getPlayerState())
+                                console.log("player state", ytPlayer.getPlayerState());
                                 if (ytPlayer.getPlayerState() === -1) {
                                     tempNotify(
                                         "Click here to play this thread's live-synced video (your browser requires a click before videos can play)",
@@ -106,7 +115,6 @@ export class Youtube {
             },
         });
     }
-
     public removeVideo(): void {
         if (!ytPlayer) return;
 
@@ -150,9 +158,5 @@ export class Youtube {
             }
             ytPlayer.setVolume(volume);
         }
-    }
-
-    getVideo() {
-
     }
 }

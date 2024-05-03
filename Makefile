@@ -34,7 +34,7 @@ js:
 	node esbuild.config.js --js
 
 generate:
-	go generate ./...
+	go generate . ./pb
 
 server:
 	go generate

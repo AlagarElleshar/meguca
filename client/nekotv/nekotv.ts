@@ -458,7 +458,10 @@ export function unsubscribeFromWatchFeed() {
 }
 
 export function subscribeToWatchFeed() {
-    if (isOpen) sendBinary(subscribeMessage)
+    if (isOpen) {
+        player.player.initMediaPlayer()
+        sendBinary(subscribeMessage)
+    }
 }
 
 export function removePlayer() {
