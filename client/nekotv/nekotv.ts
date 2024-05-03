@@ -123,6 +123,10 @@ export function isNekoTVOpen() {
     return isOpen;
 }
 
+export function isNekoTVMuted() {
+    return isMuted;
+}
+
 function updateNekoTVIcon(){
     if (isOpen) {
         nekoTV.innerText = '􀵨';

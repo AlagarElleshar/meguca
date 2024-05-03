@@ -1,6 +1,6 @@
 import {VideoItem} from "../typings/messages";
 import {tempNotify} from "../ui/notification";
-import {isNekoTVOpen, watchDiv} from "./nekotv";
+import {isNekoTVMuted, isNekoTVOpen, watchDiv} from "./nekotv";
 import options from "../options";
 
 const youTubeScript = document.createElement("script");
@@ -71,7 +71,12 @@ export class Youtube {
             events: {
                 onReady: () => {
                     this.isLoaded = true;
-                    ytPlayer.unMute()
+                    if(isNekoTVMuted()){
+                        ytPlayer.mute();
+                    }
+                    else {
+                        ytPlayer.unMute();
+                    }
                     this.setPlayerVolume()
                     ytPlayer.playVideo();
                     console.log("player state", ytPlayer.getPlayerState())
