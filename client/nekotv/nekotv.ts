@@ -381,7 +381,7 @@ export function secondsToTimeExact(totalSeconds: number): string {
     } else if (minutes) {
         formattedTime = `${minutes}:${padWithZero(seconds)}`;
     } else {
-        formattedTime = `00:${padWithZero(seconds)}`;
+        formattedTime = `0:${padWithZero(seconds)}`;
     }
 
     return formattedTime;
