@@ -155,16 +155,17 @@
 						</span>
 					{% endif %}
                     {% if tokid != nil %}
-						{% if timeElapsed <= 172800 && timeElapsed > -60 %}
-						<span class="fileinfo-newtiktok">
+					{% if timeElapsed <= 172800 && timeElapsed > -60 %}
+						<span class="fileinfo-postingtime fileinfo-newtiktok">
 							<span class="symbol">􀆿 </span>
-							New
-						</span>
-						{% endif %}
-						<span class="fileinfo-postingtime">
-						<span class="symbol">􀐫 </span>
 							{%s= timeago %}
 						</span>
+						{% else %}
+						<span class="fileinfo-postingtime">
+							<span class="symbol">􀐫 </span>
+							{%s= timeago %}
+						</span>
+						{% endif %}
                     {% endif %}
 				</div>
 			</figcaption>

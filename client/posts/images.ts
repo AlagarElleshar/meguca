@@ -106,7 +106,7 @@ export default class ImageHandler extends View<Post> {
 		})
 	}
 
-	public renderSource(id: string, el: Element,newTiktok: Element, postingTime: Element ){
+	public renderSource(id: string, el : Element, postingTime: Element){
 		let matches = el.getElementsByClassName("sourcelink")
 		if(matches.length > 0) {
 			return
@@ -121,14 +121,16 @@ export default class ImageHandler extends View<Post> {
 		let unixTime = parseInt(id, 10) / Math.pow(2,32);
 		let postingTimeText = relativeTime(unixTime);
 		sourceButton.title = `Posted ${postingTimeText}`
+		const now = Date.now() / 1000
+
+		let timeElapsed = now - unixTime
+		if( timeElapsed < 172800 && timeElapsed > -60) {
+			postingTime.firstElementChild.textContent = "􀆿 ";
+			postingTime.classList.add("fileinfo-newtiktok")
+		}
 		postingTime.insertAdjacentText('beforeend', postingTimeText);
 		el.insertBefore(sourceButton, downloadButton.nextSibling)
 
-		const now = Date.now() / 1000
-		let timeElapsed = now - unixTime
-		if( timeElapsed > 172800 || timeElapsed < -60){
-			newTiktok.remove()
-		}
 		let tikwmButton = document.createElement("a")
 		tikwmButton.href = `https://tikwm.com/video/${id}.html`;
 		tikwmButton.classList.add("tikwm-link");
@@ -161,7 +163,7 @@ export default class ImageHandler extends View<Post> {
 
 		const data = this.model.image;
 
-		const [hasAudio, duration, fileSize, dimensions, codec, newTiktok,postingTime] = Array.from(el.querySelector(".fileinfo").children) as HTMLElement[]
+		const [hasAudio, duration, fileSize, dimensions, codec, postingTime] = Array.from(el.querySelector(".fileinfo").children) as HTMLElement[]
 
 		if (!data.audio) {
 			hasAudio.remove()
@@ -219,11 +221,10 @@ export default class ImageHandler extends View<Post> {
 		el.querySelector(".media-metadata").textContent = mediaMetadataString;
 		let tokID = getTokID(data.name);
 		if(tokID != null){
-			this.renderSource(tokID,el,newTiktok,postingTime)
+			this.renderSource(tokID,el,postingTime)
 		}
 		else{
 			postingTime.remove();
-			newTiktok.remove();
 		}
 
 		// Render a name + download link of an image
