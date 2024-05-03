@@ -1,4 +1,4 @@
-import {connEvent, connSM, connState, message, sendBinary} from "../connection";
+import {connSM, connState, message, sendBinary} from "../connection";
 import {escape} from "../util"
 import {
     AddVideoEvent,
@@ -50,6 +50,13 @@ export function initNekoTV() {
     vidEl = document.getElementById('watch-video') as HTMLVideoElement;
     watchStatus = document.getElementById('status-watch')!;
     watchDiv = document.getElementById("watch-panel");
+    playerDiv.addEventListener("click",()=>{
+        if (playlistDiv.style.display) {
+            playlistDiv.style.display = ''
+        } else {
+            playlistDiv.style.display = 'block'
+        }
+    })
     let lastVal = localStorage.getItem('neko-tv')
     if (lastVal) {
         isOpen = lastVal === 't';
@@ -366,8 +373,7 @@ export function updatePlaylist() {
             videoTerm = escape(truncateWithEllipsis(video.url, 25));
         }
 
-        const argLength = video.title ? video.title.length : 0;
-        const videoTitle = escape(truncateWithEllipsis(video.title, 55 - Math.min(argLength, 25)));
+        const videoTitle = escape(video.title);
 
         li.innerHTML = `
   <span class="watch-video-term">${videoTerm}</span>
