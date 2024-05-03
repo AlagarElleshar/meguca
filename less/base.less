@@ -514,6 +514,7 @@ iframe[src^="https://www.youtube"] {
 	button {
 		font-family: "Symbols";
 		margin-right: 5px;
+		width: 36px;
 	}
 	button:last-of-type {
 		margin-right: 0;
@@ -640,6 +641,13 @@ body.watch img.embed-thumb {
 	height: unset;
 	display: block;
 	border-radius: 10px;
+}
+#watch-panel:hover {
+	.player-controls {
+		display: block;
+		right: 20px;
+		top: 15px;
+	}
 }
 
 #watch-panel:hover > #watch-playlist {

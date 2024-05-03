@@ -38,6 +38,7 @@ let isOpen : boolean;
 let isPlaylistVisible = false;
 let subscribeMessage = new Uint8Array([1,message.nekoTV]).buffer
 let unsubMessage = new Uint8Array([0,message.nekoTV]).buffer
+let isMuted : boolean;
 
 export function initNekoTV() {
     if (!nekoTV) {
@@ -71,6 +72,49 @@ export function initNekoTV() {
         updateNekoTVIcon()
         togglePlayer()
     });
+
+    let watchCloseButton = document.getElementById('watch-close-button');
+    let watchMuteButton = document.getElementById('watch-mute-button');
+    watchCloseButton.addEventListener('click',()=>{
+        isOpen = false;
+        localStorage.setItem('neko-tv', 'f');
+        updateNekoTVIcon()
+        togglePlayer()
+    })
+    lastVal = localStorage.getItem('neko-tv-mute')
+    if (lastVal) {
+        isMuted = lastVal === 't';
+    } else {
+        isMuted = false;
+    }
+    if(isMuted) {
+        watchMuteButton.innerText = '􀊢'
+        watchMuteButton.title = 'Unmute'
+    }
+    else {
+        watchMuteButton.innerText = '􀊦'
+        watchMuteButton.title = 'Mute'
+    }
+    watchMuteButton.addEventListener('click',()=> {
+        isMuted = !isMuted;
+        localStorage.setItem('neko-tv-mute', isMuted ? 't' : 'f');
+        if (ytPlayer) {
+            if(isMuted){
+                ytPlayer.mute()
+            }
+            else {
+                ytPlayer.unMute()
+            }
+        }
+        if(isMuted) {
+            watchMuteButton.innerText = '􀊢'
+            watchMuteButton.title = 'Mute'
+        }
+        else {
+            watchMuteButton.innerText = '􀊦'
+            watchMuteButton.title = 'Unmute'
+        }
+    })
     player = new Player()
 
 }
