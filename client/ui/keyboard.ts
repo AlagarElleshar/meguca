@@ -41,6 +41,12 @@ function handleShortcut(event: KeyboardEvent) {
 					expandThreadForm()
 				}
 				break
+			case "9":
+				options.audioVolume = Math.max(0, options.audioVolume - 10)
+				break
+			case "0":
+				options.audioVolume = Math.min(100, options.audioVolume + 10)
+				break
 			default:
 				caught = false
 		}
