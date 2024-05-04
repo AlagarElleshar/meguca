@@ -86,6 +86,9 @@ export class Youtube {
                     } else {
                         ytPlayer.unMute();
                     }
+                    options.onChange("audioVolume", vol => {
+                        this.setPlayerVolume(vol)
+                    });
                     this.setPlayerVolume();
                     ytPlayer.playVideo();
                     console.log("player state", ytPlayer.getPlayerState());
