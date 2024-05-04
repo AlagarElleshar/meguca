@@ -27,6 +27,7 @@ const (
 	_shortcut
 	_range
 	_hr
+	_shortcut2 // Shortcut without alt
 )
 
 // Spec of an option passed into the rendering function
@@ -136,6 +137,8 @@ func (w *formWriter) input(spec inputSpec) {
 		w.attr("accept", "image/png,image/gif,image/jpeg")
 	case _shortcut:
 		w.attr("maxlength", "1")
+		w.attr("class", "shortcut")
+	case _shortcut2:
 		w.attr("class", "shortcut")
 	}
 

@@ -10,7 +10,7 @@ import options from "."
 
 // Types of option models
 export const enum optionType {
-	checkbox, number, image, shortcut, menu, textarea, none, range,
+	checkbox, number, image, shortcut, menu, textarea, none, range,shortcut2
 }
 
 // Full schema of the option interface
@@ -307,6 +307,18 @@ export const specs: { [id: string]: OptionSpec } = {
 	meguTVShortcut: {
 		default: 84,
 		type: optionType.shortcut,
+	},
+	nekoTVShortcut: {
+		default: 89,
+		type: optionType.shortcut,
+	},
+	volumeUp:{
+		default: "0",
+		type: optionType.shortcut2,
+	},
+	volumeDown:{
+		default: "9",
+		type: optionType.shortcut2,
 	},
 	galleryModeToggle: {
 		type: optionType.none,

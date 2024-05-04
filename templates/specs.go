@@ -420,5 +420,17 @@ var optionSpecs = [...][]inputSpec{
 			ID:   "meguTVShortcut",
 			Type: _shortcut,
 		},
+		{
+			ID:   "nekoTVShortcut",
+			Type: _shortcut,
+		},
+		{
+			ID:   "volumeUp",
+			Type: _shortcut2,
+		},
+		{
+			ID:   "volumeDown",
+			Type: _shortcut2,
+		},
 	},
 }

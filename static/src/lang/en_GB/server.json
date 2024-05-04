@@ -264,6 +264,10 @@
 			"Moderators",
 			"Moderator account IDs. Moderators can delete posts, ban posters and distinguish posters by their mnemonic IDs."
 		],
+		"nekoTVShortcut": [
+			"NekoTV",
+			"Plays synchronized videos for all users"
+		],
 		"name": [
 			"Name",
 			"Name to attach to new posts"
@@ -423,6 +427,14 @@
 		"userBGImage": [
 			"",
 			"Image to use as the background"
+		],
+		"volumeUp": [
+			"Volume Up",
+			"Increase media volume"
+		],
+		"volumeDown": [
+			"Volume Down",
+			"Decrease media volume"
 		],
 		"watchThreadsOnReply": [
 			"Watch threads on reply",

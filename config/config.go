@@ -105,6 +105,7 @@ const defaultFAQ = `Supported upload file types are JPEG, PNG, APNG, WEBM, MP3, 
 <hr>NekoWatch commands (WIP, Only regular YouTube URLs are supported for now):
 .play [URL]    - Queue a video
 .remove [URL]  - Remove a video from queue 
+.seek [TIME] - Seek to a timestamp in the video
 .clear         - Clears playlist
 .skip          - Skip current video
 .pause .unpause - Self-explanatory`

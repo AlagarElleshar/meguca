@@ -155,6 +155,13 @@ export function hidePlaylist() {
     stopPlayerTimeInterval();
 }
 
+export function toggleNekoTV(){
+    isOpen = !isOpen;
+    localStorage.setItem('neko-tv', isOpen ? 't' : 'f');
+    updateNekoTVIcon()
+    togglePlayer()
+}
+
 export function togglePlaylist() {
     isPlaylistVisible = !isPlaylistVisible;
     if (isPlaylistVisible) {

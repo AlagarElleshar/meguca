@@ -47,10 +47,13 @@ interface Options extends ChangeEmitter {
 	expandAll: number
 	workMode: number
 	meguTVShortcut: number
+	nekoTVShortcut: number
 	audioVolume: number
 	inlineFit: string
 	theme: string
 	customCSS: string
+	volumeUp: string
+	volumeDown: string
 }
 
 // Central options storage model

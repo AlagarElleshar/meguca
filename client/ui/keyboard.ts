@@ -4,6 +4,7 @@ import options from "../options"
 import { FormModel, postSM, postEvent, toggleExpandAll, expandThreadForm } from "../posts"
 import { page } from "../state"
 import { trigger } from "../util"
+import {toggleNekoTV} from "../nekotv/nekotv";
 
 // Bind keyboard event listener to the document
 export default () =>
@@ -41,16 +42,21 @@ function handleShortcut(event: KeyboardEvent) {
 					expandThreadForm()
 				}
 				break
-			case "9":
-				options.audioVolume = Math.max(0, options.audioVolume - 10)
-				break
-			case "0":
-				options.audioVolume = Math.min(100, options.audioVolume + 10)
-				break
 			default:
 				caught = false
 		}
+		switch (event.key) {
+			case options.volumeUp.toUpperCase():
+				options.audioVolume = Math.min(100, options.audioVolume + 10)
+				caught = true
+				break
+			case options.volumeDown.toUpperCase():
+				options.audioVolume = Math.max(0, options.audioVolume - 10)
+				caught = true
+				break
+		}
 	}
+
 
 	if (event.altKey && !altGr) {
 		caught = true
@@ -83,6 +89,9 @@ function handleShortcut(event: KeyboardEvent) {
 				break
 			case options.meguTVShortcut:
 				options.meguTV = !options.meguTV
+				break
+			case options.nekoTVShortcut:
+				toggleNekoTV()
 				break
 			case 38:
 				navigateUp()
