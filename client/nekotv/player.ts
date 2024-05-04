@@ -1,4 +1,4 @@
-import {Youtube} from "./ytplayer";
+import {Youtube} from "./youtube";
 import {VideoList} from "./videolist";
 import {VideoItem} from "../typings/messages";
 

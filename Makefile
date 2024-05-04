@@ -35,6 +35,7 @@ js:
 
 generate:
 	go generate . ./pb
+	npx protoc --ts_out client/typings --proto_path pb pb/messages.proto
 
 server:
 	go generate

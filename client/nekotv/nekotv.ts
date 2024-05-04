@@ -20,7 +20,7 @@ import {
     WebSocketMessage,
 } from "../typings/messages";
 import {Player} from "./player";
-import {ytPlayer} from "./ytplayer";
+import {ytPlayer} from "./youtube";
 
 let player: Player;
 
@@ -32,7 +32,7 @@ export let vidEl: HTMLVideoElement;
 export let watchStatus: HTMLElement;
 export let currentSource: string;
 export let watchDiv: HTMLElement;
-let playerTimeInterval: NodeJS.Timeout | null = null;
+let playerTimeInterval: number | null = null;
 let nekoTV = document.getElementById("banner-nekotv");
 let isOpen : boolean;
 let isPlaylistVisible = false;
@@ -52,6 +52,10 @@ export function initNekoTV() {
     watchStatus = document.getElementById('status-watch')!;
     watchDiv = document.getElementById("watch-panel");
     playerDiv.addEventListener("click",()=>{
+        let is_coarse = matchMedia('(pointer:coarse)').matches
+        if(is_coarse){
+            return
+        }
         if (playlistDiv.style.display) {
             playlistDiv.style.display = ''
         } else {
@@ -178,8 +182,7 @@ export function updatePlayerTime() {
         return;
     }
 
-    let playerTime: number | undefined = null;
-    playerTime = ytPlayer.getCurrentTime();
+    let playerTime = ytPlayer.getCurrentTime();
 
     if (playerTime === undefined) {
         console.error('Player time undefined');
@@ -335,40 +338,57 @@ function handleClearPlaylistEvent(clearPlaylistEvent: ClearPlaylistEvent) {
 }
 
 export function handleMessage(message: WebSocketMessage) {
-    if (message.connectedEvent) {
-        handleConnectedEvent(message.connectedEvent);
-    } else if (message.addVideoEvent) {
-        handleAddVideoEvent(message.addVideoEvent);
-    } else if (message.removeVideoEvent) {
-        handleRemoveVideoEvent(message.removeVideoEvent);
-    } else if (message.skipVideoEvent) {
-        handleSkipVideoEvent(message.skipVideoEvent);
-    } else if (message.pauseEvent) {
-        handlePauseEvent(message.pauseEvent);
-    } else if (message.playEvent) {
-        handlePlayEvent(message.playEvent);
-    } else if (message.getTimeEvent) {
-        handleGetTimeEvent(message.getTimeEvent);
-    } else if (message.setTimeEvent) {
-        handleSetTimeEvent(message.setTimeEvent);
-    } else if (message.setRateEvent) {
-        handleSetRateEvent(message.setRateEvent);
-    } else if (message.rewindEvent) {
-        handleRewindEvent(message.rewindEvent);
-    } else if (message.playItemEvent) {
-        handlePlayItemEvent(message.playItemEvent);
-    } else if (message.setNextItemEvent) {
-        handleSetNextItemEvent(message.setNextItemEvent);
-    } else if (message.updatePlaylistEvent) {
-        handleUpdatePlaylistEvent(message.updatePlaylistEvent);
-    } else if (message.togglePlaylistLockEvent) {
-        handleTogglePlaylistLockEvent(message.togglePlaylistLockEvent);
-    } else if (message.dumpEvent) {
-        handleDumpEvent(message.dumpEvent);
-    } else if (message.clearPlaylistEvent) {
-        handleClearPlaylistEvent(message.clearPlaylistEvent);
-    } else {
-        console.error("Invalid WebSocketMessage received");
+    switch (message.messageType.oneofKind) {
+        case "connectedEvent":
+            handleConnectedEvent(message.messageType.connectedEvent);
+            break;
+        case "addVideoEvent":
+            handleAddVideoEvent(message.messageType.addVideoEvent);
+            break;
+        case "removeVideoEvent":
+            handleRemoveVideoEvent(message.messageType.removeVideoEvent);
+            break;
+        case "skipVideoEvent":
+            handleSkipVideoEvent(message.messageType.skipVideoEvent);
+            break;
+        case "pauseEvent":
+            handlePauseEvent(message.messageType.pauseEvent);
+            break;
+        case "playEvent":
+            handlePlayEvent(message.messageType.playEvent);
+            break;
+        case "getTimeEvent":
+            handleGetTimeEvent(message.messageType.getTimeEvent);
+            break;
+        case "setTimeEvent":
+            handleSetTimeEvent(message.messageType.setTimeEvent);
+            break;
+        case "setRateEvent":
+            handleSetRateEvent(message.messageType.setRateEvent);
+            break;
+        case "rewindEvent":
+            handleRewindEvent(message.messageType.rewindEvent);
+            break;
+        case "playItemEvent":
+            handlePlayItemEvent(message.messageType.playItemEvent);
+            break;
+        case "setNextItemEvent":
+            handleSetNextItemEvent(message.messageType.setNextItemEvent);
+            break;
+        case "updatePlaylistEvent":
+            handleUpdatePlaylistEvent(message.messageType.updatePlaylistEvent);
+            break;
+        case "togglePlaylistLockEvent":
+            handleTogglePlaylistLockEvent(message.messageType.togglePlaylistLockEvent);
+            break;
+        case "dumpEvent":
+            handleDumpEvent(message.messageType.dumpEvent);
+            break;
+        case "clearPlaylistEvent":
+            handleClearPlaylistEvent(message.messageType.clearPlaylistEvent);
+            break;
+        default:
+            console.error("Invalid WebSocketMessage received");
     }
 }
 function truncateWithEllipsis(e, t) {

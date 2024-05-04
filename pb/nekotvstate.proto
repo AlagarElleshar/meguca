@@ -1,0 +1,19 @@
+syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+import "messages.proto";
+option go_package = "./pb";
+
+message VideoTimer {
+  bool is_started = 1;
+  google.protobuf.Timestamp start_time = 2;
+  google.protobuf.Timestamp pause_start_time = 3;
+  google.protobuf.Timestamp rate_start_time = 4;
+  float rate = 5;
+}
+
+
+message ServerState {
+  repeated VideoItem video_list = 1;
+  int32 item_pos = 2;
+  VideoTimer timer = 3;
+}

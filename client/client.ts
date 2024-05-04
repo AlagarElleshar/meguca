@@ -10,7 +10,7 @@ import { getPostName } from "./options"
 import { OverlayNotification } from "./ui"
 import { setCookie }  from './util';
 import { debug } from "./state"
-import {protobufPackage, WebSocketMessage} from "./typings/messages";
+import {WebSocketMessage} from "./typings/messages";
 import {handleMessage} from "./nekotv/nekotv";
 
 // Message for splicing the contents of the current line
@@ -259,9 +259,9 @@ export default () => {
 	handlers[message.setCookie] = ({ key, value }: CookieMessage) =>
 		setCookie(key, value, 30)
 	handlers[message.nekoTV] = (message : ArrayBuffer) => {
-		let msg = WebSocketMessage.decode(new Uint8Array(message));
-		if (!msg.getTimeEvent) {
-			console.log(WebSocketMessage.toJSON(msg))
+		let msg = WebSocketMessage.fromBinary(new Uint8Array(message));
+		if (debug && msg.messageType.oneofKind !== "getTimeEvent") {
+			console.log(WebSocketMessage.toJsonString(msg))
 			console.log(msg)
 		}
 		handleMessage(msg)
