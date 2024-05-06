@@ -351,6 +351,22 @@ export function activateTheaterMode() {
 export function deactivateTheaterMode() {
     const rightDiv = document.getElementById('right-content');
     const watchPanel = document.getElementById('watch-panel');
+    const articles = document.getElementsByTagName('article');
+    let articleShown = null;
+    for (let i = articles.length - 1; i >= 0; i--) {
+        const article = articles[i];
+        const rect = article.getBoundingClientRect();
+
+        if (
+            rect.top >= 0 &&
+            rect.left >= 0 &&
+            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+        ) {
+            articleShown = article;
+            break
+        }
+    }
 
     document.getElementById("watcher").after(watchPanel);
 
@@ -360,4 +376,11 @@ export function deactivateTheaterMode() {
     rightDiv.remove()
 
     document.body.classList.remove("nekotv-theater");
+    articleShown.scrollIntoView(
+        {
+            behavior: "instant",
+            block: "end",
+            inline: "start"
+        }
+    )
 }
