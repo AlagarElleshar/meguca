@@ -1,9 +1,13 @@
-import {Youtube} from "./youtube";
+import {Youtube} from "./players/youtube";
 import {VideoList} from "./videolist";
 import {VideoItem} from "../typings/messages";
+import {IPlayer} from "./players/iplayer";
+import {TwitchPlayer} from "./players/twitch";
+import {RawPlayer} from "./players/rawplayer";
 
 export class Player {
-    public player: Youtube = new Youtube();
+    private player: IPlayer = null;
+    readonly players : Array<IPlayer> = [ new Youtube(), new TwitchPlayer()]
     private isLoaded = false;
     private skipSetTime = false;
     private skipSetRate = false;
@@ -43,22 +47,27 @@ export class Player {
 
     public setVideo(i: number): void {
         const item = this.videoList.getItem(i);
-        // const currentPlayer = this.players.find(p => p.isSupportedLink(item.url));
-        //
-        // if (currentPlayer !== null) {
-        //     this.setPlayer(currentPlayer);
-        // } else if (item.isIframe) {
-        //     this.setPlayer(this.iframePlayer);
-        // } else {
-        //     this.setPlayer(this.rawPlayer);
-        // }
 
         this.videoList.setPos(i);
         this.isLoaded = false;
 
-        if (this.player !== null) {
+        let matchedPlayer : IPlayer = null;
+        for(const player of this.players){
+            if(player.isSupportedLink(item.url)){
+                matchedPlayer = player;
+                break;
+            }
+        }
+        if(matchedPlayer != this.player){
+            if(this.player !== null) {
+                this.player.removeVideo();
+            }
+            this.player = matchedPlayer;
+            this.player.loadVideo(item);
+        } else{
             this.player.loadVideo(item);
         }
+
         // else {
         //     this.onCanBePlayed();
         // }
@@ -66,21 +75,21 @@ export class Player {
         // JsApi.fireVideoChangeEvents(item);
     }
 
-    public changeVideoSrc(src: string): void {
-        if (this.player === null) return;
-        const item = this.videoList.currentItem;
-        if (item === undefined) return;
-
-        this.player.loadVideo({
-            url: src,
-            title: item.title,
-            author: item.author,
-            duration: item.duration,
-            subs: item.subs,
-            isTemp: item.isTemp,
-            isIframe: item.isIframe
-        });
-    }
+    // public changeVideoSrc(src: string): void {
+    //     if (this.player === null) return;
+    //     const item = this.videoList.currentItem;
+    //     if (item === undefined) return;
+    //
+    //     this.player.loadVideo({
+    //         url: src,
+    //         title: item.title,
+    //         author: item.author,
+    //         duration: item.duration,
+    //         subs: item.subs,
+    //         isTemp: item.isTemp,
+    //         isIframe: item.isIframe
+    //     });
+    // }
 
     public removeVideo(): void {
         // JsApi.fireVideoRemoveEvents(this.videoList.currentItem);
@@ -211,5 +220,13 @@ export class Player {
         if (!this.player.isVideoLoaded()) return;
         this.skipSetRate = isLocal;
         this.player.setPlaybackRate(rate);
+    }
+
+    setMuted(isMuted: boolean) {
+        this.player.setMuted(isMuted);
+    }
+
+    stop() {
+        this.player.removeVideo()
     }
 }

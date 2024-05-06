@@ -540,18 +540,21 @@ iframe[src^="https://www.youtube"] {
 	color: #dee3e3e6
 }
 
-#watch-video {
+#watch-video > * {
 	width: 38vw;
 	height: 52vh;
 	pointer-events: none;
 	cursor: not-allowed;
 }
+#watch-video > iframe[title="Twitch"] {
+	pointer-events: all;
+}
 
-#watch-video, #watch-playlist {
+#watch-video > *, #watch-playlist {
 	width: 45vw;
 }
 @media screen and (max-width: 700px) {
-	#watch-video, #watch-playlist {
+	#watch-video > *, #watch-playlist {
 		width:90vw;
 	}
 	#watch-panel {
@@ -640,7 +643,7 @@ body.watch img.embed-thumb {
 	cursor: not-allowed;
 	user-select: none
 }
-#watch-video {
+#watch-video > * {
 	aspect-ratio: 16/9;
 	height: unset;
 	display: block;

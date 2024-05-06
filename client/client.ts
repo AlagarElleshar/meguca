@@ -11,7 +11,7 @@ import { OverlayNotification } from "./ui"
 import { setCookie }  from './util';
 import { debug } from "./state"
 import {WebSocketMessage} from "./typings/messages";
-import {handleMessage} from "./nekotv/nekotv";
+import {handleMessage} from "./nekotv/handlers";
 
 // Message for splicing the contents of the current line
 export type SpliceResponse = {
