@@ -20,6 +20,7 @@ let subscribeMessage = new Uint8Array([1,message.nekoTV]).buffer
 let unsubMessage = new Uint8Array([0,message.nekoTV]).buffer
 let isMuted : boolean;
 export let watchPlaylistButton: HTMLElement;
+export let watchMuteButton: HTMLElement;
 
 export function initNekoTV() {
     if (!nekoTV) {
@@ -59,7 +60,7 @@ export function initNekoTV() {
     });
 
     let watchCloseButton = document.getElementById('watch-close-button');
-    let watchMuteButton = document.getElementById('watch-mute-button');
+    watchMuteButton = document.getElementById('watch-mute-button');
     watchPlaylistButton = document.getElementById('watch-playlist-button');
     watchCloseButton.addEventListener('click',()=>{
         isOpen = false;

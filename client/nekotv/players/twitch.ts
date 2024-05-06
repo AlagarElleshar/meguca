@@ -1,6 +1,6 @@
 import { VideoItem } from "../../typings/messages";
 import { tempNotify } from "../../ui/notification";
-import {isNekoTVMuted, isNekoTVOpen, vidEl, watchPlaylistButton} from "../nekotv";
+import {isNekoTVMuted, isNekoTVOpen, vidEl, watchMuteButton, watchPlaylistButton} from "../nekotv";
 import options from "../../options";
 import {IPlayer, PlayerState} from "./iplayer";
 import PlayerOptions = Twitch.PlayerOptions;
@@ -53,6 +53,7 @@ export class TwitchPlayer implements IPlayer {
         this.twitchPlayer = new Twitch.Player("watch-video", twitchOptions);
         this.twitchPlayer.addEventListener(Twitch.Player.READY, () => {
             watchPlaylistButton.style.display = "";
+            watchMuteButton.style.display = "none";
             this.state = PlayerState.PLAYER_ADDED;
             if (isNekoTVMuted()) {
                 this.twitchPlayer.setMuted(true);
@@ -113,6 +114,7 @@ export class TwitchPlayer implements IPlayer {
         let twitchIframe = vidEl.querySelector(`iframe[title="Twitch"]`)
         twitchIframe.remove()
         watchPlaylistButton.style.display = "none";
+        watchMuteButton.style.display = "";
         this.state = PlayerState.SCRIPT_LOADED;
     }
 
