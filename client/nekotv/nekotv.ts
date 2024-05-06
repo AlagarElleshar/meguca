@@ -218,7 +218,11 @@ function padWithZero(value: number): string {
 }
 export function updatePlaylist() {
     if (player.isListEmpty()) {
-        player.stop()
+        if(isTheaterMode){
+            deactivateTheaterMode()
+            isTheaterMode = false
+        }
+        removePlayer()
         return;
     }
     if (!playerTimeInterval) {
@@ -288,7 +292,7 @@ export function togglePlayer() {
 }
 
 export function unsubscribeFromWatchFeed() {
-    player.stop()
+    removePlayer()
     sendBinary(unsubMessage)
 }
 

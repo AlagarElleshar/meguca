@@ -138,7 +138,10 @@ function handleRemoveVideoEvent(removeVideoEvent: RemoveVideoEvent) {
 
 function handleSkipVideoEvent(skipVideoEvent: SkipVideoEvent) {
     player.skipItem(skipVideoEvent.url);
-    if (player.isListEmpty()) player.pause();
+    if (player.isListEmpty()) {
+        player.pause();
+        hideWatchPanel();
+    }
     updatePlaylist()
 }
 
