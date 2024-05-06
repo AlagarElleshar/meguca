@@ -332,13 +332,15 @@ func HandleMediaCommand(thread uint64, c *common.MediaCommand) {
 	switch c.Type {
 	case common.AddVideo:
 		log.Info("Adding video to the playlist")
-		videoData, err := nekotv.GetVideoData(c.Args)
-		if err == nil {
-			log.Infof("Video data retrieved: %v", videoData)
-			ntv.AddVideo(&videoData, true)
-		} else {
-			log.Errorf("Failed to get video data: %v", err)
-		}
+		go func() {
+			videoData, err := nekotv.GetVideoData(c.Args)
+			if err == nil {
+				log.Infof("Video data retrieved: %v", videoData)
+				ntv.AddVideo(&videoData, true)
+			} else {
+				log.Errorf("Failed to get video data: %v", err)
+			}
+		}()
 		break
 	case common.RemoveVideo:
 		log.Infof("Removing video from the playlist: %s", c.Args)

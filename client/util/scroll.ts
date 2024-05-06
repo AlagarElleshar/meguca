@@ -28,19 +28,45 @@ export function scrollToAnchor() {
 	checkBottom()
 }
 
+function isTheaterModeActive() {
+	return document.body.classList.contains("nekotv-theater")
+}
+
+function getTheaterModeRightDiv() {
+	return document.getElementById("right-content")
+}
+
 // Scroll to particular element and compensate for the banner height
 export function scrollToElement(el: HTMLElement) {
-	window.scrollTo(0, el.offsetTop - banner.offsetHeight - 5)
+	if(isTheaterModeActive()){
+		let rightDiv = getTheaterModeRightDiv()
+		rightDiv.scrollTo(0, el.offsetTop - rightDiv.offsetTop - 5)
+	}
+	else {
+		window.scrollTo(0, el.offsetTop - banner.offsetHeight - 5)
+	}
 }
 
 function scrollToTop() {
-	window.scrollTo(0, 0)
+	if(isTheaterModeActive()){
+		let rightDiv = getTheaterModeRightDiv()
+		rightDiv.scrollTo(0, 0)
+	}
+	else {
+		window.scrollTo(0, 0)
+	}
 	checkBottom()
 }
 
 // Scroll to the bottom of the thread
 export function scrollToBottom() {
-	window.scrollTo(0, document.documentElement.scrollHeight)
+	if(isTheaterModeActive()){
+		let rightDiv = getTheaterModeRightDiv()
+		rightDiv.scrollTo(0, rightDiv.scrollHeight)
+	}
+	else {
+		window.scrollTo(0, document.documentElement.scrollHeight)
+	}
 	atBottom = true
 }
 
@@ -63,11 +89,19 @@ export function checkBottom() {
 
 // Return, if scrolled to bottom of page
 export function isAtBottom(): boolean {
+	if(isTheaterModeActive()){
+		let rightDiv = getTheaterModeRightDiv()
+		let {scrollTop, scrollHeight, offsetHeight} = rightDiv
+		console.log(scrollTop, scrollHeight, offsetHeight)
+		return Math.abs(rightDiv.scrollTop - (rightDiv.scrollHeight - rightDiv.offsetHeight)) < 2
+	}
 	return window.innerHeight
 		+ window.scrollY
 		- document.documentElement.offsetHeight
 		> -1
 }
+// @ts-ignore
+window.isAtBottom = isAtBottom
 
 // If we are at the bottom, lock
 document.addEventListener("scroll", () => {
@@ -75,6 +109,15 @@ document.addEventListener("scroll", () => {
 	locked = !scrolled;
 	checkBottom();
 }, { passive: true })
+
+export function addTheaterModeScrollListener(){
+	let rightDiv = getTheaterModeRightDiv()
+	rightDiv.addEventListener("scroll", () => {
+		scrolled = !isAtBottom()
+		locked = !scrolled;
+		checkBottom();
+	}, { passive: true })
+}
 
 // Use a MutationObserver to jump to the bottom of the page when a new
 // post is made, we are locked to the bottom or the user set the alwaysLock option

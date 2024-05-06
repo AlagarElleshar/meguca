@@ -1,5 +1,5 @@
 import {connSM, connState, message, sendBinary} from "../connection";
-import {escape} from "../util"
+import {addTheaterModeScrollListener, escape, isAtBottom, scrollToBottom} from "../util"
 import {Player} from "./player";
 
 export let player: Player;
@@ -22,6 +22,7 @@ let isMuted : boolean;
 export let watchPlaylistButton: HTMLElement;
 export let watchMuteButton: HTMLElement;
 let isTheaterMode = false;
+let rightDiv : HTMLElement = null;
 
 export function initNekoTV() {
     if (!nekoTV) {
@@ -311,8 +312,17 @@ export function removePlayer() {
     hideWatchPanel();
 }
 
+export function isTheaterModeActive() {
+    return isTheaterMode;
+}
+
+export function getTheaterModeRightDiv() {
+    return rightDiv;
+}
+
 export function activateTheaterMode() {
     const articles = document.getElementsByTagName('article');
+    const atBottom = isAtBottom()
 
     let articleShown = null;
     for (let i = articles.length - 1; i >= 0; i--) {
@@ -331,7 +341,7 @@ export function activateTheaterMode() {
     }
 
     const bodyChildren = document.body.children;
-    const rightDiv = document.createElement('div');
+    rightDiv = document.createElement('div');
     rightDiv.id = 'right-content';
     for (let i = 0; i < bodyChildren.length; i++) {
         const child = bodyChildren[i];
@@ -340,22 +350,30 @@ export function activateTheaterMode() {
     }
 
     document.body.appendChild(rightDiv);
+    addTheaterModeScrollListener()
     const videoElement = document.getElementById('watch-panel');
     document.body.insertBefore(videoElement, document.body.firstChild);
     document.body.classList.add("nekotv-theater")
-    articleShown.scrollIntoView(
-        {
-            behavior: "instant",
-            block: "end",
-            inline: "start"
-        }
-    )
+    if(atBottom){
+        let rightDiv = getTheaterModeRightDiv()
+        rightDiv.scrollTo(0, rightDiv.scrollHeight)
+    }
+    else {
+        articleShown.scrollIntoView(
+            {
+                behavior: "instant",
+                block: "end",
+                inline: "start"
+            }
+        )
+    }
+    player.reload()
 }
 
 export function deactivateTheaterMode() {
-    const rightDiv = document.getElementById('right-content');
     const watchPanel = document.getElementById('watch-panel');
     const articles = document.getElementsByTagName('article');
+    const atBottom = isAtBottom()
     let articleShown = null;
     for (let i = articles.length - 1; i >= 0; i--) {
         const article = articles[i];
@@ -378,6 +396,7 @@ export function deactivateTheaterMode() {
         document.body.appendChild(rightDiv.firstChild);
     }
     rightDiv.remove()
+    rightDiv = null;
 
     document.body.classList.remove("nekotv-theater");
     articleShown.scrollIntoView(
@@ -387,4 +406,17 @@ export function deactivateTheaterMode() {
             inline: "start"
         }
     )
+    player.reload()
+    if(atBottom){
+        scrollToBottom()
+    }
+    else {
+        articleShown.scrollIntoView(
+            {
+                behavior: "instant",
+                block: "end",
+                inline: "start"
+            }
+        )
+    }
 }

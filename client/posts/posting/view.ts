@@ -7,7 +7,6 @@ import { postSM, postEvent, postState } from "."
 import UploadForm from "./upload"
 import identity from "./identity"
 import lang from "../../lang";
-import {message, sendBinary} from "../../connection";
 
 // Element at the bottom of the thread to keep the fixed reply form from
 // overlapping any other posts, when scrolled till bottom

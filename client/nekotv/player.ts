@@ -232,4 +232,9 @@ export class Player {
             this.player = null
         }
     }
+
+    public reload() {
+        this.player.removeVideo()
+        this.player.loadVideo(this.videoList.currentItem)
+    }
 }
