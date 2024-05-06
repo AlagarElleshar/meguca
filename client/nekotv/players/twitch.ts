@@ -103,7 +103,7 @@ export class TwitchPlayer implements IPlayer {
                 this.addPlayer(item);
                 break;
             case PlayerState.PLAYER_ADDED:
-                this.twitchPlayer.setVideo(this.extractChannelName(item.url));
+                this.twitchPlayer.setChannel(this.extractChannelName(item.url));
                 break;
         }
     }
