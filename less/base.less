@@ -54,11 +54,11 @@ article time {
 	cursor:default
 }
 
-article:not(.reply-form) .control {
+article:not(.reply-form) .control > svg{
 	color: rgba(0,0,0,0);
 }
 
-article:not(.reply-form):hover .control {
+article:not(.reply-form):hover .control > svg {
 	color: inherit;
 }
 
@@ -118,7 +118,7 @@ aside {
 }
 
 .mono {
-	font-family: monospace;
+	font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
 }
 
 textarea {
@@ -359,6 +359,10 @@ td {
 		margin: 1px 0;
 	}
 
+	article:not(.reply-form) .control > svg{
+		color: inherit;
+	}
+
 	figure {
 		padding: 0;
 	}
@@ -385,8 +389,11 @@ td {
 		width: 100%;
 	}
 
-	article, article.media {
+	article {
 		min-width: 0;
+	}
+ 	article.media {
+
 	}
 
 	article:not(.reply-form) .control {
@@ -572,7 +579,7 @@ iframe[src^="https://www.youtube"] {
 	padding-right: 10px;
 	font-style: italic;
 	color: rgba(188,178,178,.934);
-	font-family: monospace
+	font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
 }
 
 #watch-playlist {
@@ -586,7 +593,7 @@ iframe[src^="https://www.youtube"] {
 	li::before {
 		content: "-";
 		margin-right: 0.5em;
-		font-family: monospace;
+		font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
 		color: rgba(121,124,125,.907)
 	}
 
@@ -628,7 +635,9 @@ iframe[src^="https://www.youtube"] {
 
 .watch-video-time {
 	padding-right: 16px;
-	font-family: monospace;
+	span:not(.infinite){
+		font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+	}
 }
 
 .hide-watch-panel {

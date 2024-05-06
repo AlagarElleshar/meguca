@@ -111,6 +111,10 @@ func CreateThread(req ThreadCreationRequest, ip string) (
 		log.Warnf("IP address %s tried to create a thread but has NOT posted before", ip)
 		return
 	}
+	if count == 1 {
+		log.Warnf("IP address %s tried to create a thread but has only posted once", ip)
+		return
+	}
 
 	// Must ensure image token usage is done atomically, as not to cause
 	// possible data races with unused image cleanup

@@ -19,6 +19,7 @@ let isPlaylistVisible = false;
 let subscribeMessage = new Uint8Array([1,message.nekoTV]).buffer
 let unsubMessage = new Uint8Array([0,message.nekoTV]).buffer
 let isMuted : boolean;
+export let watchPlaylistButton: HTMLElement;
 
 export function initNekoTV() {
     if (!nekoTV) {
@@ -59,6 +60,7 @@ export function initNekoTV() {
 
     let watchCloseButton = document.getElementById('watch-close-button');
     let watchMuteButton = document.getElementById('watch-mute-button');
+    watchPlaylistButton = document.getElementById('watch-playlist-button');
     watchCloseButton.addEventListener('click',()=>{
         isOpen = false;
         localStorage.setItem('neko-tv', 'f');
@@ -92,6 +94,9 @@ export function initNekoTV() {
             watchMuteButton.title = 'Unmute'
         }
     })
+    watchPlaylistButton.addEventListener('click',()=>{
+        togglePlaylist()
+    });
     player = new Player()
 
 }
@@ -128,8 +133,8 @@ export function showPlaylist() {
 }
 
 export function hidePlaylist() {
-    playlistDiv.style.display = 'none';
-    stopPlayerTimeInterval();
+    playlistDiv.style.display = '';
+    // stopPlayerTimeInterval();
 }
 
 export function toggleNekoTV(){
@@ -228,8 +233,10 @@ export function updatePlaylist() {
 
         const videoTitle = escape(video.title);
         let durationString: string = null;
+        let moreClasses = ""
         if (video.duration == Number.POSITIVE_INFINITY) {
             durationString = '∞';
+            moreClasses = " infinite"
         }
         else {
             durationString = secondsToTimeExact(video.duration)
@@ -242,7 +249,7 @@ export function updatePlaylist() {
   </a>
   <span class="watch-video-time">
     <span class="watch-player-time"></span>
-    <span class="watch-player-dur">${durationString}</span>
+    <span class="watch-player-dur${moreClasses}">${durationString}</span>
   </span>
 `;
 
