@@ -222,13 +222,14 @@ export class Player {
         this.player.setPlaybackRate(rate);
     }
 
-    setMuted(isMuted: boolean) {
+    public setMuted(isMuted: boolean) {
         this.player.setMuted(isMuted);
     }
 
-    stop() {
-        this.player.removeVideo()
-        this.player = null
-
+    public stop() {
+        if(this.player) {
+            this.player.removeVideo()
+            this.player = null
+        }
     }
 }
