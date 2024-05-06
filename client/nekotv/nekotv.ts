@@ -65,6 +65,10 @@ export function initNekoTV() {
     watchPlaylistButton = document.getElementById('watch-playlist-button');
     let watchTheaterButton = document.getElementById('watch-theater-button');
     watchCloseButton.addEventListener('click',()=>{
+        if(isTheaterMode){
+            deactivateTheaterMode()
+            isTheaterMode = false;
+        }
         isOpen = false;
         localStorage.setItem('neko-tv', 'f');
         updateNekoTVIcon()
@@ -297,12 +301,31 @@ export function subscribeToWatchFeed() {
 export function removePlayer() {
     if(isTheaterMode){
         deactivateTheaterMode()
+        isTheaterMode = false
     }
     player.stop()
     hideWatchPanel();
 }
 
 export function activateTheaterMode() {
+    const articles = document.getElementsByTagName('article');
+
+    let articleShown = null;
+    for (let i = articles.length - 1; i >= 0; i--) {
+        const article = articles[i];
+        const rect = article.getBoundingClientRect();
+
+        if (
+            rect.top >= 0 &&
+            rect.left >= 0 &&
+            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+        ) {
+            articleShown = article;
+            break
+        }
+    }
+
     const bodyChildren = document.body.children;
     const rightDiv = document.createElement('div');
     rightDiv.id = 'right-content';
@@ -311,10 +334,18 @@ export function activateTheaterMode() {
         rightDiv.appendChild(child);
         i--;
     }
+
     document.body.appendChild(rightDiv);
     const videoElement = document.getElementById('watch-panel');
     document.body.insertBefore(videoElement, document.body.firstChild);
     document.body.classList.add("nekotv-theater")
+    articleShown.scrollIntoView(
+        {
+            behavior: "instant",
+            block: "end",
+            inline: "start"
+        }
+    )
 }
 
 export function deactivateTheaterMode() {
