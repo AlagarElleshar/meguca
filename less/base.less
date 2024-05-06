@@ -354,6 +354,101 @@ td {
 	margin-bottom: auto;
 }
 
+.nekotv-theater {
+	display: flex;
+	overflow: hidden;
+	height: 100vh;
+
+	#watch-panel {
+		flex-grow: 1;
+		height: 100%;
+		max-height: none;
+		max-width: none;
+		overflow: auto;
+		border-radius: 0;
+		box-shadow: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		background-color: transparent;
+		justify-content: center;
+	}
+	#watch-playlist {
+		flex-grow: 1;
+		display: block;
+		width: 100%;
+	}
+
+	body {
+		overflow: hidden;
+	}
+	#right-content {
+		width: 300px;
+		height: 100%;
+		overflow-y: scroll;
+		position: relative;
+	}
+
+	#watch-video > *{
+		width: 100%;
+		border-radius: 0;
+		margin: auto;
+	}
+
+	.overlay-container {
+		height: auto;
+	}
+	.reply-form:not(.preview) {
+		position: fixed;
+		z-index: 15;
+		bottom: 0;
+		left: calc(100vw - 300px);
+	}
+	.reply-form textarea , .reply-form blockquote{
+		width: 100%;
+	}
+	article:not(.reply-form) .control > svg{
+		color: inherit;
+	}
+
+	figure {
+		padding: 0;
+	}
+
+	img.expanded {
+		margin: 0;
+	}
+
+	blockquote {
+		margin   : 0.5em 0 0.5em 0.5em;
+	}
+
+	#threads {
+		padding: 0em 0.3em 1em;
+	}
+
+	#thread-post-counters,
+	#sync-counter,
+	.image-banner {
+		display: none;
+	}
+
+	#post-controls {
+		width: 100%;
+	}
+
+	article {
+		min-width: 0;
+	}
+	article.media {
+
+	}
+
+	article:not(.reply-form) .control {
+		display: initial;
+	}
+
+}
 @media screen and (max-width: 700px) {
 	body {
 		margin: 1px 0;
