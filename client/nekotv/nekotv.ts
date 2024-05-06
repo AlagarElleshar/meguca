@@ -202,7 +202,7 @@ function padWithZero(value: number): string {
 }
 export function updatePlaylist() {
     if (player.isListEmpty()) {
-        removePlayer()
+        player.stop()
         return;
     }
     if (!playerTimeInterval) {
@@ -272,7 +272,7 @@ export function togglePlayer() {
 }
 
 export function unsubscribeFromWatchFeed() {
-    removePlayer();
+    player.stop()
     sendBinary(unsubMessage)
 }
 
@@ -283,6 +283,6 @@ export function subscribeToWatchFeed() {
 }
 
 export function removePlayer() {
-    player.removeVideo();
+    player.stop()
     hideWatchPanel();
 }

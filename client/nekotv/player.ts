@@ -143,7 +143,7 @@ export class Player {
             this.videoList.setPos(pos);
         }
 
-        if (currentUrl !== this.videoList.currentItem?.url) {
+        if (currentUrl !== this.videoList.currentItem?.url || this.player === null) {
             this.setVideo(this.videoList.pos);
         }
     }
@@ -228,5 +228,7 @@ export class Player {
 
     stop() {
         this.player.removeVideo()
+        this.player = null
+
     }
 }
