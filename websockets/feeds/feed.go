@@ -76,7 +76,7 @@ type Feed struct {
 	// Let sent sync counter
 	lastSyncCount syncCount
 	// Let sent sync counter
-	claudeMessage chan []byte
+	binaryMessages chan []byte
 	// Tiktok state
 	updatePendingTiktokState chan pendingTiktokState
 	// set of queued post IDs
@@ -198,7 +198,7 @@ func (f *Feed) Start() (err error) {
 				f.modifyPost(msg.message, func(p *cachedPost) {
 					p.PendingTikToks = msg.state
 				})
-			case msg := <-f.claudeMessage:
+			case msg := <-f.binaryMessages:
 				f.sendToAllBinary(msg)
 
 			// Posts being moderated
@@ -353,7 +353,7 @@ func (f *Feed) SendClaudeToken(id uint64, token string) {
 	binary.LittleEndian.PutUint64(message, math.Float64bits(float64(id)))
 	copy(message[8:], token)
 	message[messageSize-1] = uint8(common.MessageClaudeAppend)
-	f.claudeMessage <- message
+	f.binaryMessages <- message
 }
 func (f *Feed) SendClaudeComplete(id uint64, isError bool, response *bytes.Buffer) {
 	messageSize := 9 + response.Len()
@@ -365,7 +365,7 @@ func (f *Feed) SendClaudeComplete(id uint64, isError bool, response *bytes.Buffe
 	} else {
 		message[messageSize-1] = uint8(common.MessageClaudeDone)
 	}
-	f.claudeMessage <- message
+	f.binaryMessages <- message
 }
 func (f *Feed) GetPendingTiktokState(id uint64) (p PendingTikToks, ok bool) {
 	//return f.cache.Recent[id].PendingTikToks
@@ -390,4 +390,8 @@ func (f *Feed) UpdatePendingTiktokState(id uint64, state PendingTikToks) {
 		message: message{id, msg},
 		state:   state,
 	}
+}
+
+func (f *Feed) SendBinaryMessage(msg []byte) {
+	f.binaryMessages <- msg
 }

@@ -5,14 +5,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/bakape/meguca/common"
 	"github.com/bakape/meguca/pb"
-	"math"
 	"os/exec"
 	"regexp"
 )
 
-const (
-	twitchStreamRegex = `(?:https?:\/\/)?(?:www\.)?twitch\.tv\/(\w+)(?:\/)?`
+var (
+	twitchStreamRegex = regexp.MustCompile(`(?:https?:\/\/)?(?:www\.)?twitch\.tv\/(\w+)(?:\/)?`)
+	kickStreamRegex   = regexp.MustCompile(`(?:https?:\/\/)?(?:www\.)?kick\.com\/(\w+)(?:\/)?`)
 )
 
 type TwitchData struct {
@@ -101,8 +102,7 @@ type TwitchData struct {
 }
 
 func getTwitchData(link string) (*pb.VideoItem, error) {
-	twitchReg := regexp.MustCompile(twitchStreamRegex)
-	match := twitchReg.FindStringSubmatch(link)
+	match := twitchStreamRegex.FindStringSubmatch(link)
 	if match == nil {
 		return nil, errors.New("Invalid twitch link")
 	}
@@ -126,6 +126,21 @@ func getTwitchData(link string) (*pb.VideoItem, error) {
 	return &pb.VideoItem{
 		Url:      twitchData.WebpageURL,
 		Title:    title,
-		Duration: math.Float32frombits(0x7F800000),
+		Duration: common.Float32Infinite,
+		Type:     pb.VideoType_TWITCH,
+	}, nil
+}
+
+func getKickData(url string) (*pb.VideoItem, error) {
+	match := kickStreamRegex.FindStringSubmatch(url)
+	if match == nil {
+		return nil, errors.New("Invalid kick link")
+	}
+	kickUsername := match[1]
+	return &pb.VideoItem{
+		Url:      "https://player.kick.com/" + kickUsername,
+		Title:    kickUsername,
+		Duration: common.Float32Infinite,
+		Type:     pb.VideoType_IFRAME,
 	}, nil
 }

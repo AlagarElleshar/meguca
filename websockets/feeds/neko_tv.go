@@ -91,8 +91,9 @@ func (f *NekoTVFeed) start(thread uint64) (err error) {
 
 				continue
 			}
-
-			f.SendTimeSyncMessage()
+			if f.videoList.Length() != 0 {
+				f.SendTimeSyncMessage()
+			}
 			time.Sleep(1000 * time.Millisecond)
 		}
 	}()

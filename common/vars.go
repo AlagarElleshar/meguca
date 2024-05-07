@@ -3,6 +3,7 @@ package common
 import (
 	"encoding/json"
 	"github.com/go-playground/log"
+	"math"
 	"os"
 	"os/signal"
 	"regexp"
@@ -94,11 +95,12 @@ var (
 	CommandRegexp = regexp.MustCompile(
 		`^#(flip|\d*d\d+|8ball|pyu|pcount|sw(?:\d+:)?\d+:\d+(?:[+-]\d+)?|autobahn)$`,
 	)
-	DiceRegexp     = regexp.MustCompile(`(\d*)d(\d+)`)
-	ClaudeRegexp   = regexp.MustCompile(`(?m)^#claude (\S.*?)$`)
-	MediaComRegexp = regexp.MustCompile(`(?m)^\.(?:(play|remove|seek)\s+(\S+)|(seek|pause|unpause|skip|clear))$`)
-	MainJS         string
-	StaticJS       string
+	DiceRegexp      = regexp.MustCompile(`(\d*)d(\d+)`)
+	ClaudeRegexp    = regexp.MustCompile(`(?m)^#claude (\S.*?)$`)
+	MediaComRegexp  = regexp.MustCompile(`(?m)^\.(?:(play|remove|seek)\s+(\S+)|(seek|pause|unpause|skip|clear))$`)
+	Float32Infinite = math.Float32frombits(0x7F800000)
+	MainJS          string
+	StaticJS        string
 )
 
 func init() {

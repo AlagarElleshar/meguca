@@ -103,13 +103,13 @@ func (v *VideoList) SetNextItem(nextPos int) error {
 	return nil
 }
 
-func (v *VideoList) ToggleItemType(pos int) error {
-	if pos < 0 || pos >= len(v.items) {
-		return errors.New("invalid position")
-	}
-	v.items[pos].IsTemp = !v.items[pos].IsTemp
-	return nil
-}
+//func (v *VideoList) ToggleItemType(pos int) error {
+//	if pos < 0 || pos >= len(v.items) {
+//		return errors.New("invalid position")
+//	}
+//	v.items[pos].IsTemp = !v.items[pos].IsTemp
+//	return nil
+//}
 
 func (v *VideoList) RemoveItem(index int) error {
 	if index < 0 || index >= len(v.items) {
@@ -126,11 +126,11 @@ func (v *VideoList) RemoveItem(index int) error {
 }
 
 func (v *VideoList) SkipItem() (done bool) {
-	if !v.items[v.Pos].IsTemp {
-		v.Pos++
-	} else {
-		v.items = append(v.items[:v.Pos], v.items[v.Pos+1:]...)
-	}
+	//if !v.items[v.Pos].IsTemp {
+	v.Pos++
+	//} else {
+	//v.items = append(v.items[:v.Pos], v.items[v.Pos+1:]...)
+	//}
 	if v.Pos >= len(v.items) {
 		v.Pos = 0
 		done = true

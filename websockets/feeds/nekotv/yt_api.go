@@ -2,8 +2,8 @@ package nekotv
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
+	"github.com/bakape/meguca/common"
 	"github.com/bakape/meguca/config"
 	"github.com/bakape/meguca/pb"
 	"github.com/go-playground/log"
@@ -66,7 +66,13 @@ func extractVideoID(url string) (string, error) {
 }
 
 func GetVideoData(url string) (videoItem pb.VideoItem, err error) {
-	videoItemPtr, err := getTwitchData(url)
+	videoItemPtr, err := getKickData(url)
+	if err == nil && videoItemPtr != nil {
+		return *videoItemPtr, nil
+	} else {
+		err = nil
+	}
+	videoItemPtr, err = getTwitchData(url)
 	if err == nil && videoItemPtr != nil {
 		return *videoItemPtr, nil
 	}
@@ -123,19 +129,19 @@ func GetVideoData(url string) (videoItem pb.VideoItem, err error) {
 		title := item.Snippet.Title
 		duration := convertTime(item.ContentDetails.Duration)
 		if duration == 0 {
-			//videoItem = pb.VideoItem{
-			//	Duration: float32((99 * time.Hour) / time.Second),
-			//	Title:    title,
-			//	Url:      fmt.Sprintf(`<iframe src="https://www.youtube.com/embed/%s" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`, id),
-			//	IsIframe: true,
-			//}
-			err = errors.New("Livestreams not supported yet")
+			videoItem = pb.VideoItem{
+				Duration: common.Float32Infinite,
+				Title:    title,
+				Url:      fmt.Sprintf(`https://www.youtube.com/embed/%s`, id),
+				Type:     pb.VideoType_IFRAME,
+			}
 			return
 		}
 		videoItem = pb.VideoItem{
 			Duration: duration,
 			Title:    title,
 			Url:      url,
+			Type:     pb.VideoType_YOUTUBE,
 		}
 		return
 	}

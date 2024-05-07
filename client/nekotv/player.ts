@@ -1,13 +1,19 @@
 import {Youtube} from "./players/youtube";
 import {VideoList} from "./videolist";
-import {VideoItem} from "../typings/messages";
+import {VideoItem, VideoType} from "../typings/messages";
 import {IPlayer} from "./players/iplayer";
 import {TwitchPlayer} from "./players/twitch";
 import {RawPlayer} from "./players/rawplayer";
+import {IFramePlayer} from "./players/iframeplayer";
 
 export class Player {
     private player: IPlayer = null;
-    readonly players : Array<IPlayer> = [ new Youtube(), new TwitchPlayer()]
+    readonly players : Record<VideoType,IPlayer> = {
+        [VideoType.IFRAME]: new IFramePlayer(),
+        [VideoType.YOUTUBE]: new Youtube(),
+        [VideoType.TWITCH]: new TwitchPlayer(),
+        [VideoType.RAW]: new RawPlayer()
+    }
     private isLoaded = false;
     private skipSetTime = false;
     private skipSetRate = false;
@@ -51,22 +57,14 @@ export class Player {
         this.videoList.setPos(i);
         this.isLoaded = false;
 
-        let matchedPlayer : IPlayer = null;
-        for(const player of this.players){
-            if(player.isSupportedLink(item.url)){
-                matchedPlayer = player;
-                break;
-            }
-        }
+        let matchedPlayer : IPlayer = this.players[item.type];
         if(matchedPlayer != this.player){
             if(this.player !== null) {
                 this.player.removeVideo();
             }
             this.player = matchedPlayer;
-            this.player.loadVideo(item);
-        } else{
-            this.player.loadVideo(item);
         }
+        this.player.loadVideo(item);
 
         // else {
         //     this.onCanBePlayed();
