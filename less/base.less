@@ -425,6 +425,12 @@ td {
 			width: 100%;
 		}
 	}
+	article:not(.deleted) {
+		min-width: 0;
+	}
+	article.media:not(.deleted) {
+		min-width: 250px;
+	}
 	article:not(.reply-form) .control > svg{
 		color: inherit;
 	}
@@ -457,10 +463,9 @@ td {
 
 	article {
 		min-width: 0;
+		max-width: none;
 	}
 	article.media {
-		box-sizing: border-box;
-		width: 100%;
 	}
 
 	article:not(.reply-form) .control {
@@ -503,12 +508,11 @@ td {
 		width: 100%;
 	}
 
-	article {
+	article:not(.deleted) {
 		min-width: 0;
 	}
- 	article.media {
-		box-sizing: border-box;
-		width: 100%;
+ 	article.media:not(.deleted) {
+		min-width: 250px;
 	}
 
 	article:not(.reply-form) .control {
