@@ -8,7 +8,6 @@ import (
 	"github.com/bakape/meguca/pb"
 	"github.com/go-playground/log"
 	"io/ioutil"
-	"math"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -67,11 +66,9 @@ func extractVideoID(url string) (string, error) {
 }
 
 func GetVideoData(url string) (videoItem pb.VideoItem, err error) {
-	if isTwitchStream(url) {
-		videoItem.Url = url
-		videoItem.Duration = float32(math.Inf(1))
-		videoItem.Title = url
-		return
+	videoItemPtr, err := getTwitchData(url)
+	if err == nil && videoItemPtr != nil {
+		return *videoItemPtr, nil
 	}
 	var id string
 	id, err = extractVideoID(url)
