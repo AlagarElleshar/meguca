@@ -112,3 +112,10 @@ message TogglePlaylistLockEvent {
 message DumpEvent {
   string data = 1;
 }
+
+message VoteSkip {
+  double post = 1;
+  uint32 yes_votes = 2;
+  uint32 no_votes = 3;
+  float time = 4;
+}
