@@ -33,7 +33,7 @@ func getTwitchData(link string) (*pb.VideoItem, error) {
 		return nil, errors.New("invalid twitch link")
 	}
 	twitchURL := "https://www.twitch.tv/" + match[1]
-	cmd := exec.Command("yt-dlp", "--dump-json", twitchURL)
+	cmd := exec.Command("/usr/bin/yt-dlp", "--dump-json", twitchURL)
 	var stdoutbuf bytes.Buffer
 	cmd.Stdout = &stdoutbuf
 	err := cmd.Run()
@@ -62,7 +62,7 @@ func getKickData(link string) (*pb.VideoItem, error) {
 	}
 	kickUsername := match[1]
 	kickURL := "https://kick.com/" + kickUsername
-	cmd := exec.Command("yt-dlp", "--dump-json", kickURL)
+	cmd := exec.Command("/usr/bin/yt-dlp", "--dump-json", kickURL)
 	var stdoutbuf bytes.Buffer
 	cmd.Stdout = &stdoutbuf
 	err := cmd.Run()
