@@ -15,7 +15,6 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
-	"time"
 	"unicode/utf8"
 
 	"github.com/bakape/meguca/common"
@@ -220,9 +219,7 @@ func (c *Client) closePost() (err error) {
 	)
 	var claude *common.ClaudeState = nil
 	if c.post.len != 0 {
-		start := time.Now()
 		links, com, claude, postCommand, mediaCommand, err = parser.ParseBody(c.post.body, c.post.board, c.post.op, c.post.id, c.ip, false)
-		log.Info("ParseBody took ", time.Since(start))
 		if err != nil {
 			return
 		}
@@ -234,9 +231,7 @@ func (c *Client) closePost() (err error) {
 			)
 			if !lastThreeDigitsMatch(from) {
 
-				start := time.Now()
 				img, err = db.TransferImage(from, c.post.id, c.post.op)
-				log.Info("TransferImage took ", time.Since(start))
 				if err != nil {
 					return
 				}
@@ -273,9 +268,7 @@ func (c *Client) closePost() (err error) {
 	}
 	claudeOk := true
 	if claude != nil {
-		start := time.Now()
 		claudeOk = db.CheckIfClaudeAllowed(c.ip)
-		log.Info("CheckIfClaudeAllowed took ", time.Since(start))
 		if !claudeOk {
 			claude.Status = common.Error
 			claude.Response.WriteString("Rate limit reached, try again later.")
@@ -294,9 +287,7 @@ func (c *Client) closePost() (err error) {
 		id := c.post.id
 		feed := c.feed
 
-		start := time.Now()
 		imgSha1, err := db.GetPostSha1(id)
-		log.Info("GetPostSha1 took ", time.Since(start))
 		var image *[]byte = nil
 		if err == nil && imgSha1 != nil {
 			*imgSha1 += ".webp"
@@ -305,9 +296,7 @@ func (c *Client) closePost() (err error) {
 			log.Info("CWD: ", cwd)
 			log.Info("img: ", file)
 
-			start := time.Now()
 			fileData, err := os.ReadFile(file)
-			log.Info("os.ReadFile took ", time.Since(start))
 			if err == nil {
 				size := len(preImageJson) + base64.StdEncoding.EncodedLen(len(fileData)) + len(postImageJson)
 				buf := make([]byte, size)
@@ -331,15 +320,11 @@ func (c *Client) closePost() (err error) {
 			func() {
 				isError := claude.Status == common.Error
 				feed.SendClaudeComplete(id, isError, &claude.Response)
-				start := time.Now()
 				db.UpdateClaude(cid, claude)
-				log.Info("UpdateClaude took ", time.Since(start))
 			})
 	}
 	if postCommand != nil {
-		start := time.Now()
 		hasImage, err := c.hasImage()
-		log.Info("hasImage took ", time.Since(start))
 		if err == nil && !hasImage {
 			//handlePostCommand(c.post.id, c.post.op, postCommand)
 		}

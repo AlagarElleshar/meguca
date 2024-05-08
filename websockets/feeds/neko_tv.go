@@ -332,7 +332,6 @@ func HandleMediaCommand(thread uint64, c *common.MediaCommand) {
 	}
 	switch c.Type {
 	case common.AddVideo:
-		log.Info("Adding video to the playlist")
 		go func() {
 			videoData, err := nekotv.GetVideoData(c.Args)
 			if err == nil {
@@ -344,19 +343,14 @@ func HandleMediaCommand(thread uint64, c *common.MediaCommand) {
 		}()
 		break
 	case common.RemoveVideo:
-		log.Infof("Removing video from the playlist: %s", c.Args)
 		ntv.RemoveVideo(c.Args)
 	case common.SkipVideo:
-		log.Info("Skipping to the next video")
 		ntv.SkipVideo()
 	case common.Pause:
-		log.Info("Pausing the video playback")
 		ntv.Pause()
 	case common.Play:
-		log.Info("Resuming the video playback")
 		ntv.Play()
 	case common.SetTime:
-		log.Infof("Setting video playback time to: %s", c.Args)
 		time, err := parseTimestamp(c.Args)
 		if err != nil {
 			log.Errorf("Failed to parse timestamp: %v", err)
@@ -364,7 +358,6 @@ func HandleMediaCommand(thread uint64, c *common.MediaCommand) {
 			ntv.SetTime(time)
 		}
 	case common.ClearPlaylist:
-		log.Info("Clearing the video playlist")
 		ntv.ClearPlaylist()
 	default:
 		log.Warnf("Unknown media command type: %v", c.Type)
