@@ -1,12 +1,14 @@
 package nekotv
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/bakape/meguca/common"
 	"github.com/bakape/meguca/config"
 	"github.com/bakape/meguca/pb"
 	"github.com/go-playground/log"
+	"gopkg.in/vansante/go-ffprobe.v2"
 	"io/ioutil"
 	"net/http"
 	"regexp"
@@ -65,8 +67,20 @@ func extractVideoID(url string) (string, error) {
 	return "", fmt.Errorf("no matching video ID found in URL: %s", url)
 }
 
+func IsWhitelistedDomain(url string) bool {
+	if config.Server.Mp4Whitelist == nil {
+		return false
+	}
+	for _, key := range config.Server.Mp4Whitelist {
+		if strings.HasPrefix(url, key) {
+			return true
+		}
+	}
+	return false
+}
+
 func GetVideoData(url string) (videoItem pb.VideoItem, err error) {
-	videoItemPtr, err := getKickData(url)
+	videoItemPtr, err := GetTiktokData(url)
 	if err == nil && videoItemPtr != nil {
 		return *videoItemPtr, nil
 	} else {
@@ -75,12 +89,31 @@ func GetVideoData(url string) (videoItem pb.VideoItem, err error) {
 	videoItemPtr, err = getTwitchData(url)
 	if err == nil && videoItemPtr != nil {
 		return *videoItemPtr, nil
+	} else {
+		err = nil
+	}
+	videoItemPtr, err = getKickData(url)
+	if err == nil && videoItemPtr != nil {
+		return *videoItemPtr, nil
 	}
 	var id string
 	id, err = extractVideoID(url)
 	if err != nil {
-		if strings.HasSuffix(strings.ToLower(url), ".webm") || strings.HasSuffix(strings.ToLower(url), ".mp4") {
-			// Maybe raw player later
+		if IsWhitelistedDomain(url) {
+			if strings.HasSuffix(strings.ToLower(url), ".webm") || strings.HasSuffix(strings.ToLower(url), ".mp4") {
+				var probe *ffprobe.ProbeData
+				probe, err = ffprobe.ProbeURL(context.Background(), url)
+				if err != nil {
+					return
+				}
+				videoItem = pb.VideoItem{
+					Duration: float32(probe.Format.DurationSeconds),
+					Title:    url,
+					Url:      url,
+					Type:     pb.VideoType_RAW,
+				}
+				return
+			}
 		}
 		return
 	}
@@ -132,7 +165,8 @@ func GetVideoData(url string) (videoItem pb.VideoItem, err error) {
 			videoItem = pb.VideoItem{
 				Duration: common.Float32Infinite,
 				Title:    title,
-				Url:      fmt.Sprintf(`https://www.youtube.com/embed/%s`, id),
+				Url:      "https://www.youtube.com/watch?v=" + id,
+				Id:       fmt.Sprintf(`https://www.youtube.com/embed/%s`, id),
 				Type:     pb.VideoType_IFRAME,
 			}
 			return

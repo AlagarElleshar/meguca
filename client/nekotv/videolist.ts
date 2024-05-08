@@ -64,8 +64,10 @@ export class VideoList {
 
     public skipItem(): void {
         const item = this.items[this.pos];
-        if (!item.isTemp) this.pos++;
-        else this.items.splice(this.pos, 1);
+        // if (!item.isTemp)
+        //     this.pos++;
+        // else
+            this.items.splice(this.pos, 1);
         if (this.pos >= this.items.length) this.pos = 0;
     }
 

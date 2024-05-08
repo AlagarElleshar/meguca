@@ -8,6 +8,7 @@ enum VideoType {
   YOUTUBE = 1;
   TWITCH = 2;
   IFRAME = 3;
+  TIKTOK = 4;
 }
 
 message VideoItem {
@@ -15,7 +16,7 @@ message VideoItem {
   string title = 2;
   string author = 3;
   float duration = 4;
-  string iframe = 5;
+  string id = 5;
   VideoType type = 6;
 }
 

@@ -389,21 +389,6 @@ func getAudioCodec(file io.Reader) (string, error) {
 	return "", errors.New("no audio stream found")
 }
 
-// This function validates tok IDs
-func isValidTokID(digits string) bool {
-	//Max TokID is a week from now
-	//Min TokID is 2016-08-01
-	now := time.Now()
-	maxTokID := now.Add(time.Hour*24*7).Unix() << 32
-	var minTokID int64 = 6313705004335104000
-	numDigits := len(digits)
-	if numDigits > 20 || numDigits < 19 {
-		return false
-	}
-	tokID, _ := strconv.ParseInt(digits, 10, 64)
-	return tokID > minTokID && tokID < maxTokID
-}
-
 // Separate function for easier testability
 func processFile(f multipart.File, filename string, img *common.ImageCommon, tiktokName *string, opts thumbnailer.Options) (thumb []byte, err error) {
 	jpegThumb := config.Get().JPEGThumbnails

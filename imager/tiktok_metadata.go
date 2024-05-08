@@ -3,6 +3,7 @@ package imager
 import (
 	"encoding/json"
 	"errors"
+	"github.com/bakape/meguca/common"
 	"github.com/go-playground/log"
 	"net"
 	"net/http"
@@ -43,26 +44,8 @@ var client = &http.Client{
 const maxRetries = 2
 const retryDelay = time.Second
 
-func getTokID(filename string) *string {
-	digits := ""
-	for _, c := range filename {
-		if c >= '0' && c <= '9' {
-			digits += string(c)
-		} else {
-			if isValidTokID(digits) {
-				return &digits
-			}
-			digits = ""
-		}
-	}
-	if isValidTokID(digits) {
-		return &digits
-	}
-	return nil
-}
-
 func getTiktokUsername(filename string) (string, error) {
-	tokID := getTokID(filename)
+	tokID := common.GetTokID(filename)
 	if tokID == nil {
 		return "", errors.New("No TokID found")
 	}

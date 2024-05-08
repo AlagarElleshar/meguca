@@ -4,8 +4,8 @@ import {VideoItem} from "../../typings/messages";
 import {watchVideoDiv} from "../nekotv";
 
 export class RawPlayer implements IPlayer {
-    private videoElement: HTMLVideoElement = null;
-    private loaded : boolean = false;
+    protected videoElement: HTMLVideoElement = null;
+    protected loaded : boolean = false;
     getPlaybackRate(): number {
         return this.videoElement.playbackRate
     }

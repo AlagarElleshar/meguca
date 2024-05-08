@@ -5,6 +5,7 @@ import {IPlayer} from "./players/iplayer";
 import {TwitchPlayer} from "./players/twitch";
 import {RawPlayer} from "./players/rawplayer";
 import {IFramePlayer} from "./players/iframeplayer";
+import {TikTokPlayer} from "./players/tiktokplayer";
 
 export class Player {
     private player: IPlayer = null;
@@ -12,7 +13,8 @@ export class Player {
         [VideoType.IFRAME]: new IFramePlayer(),
         [VideoType.YOUTUBE]: new Youtube(),
         [VideoType.TWITCH]: new TwitchPlayer(),
-        [VideoType.RAW]: new RawPlayer()
+        [VideoType.RAW]: new RawPlayer(),
+        [VideoType.TIKTOK]: new TikTokPlayer(),
     }
     private isLoaded = false;
     private skipSetTime = false;
@@ -89,14 +91,6 @@ export class Player {
     //     });
     // }
 
-    public removeVideo(): void {
-        // JsApi.fireVideoRemoveEvents(this.videoList.currentItem);
-        if (this.player !== null) {
-            this.player.removeVideo();
-        }
-    }
-
-
     public addVideoItem(item: VideoItem, atEnd: boolean): void {
         this.videoList.addItem(item, atEnd);
     }
@@ -153,7 +147,7 @@ export class Player {
     public refresh(): void {
         if (this.videoList.length === 0) return;
         const time = this.getTime();
-        this.removeVideo();
+        this.player.removeVideo();
         this.setVideo(this.videoList.pos);
     }
 
@@ -229,6 +223,7 @@ export class Player {
             this.player.removeVideo()
             this.player = null
         }
+        this.clearItems()
     }
 
     public reload() {

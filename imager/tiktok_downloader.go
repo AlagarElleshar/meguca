@@ -116,7 +116,7 @@ func downloadToTemp(url string, file string) (fileSize int64, status int, err er
 	return
 }
 
-func getFilename(videoID string, caption string) string {
+func GetTikTokFilename(videoID string, caption string) string {
 	if len(caption) == 0 {
 		return videoID
 	}
@@ -153,6 +153,15 @@ func getFilename(videoID string, caption string) string {
 
 	truncatedCaption := string(captionBytes[:truncationPosition])
 	return idPrefix + strings.TrimSpace(truncatedCaption) + truncationSuffix
+}
+
+func GetTikTokMetadata(input string) (tokData *TWMTikTokData, err error) {
+	twmMutex.Lock()
+	twmRequestChannel <- &common.PostCommand{Input: input}
+	tokData = <-twmResponseChannel
+	err = <-twmErrChannel
+	twmMutex.Unlock()
+	return
 }
 
 func DownloadTikTok(input *common.PostCommand) (token string, filename string, err error) {
@@ -216,7 +225,7 @@ func DownloadTikTok(input *common.PostCommand) (token string, filename string, e
 	if err != nil {
 		return
 	}
-	filename = getFilename(tokData.ID, strings.Trim(tokData.Title, " "))
+	filename = GetTikTokFilename(tokData.ID, strings.Trim(tokData.Title, " "))
 	res := <-requestThumbnailing(tmpFile, filename, int(size), &tokData.Author.UniqueID)
 	if res.err != nil {
 		err = res.err

@@ -42,14 +42,14 @@ export class IFramePlayer implements IPlayer {
     loadVideo(item: VideoItem): void {
         if(this.currentIframe === null){
             this.currentIframe = iframeElement.cloneNode() as HTMLIFrameElement;
-            this.currentIframe.src = item.url;
+            this.currentIframe.src = item.id;
             this.currentIframe.title = item.title;
             this.currentIframe.onload = () => {
                 this.loaded = true;
             }
             watchVideoDiv.appendChild(this.currentIframe);
         } else {
-            this.currentIframe.src = item.url;
+            this.currentIframe.src = item.id;
             this.currentIframe.title = item.title;
         }
     }

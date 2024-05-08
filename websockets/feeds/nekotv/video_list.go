@@ -127,9 +127,9 @@ func (v *VideoList) RemoveItem(index int) error {
 
 func (v *VideoList) SkipItem() (done bool) {
 	//if !v.items[v.Pos].IsTemp {
-	v.Pos++
+	//v.Pos++
 	//} else {
-	//v.items = append(v.items[:v.Pos], v.items[v.Pos+1:]...)
+	v.items = append(v.items[:v.Pos], v.items[v.Pos+1:]...)
 	//}
 	if v.Pos >= len(v.items) {
 		v.Pos = 0

@@ -1,7 +1,7 @@
 import {connSM, connState, message, sendBinary} from "../connection";
 import {Player} from "./player";
 import {getTheaterMode, setTheaterMode} from "./theaterMode";
-import {togglePlaylist, updatePlaylist} from "./playlist";
+import {startPlayerTimeInterval, stopPlayerTimeInterval, togglePlaylist, updatePlaylist} from "./playlist";
 
 
 
@@ -92,11 +92,13 @@ export function updateNekoTVPanel(){
     if (player.isListEmpty() || !isNekoTVEnabled) {
         setTheaterMode(false)
         setPanelVisible(false)
-        player.removeVideo()
+        player.stop()
+        stopPlayerTimeInterval()
     }
     else{
         setPanelVisible(true)
         updatePlaylist()
+        startPlayerTimeInterval()
     }
 }
 
@@ -140,6 +142,12 @@ function setNekoTVEnabled(value: boolean){
     updateNekoTVIcon()
     localStorage.setItem('neko-tv', isNekoTVEnabled ? 't' : 'f');
     updateNekoTVPanel()
+    if(isNekoTVEnabled){
+        subscribeToWatchFeed()
+    }
+    else{
+        unsubscribeFromWatchFeed()
+    }
 }
 
 export function secondsToTimeExact(totalSeconds: number): string {
