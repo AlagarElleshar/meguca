@@ -102,13 +102,15 @@ const defaultFAQ = `Supported upload file types are JPEG, PNG, APNG, WEBP, AVIF,
 #sw24:30 #sw2:24:30 #sw24:30+30 #sw24:30-30 - "Syncwatch" synchronized time counter
 #steal - steal the image of the first post linked; does not work on OPs
 #claude [prompt] - Generates text from a large language model named Claude
-<hr>NekoTV commands (WIP, Only YouTube videos and Twitch streams are supported for now):
+<hr>NekoTV commands:
 .play [URL]    - Queue a video
 .remove [URL]  - Remove a video from queue 
 .seek [TIME] - Seek to a timestamp in the video
 .clear         - Clears playlist
 .skip          - Skip current video
-.pause .unpause - Self-explanatory`
+.pause .unpause - Self-explanatory
+Supported domains: youtube, twitch.tv, kick.com, tiktok.com
+`
 
 // Generate /all/ board configs
 func init() {
