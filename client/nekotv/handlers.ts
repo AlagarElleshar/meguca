@@ -121,6 +121,7 @@ function handleConnectedEvent(connectedEvent: ConnectedEvent) {
 
 function handleAddVideoEvent(addVideoEvent: AddVideoEvent) {
     player.videoList.addItem(addVideoEvent.item, addVideoEvent.atEnd);
+    if (player.itemsLength() == 1) player.setVideo(0);
     updateNekoTVPanel()
 }
 

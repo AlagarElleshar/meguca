@@ -5,18 +5,24 @@ import {watchVideoDiv} from "../nekotv";
 
 export class RawPlayer implements IPlayer {
     private videoElement: HTMLVideoElement = null;
+    private loaded : boolean = false;
     getPlaybackRate(): number {
-        return 0;
+        return this.videoElement.playbackRate
     }
 
     getTime(): number {
-        return 0;
+        return this.videoElement.currentTime;
     }
 
     initMediaPlayer(): void {
         if(this.videoElement == null){
             this.videoElement = document.createElement('video');
             this.videoElement.id = 'raw-player';
+            this.loaded = false
+            let rp = this
+            this.videoElement.addEventListener('loadeddata', function() {
+                rp.loaded = true;
+            }, false);
             watchVideoDiv.appendChild(this.videoElement);
         }
     }
@@ -26,10 +32,11 @@ export class RawPlayer implements IPlayer {
     }
 
     isVideoLoaded(): boolean {
-        return false;
+        return this.loaded;
     }
 
     loadVideo(item: VideoItem): void {
+        this.loaded = false;
         if(this.videoElement == null) {
             this.initMediaPlayer()
         }
@@ -57,7 +64,11 @@ export class RawPlayer implements IPlayer {
     }
 
     removeVideo(): void {
-        this.videoElement.remove();
+        this.loaded = false;
+        if(this.videoElement) {
+            this.videoElement.remove();
+            this.videoElement = null;
+        }
     }
 
 }
