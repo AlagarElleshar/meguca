@@ -1,6 +1,6 @@
 import {VideoItem} from "../../typings/messages";
 import {tempNotify} from "../../ui/notification";
-import {isNekoTVMuted, isNekoTVOpen, vidEl} from "../nekotv";
+import {isNekoTVMuted, watchVideoDiv} from "../nekotv";
 import options from "../../options";
 import {IPlayer, PlayerState} from "./iplayer";
 
@@ -57,7 +57,7 @@ export class Youtube implements IPlayer {
     public addPlayer(item:VideoItem){
         this.playerEl = document.createElement("div");
         this.playerEl.id = "youtube-player";
-        vidEl.appendChild(this.playerEl);
+        watchVideoDiv.appendChild(this.playerEl);
 
         this.ytPlayer = new YT.Player('youtube-player', {
             videoId: this.extractVideoId(item.url),

@@ -1,7 +1,7 @@
 import options from "../../options";
 import {IPlayer} from "./iplayer";
 import {VideoItem} from "../../typings/messages";
-import {vidEl} from "../nekotv";
+import {watchVideoDiv} from "../nekotv";
 
 export class RawPlayer implements IPlayer {
     private videoElement: HTMLVideoElement = null;
@@ -17,7 +17,7 @@ export class RawPlayer implements IPlayer {
         if(this.videoElement == null){
             this.videoElement = document.createElement('video');
             this.videoElement.id = 'raw-player';
-            vidEl.appendChild(this.videoElement);
+            watchVideoDiv.appendChild(this.videoElement);
         }
     }
 

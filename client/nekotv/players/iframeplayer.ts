@@ -1,6 +1,6 @@
 import {IPlayer} from "./iplayer";
 import {VideoItem} from "../../typings/messages";
-import {vidEl} from "../nekotv";
+import {watchVideoDiv} from "../nekotv";
 
 const iframeElement: HTMLIFrameElement = document.createElement('iframe');
 iframeElement.id = 'youtube-player';
@@ -47,7 +47,7 @@ export class IFramePlayer implements IPlayer {
             this.currentIframe.onload = () => {
                 this.loaded = true;
             }
-            vidEl.appendChild(this.currentIframe);
+            watchVideoDiv.appendChild(this.currentIframe);
         } else {
             this.currentIframe.src = item.url;
             this.currentIframe.title = item.title;

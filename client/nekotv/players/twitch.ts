@@ -1,6 +1,6 @@
 import { VideoItem } from "../../typings/messages";
 import { tempNotify } from "../../ui/notification";
-import {isNekoTVMuted, isNekoTVOpen, vidEl, watchMuteButton, watchPlaylistButton} from "../nekotv";
+import {isNekoTVMuted, watchVideoDiv, watchMuteButton, watchPlaylistButton} from "../nekotv";
 import options from "../../options";
 import {IPlayer, PlayerState} from "./iplayer";
 import PlayerOptions = Twitch.PlayerOptions;
@@ -111,7 +111,7 @@ export class TwitchPlayer implements IPlayer {
     public removeVideo(): void {
         if (!this.twitchPlayer) return;
         this.twitchPlayer = null;
-        let twitchIframe = vidEl.querySelector(`iframe[title="Twitch"]`)
+        let twitchIframe = watchVideoDiv.querySelector(`iframe[title="Twitch"]`)
         twitchIframe.remove()
         watchPlaylistButton.style.display = "none";
         watchMuteButton.style.display = "";

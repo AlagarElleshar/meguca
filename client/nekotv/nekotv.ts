@@ -1,64 +1,48 @@
 import {connSM, connState, message, sendBinary} from "../connection";
-import {addTheaterModeScrollListener, escape, isAtBottom, scrollToBottom} from "../util"
 import {Player} from "./player";
+import {getTheaterMode, setTheaterMode} from "./theaterMode";
+import {togglePlaylist, updatePlaylist} from "./playlist";
+
+
 
 export let player: Player;
+export let watchVideoDiv = document.getElementById('watch-video') as HTMLVideoElement;
 
-let playlistDiv: HTMLDivElement;
-let playlistOl: HTMLOListElement;
-let playerDiv: HTMLDivElement;
-let playlistStatus: HTMLElement;
-export let vidEl: HTMLVideoElement;
-let watchStatus: HTMLElement;
-let currentSource: string;
-let watchDiv: HTMLElement;
-let playerTimeInterval: number | null = null;
-let nekoTV = document.getElementById("banner-nekotv");
-let isOpen : boolean;
-let isPlaylistVisible = false;
+let playerDiv = document.getElementById('watch-player') as HTMLDivElement;
+let playlistStatus = document.getElementById('watch-playlist-status')!;
+let watchStatus = document.getElementById('status-watch')!;
+let watchDiv = document.getElementById("watch-panel");
+let nekoTVBannerIcon : HTMLElement;
+
 let subscribeMessage = new Uint8Array([1,message.nekoTV]).buffer
 let unsubMessage = new Uint8Array([0,message.nekoTV]).buffer
+
 let isMuted : boolean;
+let isNekoTVEnabled : boolean;
+let panelVisible : boolean = false;
 export let watchPlaylistButton: HTMLElement;
 export let watchMuteButton: HTMLElement;
-let isTheaterMode = false;
-let rightDiv : HTMLElement = null;
 
 export function initNekoTV() {
-    if (!nekoTV) {
-        return;
-    }
-    playlistDiv = document.getElementById('watch-playlist') as HTMLDivElement;
-    playlistOl = document.getElementById('watch-playlist-entries') as HTMLOListElement;
-    playerDiv = document.getElementById('watch-player') as HTMLDivElement;
-    playlistStatus = document.getElementById('watch-playlist-status')!;
-    vidEl = document.getElementById('watch-video') as HTMLVideoElement;
-    watchStatus = document.getElementById('status-watch')!;
-    watchDiv = document.getElementById("watch-panel");
+
+    nekoTVBannerIcon = document.getElementById("banner-nekotv");
     playerDiv.addEventListener("click",()=>{
         let is_coarse = matchMedia('(pointer:coarse)').matches
         if(is_coarse){
             return
         }
-        if (playlistDiv.style.display) {
-            playlistDiv.style.display = ''
-        } else {
-            playlistDiv.style.display = 'block'
-        }
+        togglePlaylist()
     })
     let lastVal = localStorage.getItem('neko-tv')
     if (lastVal) {
-        isOpen = lastVal === 't';
+       isNekoTVEnabled= lastVal === 't';
     } else {
-        isOpen = true;
+        isNekoTVEnabled = true;
     }
     updateNekoTVIcon()
     connSM.on(connState.synced,subscribeToWatchFeed)
-    nekoTV.addEventListener("click", () => {
-        isOpen = !isOpen;
-        localStorage.setItem('neko-tv', isOpen ? 't' : 'f');
-        updateNekoTVIcon()
-        togglePlayer()
+    nekoTVBannerIcon.addEventListener("click", () => {
+        setNekoTVEnabled(!isNekoTVEnabled)
     });
 
     let watchCloseButton = document.getElementById('watch-close-button');
@@ -66,14 +50,7 @@ export function initNekoTV() {
     watchPlaylistButton = document.getElementById('watch-playlist-button');
     let watchTheaterButton = document.getElementById('watch-theater-button');
     watchCloseButton.addEventListener('click',()=>{
-        if(isTheaterMode){
-            deactivateTheaterMode()
-            isTheaterMode = false;
-        }
-        isOpen = false;
-        localStorage.setItem('neko-tv', 'f');
-        updateNekoTVIcon()
-        togglePlayer()
+        setNekoTVEnabled(false)
     })
     lastVal = localStorage.getItem('neko-tv-mute')
     if (lastVal) {
@@ -106,20 +83,21 @@ export function initNekoTV() {
         togglePlaylist()
     });
     watchTheaterButton.addEventListener('click',()=>{
-        if(!isTheaterMode) {
-            activateTheaterMode()
-        }
-        else{
-            deactivateTheaterMode()
-        }
-        isTheaterMode = !isTheaterMode;
+        setTheaterMode(!getTheaterMode())
     })
     player = new Player()
-
 }
 
-export function isNekoTVOpen() {
-    return isOpen;
+export function updateNekoTVPanel(){
+    if (player.isListEmpty() || !isNekoTVEnabled) {
+        setTheaterMode(false)
+        setPanelVisible(false)
+        player.removeVideo()
+    }
+    else{
+        setPanelVisible(true)
+        updatePlaylist()
+    }
 }
 
 export function isNekoTVMuted() {
@@ -127,71 +105,41 @@ export function isNekoTVMuted() {
 }
 
 function updateNekoTVIcon(){
-    if (isOpen) {
-        nekoTV.innerText = '􀵨';
-        nekoTV.title = 'NekoTV: Enabled'
+    if (isNekoTVEnabled) {
+        nekoTVBannerIcon.innerText = '􀵨';
+        nekoTVBannerIcon.title = 'NekoTV: Enabled'
     } else {
-        nekoTV.innerText = '􁋞';
-        nekoTV.title = 'NekoTV: Disabled'
+        nekoTVBannerIcon.innerText = '􁋞';
+        nekoTVBannerIcon.title = 'NekoTV: Disabled'
     }
-
-}
-export function showWatchPanel() {
-    watchDiv.style.display = 'flex';
-    watchDiv.classList.remove('hide-watch-panel');
 }
 
-export function hideWatchPanel() {
-    watchDiv.classList.add('hide-watch-panel');
-    watchDiv.style.display = 'none';
-}
-export function showPlaylist() {
-    playlistDiv.style.display = 'block';
+function setPanelVisible(visible: boolean){
+    if(panelVisible == visible){
+        return
+    }
+    panelVisible = visible;
+    if(visible){
+        watchDiv.style.display = 'flex';
+        watchDiv.classList.remove('hide-watch-panel');
+    }
+    else{
+        watchDiv.classList.add('hide-watch-panel');
+        watchDiv.style.display = 'none';
+    }
 }
 
-export function hidePlaylist() {
-    playlistDiv.style.display = '';
-    // stopPlayerTimeInterval();
+export function toggleNekoTV() {
+    setNekoTVEnabled(!isNekoTVEnabled)
 }
-
-export function toggleNekoTV(){
-    isOpen = !isOpen;
-    localStorage.setItem('neko-tv', isOpen ? 't' : 'f');
+function setNekoTVEnabled(value: boolean){
+    if(isNekoTVEnabled == value){
+        return
+    }
+    isNekoTVEnabled = value;
     updateNekoTVIcon()
-    togglePlayer()
-}
-
-export function togglePlaylist() {
-    isPlaylistVisible = !isPlaylistVisible;
-    if (isPlaylistVisible) {
-        showPlaylist();
-    } else {
-        hidePlaylist();
-    }
-}
-
-
-export function updatePlayerTime() {
-    if (!playlistOl || !playlistOl.firstElementChild ) {
-        console.log('Skipping updatePlayerTime');
-        return;
-    }
-
-    let playerTime = player.getTime();
-
-    if (playerTime === undefined || playerTime === null) {
-        console.error('Player time undefined');
-        return;
-    }
-
-    playlistOl.children[player.getItemPos()].querySelector('.watch-player-time')!.innerHTML = `${secondsToTimeExact(playerTime)} / `;
-}
-
-function stopPlayerTimeInterval() {
-    if (playerTimeInterval) {
-        clearInterval(playerTimeInterval);
-        playerTimeInterval = null;
-    }
+    localStorage.setItem('neko-tv', isNekoTVEnabled ? 't' : 'f');
+    updateNekoTVPanel()
 }
 
 export function secondsToTimeExact(totalSeconds: number): string {
@@ -217,206 +165,13 @@ export function secondsToTimeExact(totalSeconds: number): string {
 function padWithZero(value: number): string {
     return value < 10 ? `0${value}` : value.toString();
 }
-export function updatePlaylist() {
-    if (player.isListEmpty()) {
-        if(isTheaterMode){
-            deactivateTheaterMode()
-            isTheaterMode = false
-        }
-        removePlayer()
-        return;
-    }
-    if (!playerTimeInterval) {
-        updatePlayerTime();
-        playerTimeInterval = setInterval(updatePlayerTime, 1000);
-    }
-
-    // updatePlaylistStatus();
-    showWatchPanel()
-
-    const playlistItems: HTMLLIElement[] = [];
-
-    const currentItemPos = player.getItemPos();
-
-    for (let i = 0; i < player.videoList.items.length; i++) {
-        const video = player.videoList.items[i];
-        const li = document.createElement('li');
-        li.classList.add('watch-playlist-entry');
-
-        if (i === currentItemPos) {
-            li.classList.add('selected');
-        }
-
-        let videoTerm = '';
-        if (video.url && !video.url.startsWith('https')) {
-            videoTerm = escape(video.url);
-        }
-
-        const videoTitle = escape(video.title);
-        let durationString: string = null;
-        let moreClasses = ""
-        if (video.duration == Number.POSITIVE_INFINITY) {
-            durationString = '∞';
-            moreClasses = " infinite"
-        }
-        else {
-            durationString = secondsToTimeExact(video.duration)
-        }
-
-        li.innerHTML = `
-  <span class="watch-video-term">${videoTerm}</span>
-  <a class="watch-video-title" target="_blank" href="${video.url}" title="${escape(video.title)}">
-    ${videoTitle}
-  </a>
-  <span class="watch-video-time">
-    <span class="watch-player-time"></span>
-    <span class="watch-player-dur${moreClasses}">${durationString}</span>
-  </span>
-`;
-
-        playlistItems.push(li);
-    }
-    playlistOl.replaceChildren(...playlistItems);
-
-    if (!isOpen) {
-        isOpen = true;
-    }
-}
-
-export function togglePlayer() {
-    if (isOpen) {
-        subscribeToWatchFeed();
-    }
-    else {
-        unsubscribeFromWatchFeed();
-    }
-}
 
 export function unsubscribeFromWatchFeed() {
-    removePlayer()
     sendBinary(unsubMessage)
 }
 
 export function subscribeToWatchFeed() {
-    if (isOpen) {
+    if (isNekoTVEnabled) {
         sendBinary(subscribeMessage)
-    }
-}
-
-export function removePlayer() {
-    if(isTheaterMode){
-        deactivateTheaterMode()
-        isTheaterMode = false
-    }
-    player.stop()
-    hideWatchPanel();
-}
-
-export function isTheaterModeActive() {
-    return isTheaterMode;
-}
-
-export function getTheaterModeRightDiv() {
-    return rightDiv;
-}
-
-export function activateTheaterMode() {
-    const articles = document.getElementsByTagName('article');
-    const atBottom = isAtBottom()
-
-    let articleShown = null;
-    for (let i = articles.length - 1; i >= 0; i--) {
-        const article = articles[i];
-        const rect = article.getBoundingClientRect();
-
-        if (
-            rect.top >= 0 &&
-            rect.left >= 0 &&
-            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-        ) {
-            articleShown = article;
-            break
-        }
-    }
-
-    const bodyChildren = document.body.children;
-    rightDiv = document.createElement('div');
-    rightDiv.id = 'right-content';
-    for (let i = 0; i < bodyChildren.length; i++) {
-        const child = bodyChildren[i];
-        rightDiv.appendChild(child);
-        i--;
-    }
-
-    document.body.appendChild(rightDiv);
-    addTheaterModeScrollListener()
-    const videoElement = document.getElementById('watch-panel');
-    document.body.insertBefore(videoElement, document.body.firstChild);
-    document.body.classList.add("nekotv-theater")
-    if(atBottom){
-        let rightDiv = getTheaterModeRightDiv()
-        rightDiv.scrollTo(0, rightDiv.scrollHeight)
-    }
-    else {
-        articleShown.scrollIntoView(
-            {
-                behavior: "instant",
-                block: "end",
-                inline: "start"
-            }
-        )
-    }
-    player.reload()
-}
-
-export function deactivateTheaterMode() {
-    const watchPanel = document.getElementById('watch-panel');
-    const articles = document.getElementsByTagName('article');
-    const atBottom = isAtBottom()
-    let articleShown = null;
-    for (let i = articles.length - 1; i >= 0; i--) {
-        const article = articles[i];
-        const rect = article.getBoundingClientRect();
-
-        if (
-            rect.top >= 0 &&
-            rect.left >= 0 &&
-            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-        ) {
-            articleShown = article;
-            break
-        }
-    }
-
-    document.getElementById("watcher").after(watchPanel);
-
-    while (rightDiv.firstChild) {
-        document.body.appendChild(rightDiv.firstChild);
-    }
-    rightDiv.remove()
-    rightDiv = null;
-
-    document.body.classList.remove("nekotv-theater");
-    articleShown.scrollIntoView(
-        {
-            behavior: "instant",
-            block: "end",
-            inline: "start"
-        }
-    )
-    player.reload()
-    if(atBottom){
-        scrollToBottom()
-    }
-    else {
-        articleShown.scrollIntoView(
-            {
-                behavior: "instant",
-                block: "end",
-                inline: "start"
-            }
-        )
     }
 }

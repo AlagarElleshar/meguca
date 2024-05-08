@@ -16,7 +16,7 @@ var (
 	kickStreamRegex   = regexp.MustCompile(`(?:https?:\/\/)?(?:www\.)?kick\.com\/(\w+)(?:\/)?`)
 )
 
-type TwitchData struct {
+type YtdlpData struct {
 	ID          string `json:"id"`
 	DisplayID   string `json:"display_id"`
 	Title       string `json:"title"`
@@ -101,13 +101,8 @@ type TwitchData struct {
 	} `json:"_version"`
 }
 
-func getTwitchData(link string) (*pb.VideoItem, error) {
-	match := twitchStreamRegex.FindStringSubmatch(link)
-	if match == nil {
-		return nil, errors.New("Invalid twitch link")
-	}
-	twitchURL := "https://www.twitch.tv/" + match[1]
-	cmd := exec.Command("yt-dlp", "--dump-json", twitchURL)
+func getYTDLData(url string) (*YtdlpData, error) {
+	cmd := exec.Command("yt-dlp", "--dump-json", url)
 	var stdoutbuf bytes.Buffer
 	var errorbuf bytes.Buffer
 	cmd.Stdout = &stdoutbuf
@@ -117,8 +112,18 @@ func getTwitchData(link string) (*pb.VideoItem, error) {
 		return nil, err
 	}
 	jsonBytes := stdoutbuf.Bytes()
-	var twitchData TwitchData
+	var twitchData YtdlpData
 	err = json.Unmarshal(jsonBytes, &twitchData)
+	return &twitchData, err
+}
+
+func getTwitchData(link string) (*pb.VideoItem, error) {
+	match := twitchStreamRegex.FindStringSubmatch(link)
+	if match == nil {
+		return nil, errors.New("Invalid twitch link")
+	}
+	twitchURL := "https://www.twitch.tv/" + match[1]
+	twitchData, err := getYTDLData(twitchURL)
 	if err != nil {
 		return nil, err
 	}

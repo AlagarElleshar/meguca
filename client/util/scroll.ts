@@ -124,7 +124,7 @@ export function addTheaterModeScrollListener(){
 let threadContainer = document.getElementById("thread-container")
 if (threadContainer !== null) {
 	let threadObserver = new MutationObserver((mut) => {
-		if (locked || (trigger("getOptions").alwaysLock && !scrolled)) {
+		if (locked || (trigger("getOptions").alwaysLock)) {
 			scrollToBottom()
 		}
 	})
