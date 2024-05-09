@@ -4,7 +4,7 @@ go 1.13
 
 replace github.com/Sirupsen/logrus => github.com/sirupsen/logrus v1.4.0
 
-replace github.com/bakape/thumbnailer/v2 => github.com/meowmin/thumbnailer/v2 v2.0.3
+replace github.com/bakape/thumbnailer/v2 => github.com/meowmin/thumbnailer/v2 v2.0.5
 
 require (
 	github.com/Masterminds/squirrel v1.5.1
