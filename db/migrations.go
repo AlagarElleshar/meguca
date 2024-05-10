@@ -1602,6 +1602,10 @@ var migrations = []func(tx *sql.Tx) error{
 		_, err = tx.Exec(`DROP INDEX post_board`)
 		return
 	},
+	func(tx *sql.Tx) (err error) {
+		_, err = tx.Exec(`DROP INDEX ip`)
+		return
+	},
 }
 
 func createIndex(table string, columns ...string) string {
