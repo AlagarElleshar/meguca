@@ -33,9 +33,6 @@ func prepareInsertPostStmt() (err error) {
         )
         RETURNING id, time, moderated
     `)
-	if err != nil {
-		return
-	}
 	return
 }
 

@@ -28,6 +28,7 @@ const (
 	BoardAssets
 	ConfigureServer
 	AdminNotification
+	PlaylistLock
 )
 
 // Contains fields of a post moderation log entry
@@ -79,4 +80,5 @@ var ActionPrivilege = [...]ModerationLevel{
 	AssignStaff:       BoardOwner,
 	ConfigureServer:   Admin,
 	AdminNotification: Admin,
+	PlaylistLock:      Moderator,
 }

@@ -1,10 +1,23 @@
-import {VideoItem, VideoItemList} from "../typings/messages";
+import {VideoItem} from "../typings/messages";
 
 
 export class VideoList {
     public items: VideoItem[] = [];
     public pos: number = 0;
-    public isOpen: boolean = true;
+    private _isOpen: boolean = true;
+
+    get isOpen(): boolean {
+        return this._isOpen;
+    }
+
+    set isOpen(value: boolean) {
+        this._isOpen = value;
+    }
+
+
+    public toggleIsOpen(): void {
+        this.isOpen = !this.isOpen;
+    }
 
     public get length(): number {
         return this.items.length;
@@ -63,11 +76,7 @@ export class VideoList {
     }
 
     public skipItem(): void {
-        const item = this.items[this.pos];
-        // if (!item.isTemp)
-        //     this.pos++;
-        // else
-            this.items.splice(this.pos, 1);
+        this.items.splice(this.pos, 1);
         if (this.pos >= this.items.length) this.pos = 0;
     }
 

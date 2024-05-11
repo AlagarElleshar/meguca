@@ -435,6 +435,13 @@
 							<input type="text" id="notification-text" class="full-width" placeholder="{%s= ln.UI["text"] %}">
 							<hr>
 						{% endif %}
+						{% if pos >= common.ActionPrivilege[common.PlaylistLock] %}
+						<span title="nekotv-playlist-lock">
+						Set Playlist Lock:
+						<input type="button" id="lock-playlist-button" value="Lock Playlist">
+						<input type="button" id="unlock-playlist-button" value="Unlock Playlist">
+						</span>
+						{% endif %}
 						<form>
 							{% if pos >= common.ActionPrivilege[common.BanPost] %}
 								<label><input type="checkbox" name="ban-poster">{%s= ln.UI["ban"] %}</label>

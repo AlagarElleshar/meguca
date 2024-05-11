@@ -153,6 +153,9 @@ func (f *NekoTVFeed) AddVideo(v *pb.VideoItem, atEnd bool) {
 
 // RemoveVideo removes a video from the playlist
 func (f *NekoTVFeed) RemoveVideo(url string) {
+	if !f.videoList.IsOpen {
+		return
+	}
 
 	index := f.videoList.FindIndex(func(item *pb.VideoItem) bool {
 		return item.Url == url
@@ -174,6 +177,9 @@ func (f *NekoTVFeed) RemoveVideo(url string) {
 // SkipVideo skips to the next video in the playlist
 func (f *NekoTVFeed) SkipVideo() {
 
+	if !f.videoList.IsOpen {
+		return
+	}
 	if f.videoList.Length() == 0 {
 		return
 	}
@@ -201,6 +207,9 @@ func (f *NekoTVFeed) SkipVideo() {
 // Pause pauses the current video
 func (f *NekoTVFeed) Pause() {
 
+	if !f.videoList.IsOpen {
+		return
+	}
 	if f.videoList.Length() == 0 {
 		return
 	}
@@ -236,6 +245,9 @@ func (f *NekoTVFeed) Play() {
 // SetTime sets the current playback time
 func (f *NekoTVFeed) SetTime(time float32) {
 
+	if !f.videoList.IsOpen {
+		return
+	}
 	if f.videoList.Length() == 0 {
 		return
 	}
@@ -266,6 +278,9 @@ func (f *NekoTVFeed) UpdatePlaylist() {
 // ClearPlaylist clears the playlist
 func (f *NekoTVFeed) ClearPlaylist() {
 
+	if !f.videoList.IsOpen {
+		return
+	}
 	f.videoList.Clear()
 	f.videoTimer.Stop()
 	msg := pb.WebSocketMessage{MessageType: &pb.WebSocketMessage_ClearPlaylistEvent{ClearPlaylistEvent: &pb.ClearPlaylistEvent{}}}

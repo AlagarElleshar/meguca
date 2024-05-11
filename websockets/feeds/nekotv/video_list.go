@@ -9,14 +9,14 @@ import (
 type VideoList struct {
 	items  []*pb.VideoItem
 	Pos    int
-	isOpen bool
+	IsOpen bool
 }
 
 func NewVideoList() *VideoList {
 	return &VideoList{
 		items:  []*pb.VideoItem{},
 		Pos:    0,
-		isOpen: true,
+		IsOpen: true,
 	}
 }
 
