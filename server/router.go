@@ -179,6 +179,7 @@ func createRouter() http.Handler {
 		api.POST("/report", report)
 		api.GET("/sse", sse)
 		api.POST("/moderate", moderate)
+		api.POST("/lock-playlist", lockPlaylist)
 
 		redir := api.NewGroup("/redirect")
 		redir.POST("/by-ip", redirectByIP)

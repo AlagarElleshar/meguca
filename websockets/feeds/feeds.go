@@ -7,6 +7,7 @@ import (
 	"errors"
 	"github.com/bakape/meguca/common"
 	"github.com/bakape/meguca/db"
+	"github.com/bakape/meguca/pb"
 	"sync"
 )
 
@@ -133,6 +134,16 @@ func HandleNekoTV(c common.Client, data []byte) (err error) {
 		}
 	}
 	return
+}
+
+func ToggleNekoTVLock(lock *pb.SetPlaylistLock) {
+	feeds.mu.RLock()
+	defer feeds.mu.RUnlock()
+	feed, ok := feeds.nekotvFeeds[uint64(lock.Post)]
+	if !ok {
+		return
+	}
+	feed.SetIsOpen(lock.IsOpen)
 }
 
 // Remove client from a subscribed feed

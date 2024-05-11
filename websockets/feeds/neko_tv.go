@@ -296,6 +296,12 @@ func (f *NekoTVFeed) SendTimeSyncMessage() {
 	data = append(data, uint8(common.MessageNekoTV))
 	f.sendToAllBinary(data)
 }
+func (f *NekoTVFeed) GetIsOpen() bool {
+	return f.videoList.IsOpen
+}
+func (f *NekoTVFeed) SetIsOpen(b bool) {
+	f.videoList.IsOpen = b
+}
 func parseTimestamp(timestamp string) (time float32, err error) {
 	if strings.Contains(timestamp, ":") {
 		parts := strings.Split(timestamp, ":")

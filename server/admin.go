@@ -6,6 +6,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/bakape/meguca/pb"
+	"github.com/go-playground/log"
+	"google.golang.org/protobuf/proto"
+	"io"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -601,6 +605,23 @@ func handleBoolRequest(w http.ResponseWriter, r *http.Request,
 // Set the locked flag of a thread
 func setThreadLock(w http.ResponseWriter, r *http.Request) {
 	handleBoolRequest(w, r, common.LockThread, db.SetThreadLock)
+}
+
+func lockPlaylist(writer http.ResponseWriter, request *http.Request) {
+	log.Info("Locking playlist")
+	// Read the body of the HTTP request
+	body, err := io.ReadAll(request.Body)
+	if err != nil {
+		httpError(writer, request, err)
+		return
+	}
+	message := pb.SetPlaylistLock{}
+	err = proto.Unmarshal(body, &message)
+	if err != nil {
+		httpError(writer, request, err)
+		return
+	}
+	feeds.ToggleNekoTVLock(&message)
 }
 
 // Render list of bans on a board with unban links for authenticated staff

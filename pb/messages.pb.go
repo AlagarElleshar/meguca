@@ -1230,6 +1230,61 @@ func (x *TogglePlaylistLockEvent) GetIsOpen() bool {
 	return false
 }
 
+type SetPlaylistLock struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Post   float64 `protobuf:"fixed64,1,opt,name=post,proto3" json:"post,omitempty"`
+	IsOpen bool    `protobuf:"varint,2,opt,name=is_open,json=isOpen,proto3" json:"is_open,omitempty"`
+}
+
+func (x *SetPlaylistLock) Reset() {
+	*x = SetPlaylistLock{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_messages_proto_msgTypes[18]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SetPlaylistLock) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetPlaylistLock) ProtoMessage() {}
+
+func (x *SetPlaylistLock) ProtoReflect() protoreflect.Message {
+	mi := &file_messages_proto_msgTypes[18]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetPlaylistLock.ProtoReflect.Descriptor instead.
+func (*SetPlaylistLock) Descriptor() ([]byte, []int) {
+	return file_messages_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *SetPlaylistLock) GetPost() float64 {
+	if x != nil {
+		return x.Post
+	}
+	return 0
+}
+
+func (x *SetPlaylistLock) GetIsOpen() bool {
+	if x != nil {
+		return x.IsOpen
+	}
+	return false
+}
+
 type DumpEvent struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1241,7 +1296,7 @@ type DumpEvent struct {
 func (x *DumpEvent) Reset() {
 	*x = DumpEvent{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_messages_proto_msgTypes[18]
+		mi := &file_messages_proto_msgTypes[19]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1254,7 +1309,7 @@ func (x *DumpEvent) String() string {
 func (*DumpEvent) ProtoMessage() {}
 
 func (x *DumpEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_messages_proto_msgTypes[18]
+	mi := &file_messages_proto_msgTypes[19]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1267,7 +1322,7 @@ func (x *DumpEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DumpEvent.ProtoReflect.Descriptor instead.
 func (*DumpEvent) Descriptor() ([]byte, []int) {
-	return file_messages_proto_rawDescGZIP(), []int{18}
+	return file_messages_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *DumpEvent) GetData() string {
@@ -1291,7 +1346,7 @@ type VoteSkip struct {
 func (x *VoteSkip) Reset() {
 	*x = VoteSkip{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_messages_proto_msgTypes[19]
+		mi := &file_messages_proto_msgTypes[20]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1304,7 +1359,7 @@ func (x *VoteSkip) String() string {
 func (*VoteSkip) ProtoMessage() {}
 
 func (x *VoteSkip) ProtoReflect() protoreflect.Message {
-	mi := &file_messages_proto_msgTypes[19]
+	mi := &file_messages_proto_msgTypes[20]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1317,7 +1372,7 @@ func (x *VoteSkip) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VoteSkip.ProtoReflect.Descriptor instead.
 func (*VoteSkip) Descriptor() ([]byte, []int) {
-	return file_messages_proto_rawDescGZIP(), []int{19}
+	return file_messages_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *VoteSkip) GetPost() float64 {
@@ -1476,6 +1531,10 @@ var file_messages_proto_rawDesc = []byte{
 	0x69, 0x64, 0x65, 0x6f, 0x4c, 0x69, 0x73, 0x74, 0x22, 0x32, 0x0a, 0x17, 0x54, 0x6f, 0x67, 0x67,
 	0x6c, 0x65, 0x50, 0x6c, 0x61, 0x79, 0x6c, 0x69, 0x73, 0x74, 0x4c, 0x6f, 0x63, 0x6b, 0x45, 0x76,
 	0x65, 0x6e, 0x74, 0x12, 0x17, 0x0a, 0x07, 0x69, 0x73, 0x5f, 0x6f, 0x70, 0x65, 0x6e, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x08, 0x52, 0x06, 0x69, 0x73, 0x4f, 0x70, 0x65, 0x6e, 0x22, 0x3e, 0x0a, 0x0f,
+	0x53, 0x65, 0x74, 0x50, 0x6c, 0x61, 0x79, 0x6c, 0x69, 0x73, 0x74, 0x4c, 0x6f, 0x63, 0x6b, 0x12,
+	0x12, 0x0a, 0x04, 0x70, 0x6f, 0x73, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x01, 0x52, 0x04, 0x70,
+	0x6f, 0x73, 0x74, 0x12, 0x17, 0x0a, 0x07, 0x69, 0x73, 0x5f, 0x6f, 0x70, 0x65, 0x6e, 0x18, 0x02,
 	0x20, 0x01, 0x28, 0x08, 0x52, 0x06, 0x69, 0x73, 0x4f, 0x70, 0x65, 0x6e, 0x22, 0x1f, 0x0a, 0x09,
 	0x44, 0x75, 0x6d, 0x70, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x64, 0x61, 0x74,
 	0x61, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x22, 0x6a, 0x0a,
@@ -1506,7 +1565,7 @@ func file_messages_proto_rawDescGZIP() []byte {
 }
 
 var file_messages_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
+var file_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
 var file_messages_proto_goTypes = []interface{}{
 	(VideoType)(0),                  // 0: VideoType
 	(*VideoItem)(nil),               // 1: VideoItem
@@ -1527,8 +1586,9 @@ var file_messages_proto_goTypes = []interface{}{
 	(*SetNextItemEvent)(nil),        // 16: SetNextItemEvent
 	(*UpdatePlaylistEvent)(nil),     // 17: UpdatePlaylistEvent
 	(*TogglePlaylistLockEvent)(nil), // 18: TogglePlaylistLockEvent
-	(*DumpEvent)(nil),               // 19: DumpEvent
-	(*VoteSkip)(nil),                // 20: VoteSkip
+	(*SetPlaylistLock)(nil),         // 19: SetPlaylistLock
+	(*DumpEvent)(nil),               // 20: DumpEvent
+	(*VoteSkip)(nil),                // 21: VoteSkip
 }
 var file_messages_proto_depIdxs = []int32{
 	0,  // 0: VideoItem.type:type_name -> VideoType
@@ -1547,7 +1607,7 @@ var file_messages_proto_depIdxs = []int32{
 	16, // 13: WebSocketMessage.set_next_item_event:type_name -> SetNextItemEvent
 	17, // 14: WebSocketMessage.update_playlist_event:type_name -> UpdatePlaylistEvent
 	18, // 15: WebSocketMessage.toggle_playlist_lock_event:type_name -> TogglePlaylistLockEvent
-	19, // 16: WebSocketMessage.dump_event:type_name -> DumpEvent
+	20, // 16: WebSocketMessage.dump_event:type_name -> DumpEvent
 	9,  // 17: WebSocketMessage.clear_playlist_event:type_name -> ClearPlaylistEvent
 	1,  // 18: ConnectedEvent.video_list:type_name -> VideoItem
 	11, // 19: ConnectedEvent.get_time:type_name -> GetTimeEvent
@@ -1783,7 +1843,7 @@ func file_messages_proto_init() {
 			}
 		}
 		file_messages_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DumpEvent); i {
+			switch v := v.(*SetPlaylistLock); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1795,6 +1855,18 @@ func file_messages_proto_init() {
 			}
 		}
 		file_messages_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DumpEvent); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_messages_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*VoteSkip); i {
 			case 0:
 				return &v.state
@@ -1831,7 +1903,7 @@ func file_messages_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_messages_proto_rawDesc,
 			NumEnums:      1,
-			NumMessages:   20,
+			NumMessages:   21,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

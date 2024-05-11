@@ -2,6 +2,8 @@ import { View } from "../base"
 import { postJSON, toggleHeadStyle, getClosestID } from "../util"
 import collectionView from "../posts/collectionView"
 import { ModerationLevel } from "../common"
+import {SetPlaylistLock, TogglePlaylistLockEvent} from "../typings/messages";
+import {page} from "../state";
 
 type ModerationData = {
 	id: number;
@@ -52,6 +54,13 @@ export default class ModPanel extends View<null> {
 
 			document.getElementById("admin-notification").addEventListener("click", () => {
 				this.sendNotification();
+			});
+
+			document.getElementById("lock-playlist-button").addEventListener("click", () => {
+				this.sendLockPlaylist();
+			});
+			document.getElementById("unlock-playlist-button").addEventListener("click", () => {
+				this.sendUnlockPlaylist();
 			});
 		}
 
@@ -272,5 +281,32 @@ export default class ModPanel extends View<null> {
 	// Force panel to stay visible
 	public setSlideOut(on: boolean) {
 		this.el.classList.toggle("keep-visible", on);
+	}
+
+	private async sendLockPlaylist() {
+		let message = SetPlaylistLock.create();
+		message.post = page.thread
+		message.isOpen = false
+		let msg = SetPlaylistLock.toBinary(message);
+		await fetch("/api/lock-playlist", {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/octet-stream'
+			},
+			body: msg
+		})
+	}
+	private async sendUnlockPlaylist() {
+		let message = SetPlaylistLock.create();
+		message.post = page.thread
+		message.isOpen = true
+		let msg = SetPlaylistLock.toBinary(message);
+		await fetch("/api/lock-playlist", {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/octet-stream'
+			},
+			body: msg
+		})
 	}
 }

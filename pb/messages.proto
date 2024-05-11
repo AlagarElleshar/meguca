@@ -110,6 +110,11 @@ message TogglePlaylistLockEvent {
   bool is_open = 1;
 }
 
+message SetPlaylistLock{
+  double post = 1;
+  bool is_open = 2;
+}
+
 message DumpEvent {
   string data = 1;
 }
