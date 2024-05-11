@@ -104,7 +104,23 @@ em {
 
 figcaption {
 	margin: 2px 0;
+  width: 100%;
 }
+
+.figcaption-firstrow {
+  display: flex;
+  gap: 3px;
+  max-width: 100%;
+  white-space: nowrap;
+  .filename-link {
+    text-overflow: ellipsis;
+    overflow: auto;
+  }
+  .filename-link:hover {
+    white-space: normal;
+  }
+}
+
 .fileinfo-newtiktok {
 	color: #a00000;
 }
