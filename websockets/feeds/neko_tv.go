@@ -93,6 +93,7 @@ func (f *NekoTVFeed) syncVideoState() {
 					return
 				}
 				f.SkipVideo()
+				f.Play()
 			}
 		})
 		return
@@ -111,7 +112,11 @@ func (e *NekoTVFeed) GetCurrentState() *pb.ServerState {
 }
 
 func (f *NekoTVFeed) WriteStateToDb() {
-	db.SetNekoTVState(f.thread, f.GetCurrentState())
+	if f.videoList.Length() == 0 {
+		db.DeleteNekoTVValue(f.thread)
+	} else {
+		db.SetNekoTVState(f.thread, f.GetCurrentState())
+	}
 }
 
 func (f *NekoTVFeed) sendConnectedMessage(c common.Client) {
@@ -190,12 +195,11 @@ func (f *NekoTVFeed) SkipVideo() {
 		return
 	}
 
-	finished := f.videoList.SkipItem()
-	f.videoTimer.SetTime(0)
-	if !finished {
-		f.Play()
+	isEmpty := f.videoList.SkipItem()
+	if isEmpty {
+		f.videoTimer.Stop()
 	} else {
-		f.ClearPlaylist()
+		f.videoTimer.SetTime(0)
 	}
 	msg := pb.WebSocketMessage{MessageType: &pb.WebSocketMessage_SkipVideoEvent{SkipVideoEvent: &pb.SkipVideoEvent{
 		Url: currentItem.Url,
@@ -203,6 +207,7 @@ func (f *NekoTVFeed) SkipVideo() {
 	data, _ := proto.Marshal(&msg)
 	data = append(data, uint8(common.MessageNekoTV))
 	f.sendToAllBinary(data)
+	f.WriteStateToDb()
 }
 
 // Pause pauses the current video
