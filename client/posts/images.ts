@@ -129,7 +129,8 @@ export default class ImageHandler extends View<Post> {
 			postingTime.classList.add("fileinfo-newtiktok")
 		}
 		postingTime.insertAdjacentText('beforeend', postingTimeText);
-		el.insertBefore(sourceButton, downloadButton.nextSibling)
+    let firstRow = el.querySelector(".figcaption-firstrow")
+    downloadButton.after(sourceButton)
 
 		let tikwmButton = document.createElement("a")
 		tikwmButton.href = `https://tikwm.com/video/${id}.html`;
@@ -139,7 +140,7 @@ export default class ImageHandler extends View<Post> {
 		tikwmButton.target = "_blank";
 		tikwmButton.rel = "noopener noreferrer";
 		tikwmButton.title = "TikWM"
-		el.insertBefore(tikwmButton, downloadButton.nextSibling)
+    downloadButton.after(tikwmButton)
 	}
 	// Render the information caption above the image
 	private renderFigcaption(reveal: boolean) {

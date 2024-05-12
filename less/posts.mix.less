@@ -22,8 +22,9 @@ article {
 article {
 	word-break: break-word;
 	word-wrap : break-word;
-	max-width : 95vw;
+	max-width : 100%;
 	position: relative;
+	box-sizing: border-box;
 
 	ul {
 		word-wrap : normal;
@@ -104,7 +105,23 @@ em {
 
 figcaption {
 	margin: 2px 0;
+	width: 100%;
 }
+
+.figcaption-firstrow {
+	display: flex;
+	gap: 3px;
+	max-width: 100%;
+	white-space: nowrap;
+	.filename-link {
+		text-overflow: ellipsis;
+		overflow: auto;
+	}
+	.filename-link:hover {
+		white-space: normal;
+	}
+}
+
 .fileinfo-newtiktok {
 	color: #a00000;
 }

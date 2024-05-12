@@ -89,6 +89,7 @@
 			{% code img := *p.Image %}
 			{% code src =  assets.SourcePath(img.FileType, img.SHA1) %}
 			<figcaption class="spaced">
+        <div class="figcaption-firstrow">
 				<a class="image-toggle act" hidden></a>
 				<span class="spaced image-search-container">
 					{%= imageSearch(c.root, img) %}
@@ -120,6 +121,7 @@
 				<a class="tikwm-link symbol" href="https://tikwm.com/video/{%s= *tokid %}.html" title="TikWM" target="_blank" rel="noopener noreferrer">􀂺</a>
 				<a class="sourcelink symbol" href="https://www.tiktok.com/@/video/{%s= *tokid %}" title="Posted{% space %}{%s= timeago %}" target="_blank" rel="noopener noreferrer">􀉣</a>
 				{% endif %}
+		</div>
 				<div class="fileinfo">
 					{% if img.Audio %}
 						<span class="symbol fileinfo-has-audio">􀑪</span>

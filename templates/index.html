@@ -81,6 +81,7 @@
 		</template>
 		<template name="figcaption">
 			<figcaption class="spaced">
+        <div class="figcaption-firstrow">
 				<a class="image-toggle act" hidden></a>
 				<span class="spaced image-search-container">
 					{% code engines := [...][2]string{
@@ -102,6 +103,7 @@
                 </span>
 				<a target="_blank" class="filename-link"></a>
 				<a class="download-link symbol">􀄩</a>
+        </div>
 				<div class="fileinfo">
                     <span class="symbol fileinfo-has-audio">􀑪</span>
                     <span class="fileinfo-duration">
