@@ -20,6 +20,8 @@ type NekoTVFeed struct {
 	thread     uint64
 	isRunning  bool
 	actions    chan func()
+	ticker     *time.Ticker
+	isPaused   bool
 }
 
 func NewNekoTVFeed() *NekoTVFeed {
@@ -44,67 +46,60 @@ func (f *NekoTVFeed) start(thread uint64) (err error) {
 			f.videoTimer.FromProto(state.Timer)
 		}
 	}
+	f.ticker = time.NewTicker(time.Second)
+	go f.mainLoop()
+	return
+}
 
-	go func() {
-		for {
-			select {
-			case c := <-f.add:
-				f.addClient(c)
-				f.sendConnectedMessage(c)
-				log.Info("Client added")
-			case c := <-f.remove:
-				if f.removeClient(c) {
-					f.isRunning = false
-					log.Info("shutting down feed for thread ", thread)
-					db.DeleteNekoTVValue(f.thread)
-					return
-				}
-			case action := <-f.actions:
-				action()
-			}
-		}
-	}()
-	go func() {
-		for {
-			if !f.isRunning {
+func (f *NekoTVFeed) mainLoop() {
+	for {
+		select {
+		case c := <-f.add:
+			f.addClient(c)
+			f.sendConnectedMessage(c)
+			log.Info("Client added")
+		case c := <-f.remove:
+			if f.removeClient(c) {
+				f.isRunning = false
+				log.Info("shutting down feed for thread ", f.thread)
+				db.DeleteNekoTVValue(f.thread)
 				return
 			}
-			item, err := f.videoList.CurrentItem()
-			if err != nil {
-
-				time.Sleep(1000 * time.Millisecond)
-				continue
-			}
-			maxTime := item.Duration - 0.01
-			if f.videoTimer.GetTime() > maxTime {
-				f.videoTimer.Pause()
-				f.videoTimer.SetTime(maxTime)
-				skipUrl := item.Url
-				time.AfterFunc(500*time.Millisecond, func() {
-					if f.videoList.Length() == 0 {
-						return
-					}
-					currentItem, err := f.videoList.CurrentItem()
-					if err != nil || currentItem.Url != skipUrl {
-						return
-					}
-					f.actions <- func() {
-						f.SkipVideo()
-					}
-				})
-
-				continue
-			}
-			if f.videoList.Length() != 0 {
-				f.actions <- func() {
-					f.SendTimeSyncMessage()
-				}
-			}
-			time.Sleep(1000 * time.Millisecond)
+		case action := <-f.actions:
+			action()
+		case <-f.ticker.C:
+			f.syncVideoState()
 		}
-	}()
+	}
+}
 
-	return
+func (f *NekoTVFeed) syncVideoState() {
+	item, err := f.videoList.CurrentItem()
+	if err != nil {
+		return
+	}
+	maxTime := item.Duration - 0.01
+	if f.videoTimer.GetTime() > maxTime {
+		f.videoTimer.Pause()
+		f.videoTimer.SetTime(maxTime)
+		skipUrl := item.Url
+		time.AfterFunc(time.Second, func() {
+			f.actions <- func() {
+				if f.videoList.Length() == 0 {
+					return
+				}
+				currentItem, err := f.videoList.CurrentItem()
+				if err != nil || currentItem.Url != skipUrl {
+					return
+				}
+				f.SkipVideo()
+			}
+		})
+		return
+	}
+	if f.videoList.Length() != 0 {
+		f.SendTimeSyncMessage()
+	}
 }
 
 func (e *NekoTVFeed) GetCurrentState() *pb.ServerState {
@@ -123,7 +118,7 @@ func (f *NekoTVFeed) sendConnectedMessage(c common.Client) {
 	conMessage := pb.ConnectedEvent{
 		VideoList:      f.videoList.GetItems(),
 		ItemPos:        int32(f.videoList.Pos),
-		IsPlaylistOpen: false,
+		IsPlaylistOpen: true,
 		GetTime:        f.videoTimer.GetTimeData(),
 	}
 	wsMessage := pb.WebSocketMessage{MessageType: &pb.WebSocketMessage_ConnectedEvent{ConnectedEvent: &conMessage}}
