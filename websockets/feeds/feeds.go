@@ -59,6 +59,7 @@ func addToFeed(id uint64, board string, c common.Client) (
 				messageBuffer:            make([]string, 0, 64),
 				binaryMessages:           make(chan []byte),
 				updatePendingTiktokState: make(chan pendingTiktokState),
+				queuedPosts:              make(map[uint64]struct{}),
 			}
 
 			feed.baseFeed.init()

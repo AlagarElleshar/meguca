@@ -10,7 +10,6 @@ import (
 	"google.golang.org/protobuf/proto"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 )
 
@@ -19,8 +18,8 @@ type NekoTVFeed struct {
 	videoTimer *nekotv.VideoTimer
 	videoList  *nekotv.VideoList
 	thread     uint64
-	mu         sync.Mutex
 	isRunning  bool
+	actions    chan func()
 }
 
 func NewNekoTVFeed() *NekoTVFeed {
@@ -29,6 +28,7 @@ func NewNekoTVFeed() *NekoTVFeed {
 		videoList:  nekotv.NewVideoList(),
 	}
 	nf.baseFeed.init()
+	nf.actions = make(chan func(), 10)
 	return &nf
 }
 
@@ -59,6 +59,8 @@ func (f *NekoTVFeed) start(thread uint64) (err error) {
 					db.DeleteNekoTVValue(f.thread)
 					return
 				}
+			case action := <-f.actions:
+				action()
 			}
 		}
 	}()
@@ -86,13 +88,17 @@ func (f *NekoTVFeed) start(thread uint64) (err error) {
 					if err != nil || currentItem.Url != skipUrl {
 						return
 					}
-					f.SkipVideo()
+					f.actions <- func() {
+						f.SkipVideo()
+					}
 				})
 
 				continue
 			}
 			if f.videoList.Length() != 0 {
-				f.SendTimeSyncMessage()
+				f.actions <- func() {
+					f.SendTimeSyncMessage()
+				}
 			}
 			time.Sleep(1000 * time.Millisecond)
 		}
@@ -353,7 +359,7 @@ func HandleMediaCommand(thread uint64, c *common.MediaCommand) {
 	}
 	switch c.Type {
 	case common.AddVideo:
-		go func() {
+		ntv.actions <- func() {
 			videoData, err := nekotv.GetVideoData(c.Args)
 			if err == nil {
 				log.Infof("Video data retrieved: %v", videoData)
@@ -361,25 +367,37 @@ func HandleMediaCommand(thread uint64, c *common.MediaCommand) {
 			} else {
 				log.Errorf("Failed to get video data: %v", err)
 			}
-		}()
+		}
 		break
 	case common.RemoveVideo:
-		ntv.RemoveVideo(c.Args)
+		ntv.actions <- func() {
+			ntv.RemoveVideo(c.Args)
+		}
 	case common.SkipVideo:
-		ntv.SkipVideo()
+		ntv.actions <- func() {
+			ntv.SkipVideo()
+		}
 	case common.Pause:
-		ntv.Pause()
+		ntv.actions <- func() {
+			ntv.Pause()
+		}
 	case common.Play:
-		ntv.Play()
+		ntv.actions <- func() {
+			ntv.Play()
+		}
 	case common.SetTime:
 		time, err := parseTimestamp(c.Args)
 		if err != nil {
 			log.Errorf("Failed to parse timestamp: %v", err)
 		} else {
-			ntv.SetTime(time)
+			ntv.actions <- func() {
+				ntv.SetTime(time)
+			}
 		}
 	case common.ClearPlaylist:
-		ntv.ClearPlaylist()
+		ntv.actions <- func() {
+			ntv.ClearPlaylist()
+		}
 	default:
 		log.Warnf("Unknown media command type: %v", c.Type)
 	}
