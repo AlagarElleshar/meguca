@@ -12,6 +12,19 @@ import (
 // Decodes post links from Postgres array aggregations
 type linkScanner []common.Link
 
+var (
+	insertLinkStatement *sql.Stmt
+)
+
+func prepareLinkStatement() (err error) {
+	insertLinkStatement, err = sqlDB.Prepare(
+		`insert into links (source, target) values($1, $2) on conflict do nothing`)
+	if err != nil {
+		return
+	}
+	return
+}
+
 func (l *linkScanner) Scan(src interface{}) error {
 	switch src := src.(type) {
 	case []byte:
@@ -74,21 +87,13 @@ func writeLinks(tx *sql.Tx, source uint64, links []common.Link) (err error) {
 		return
 	}
 
-	q, err := tx.Prepare(
-		`insert into links (source, target)
-		values($1, $2)
-		on conflict do nothing`)
-	if err != nil {
-		return
-	}
-
 	// Dedup to prevent needless I/O
 	written := make(map[uint64]bool, len(links))
 	for _, l := range links {
 		if written[l.ID] {
 			continue
 		}
-		_, err = q.Exec(source, l.ID)
+		_, err = tx.Stmt(insertLinkStatement).Exec(source, l.ID)
 		if err != nil {
 			return
 		}
