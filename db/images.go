@@ -22,6 +22,7 @@ var (
 	// non-existent token. The token might have expired (60 to 119 seconds) or
 	// the client could have provided an invalid token to begin with.
 	ErrInvalidToken = common.ErrInvalidInput("invalid image token")
+	insertImageStmt *sql.Stmt
 )
 
 // Video structure
@@ -29,6 +30,16 @@ type Video struct {
 	FileType uint8         `json:"file_type"`
 	Duration time.Duration `json:"-"`
 	SHA1     string        `json:"sha1"`
+}
+
+func prepareInsertImageStmt() (err error) {
+	insertImageStmt, err = sqlDB.Prepare(`
+        select insert_image($1::bigint,
+                             $2::char(86),
+                             $3::varchar(200),
+                             $4::bool)
+    `)
+	return
 }
 
 // WriteImage writes a processed image record to the DB. Only used in tests.
@@ -174,13 +185,8 @@ func InsertImage(tx *sql.Tx, postID uint64, token, name string, spoiler bool,
 ) (
 	json []byte, err error,
 ) {
-	err = tx.QueryRow(
-		`select insert_image($1::bigint,
-			$2::char(86),
-			$3::varchar(200),
-			$4::bool)`,
-		postID, token, name, spoiler).
-		Scan(&json)
+	stmt := tx.Stmt(insertImageStmt)
+	err = stmt.QueryRow(postID, token, name, spoiler).Scan(&json)
 	if extractException(err) == "invalid image token" {
 		err = ErrInvalidToken
 	}
