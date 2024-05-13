@@ -31,36 +31,45 @@ func prepareUpdatePostsStmt() (err error) {
 // ClosePost closes an open post and commits any links and hash commands
 func ClosePost(id, op uint64, body string, links []common.Link, com []common.Command, claude *common.ClaudeState) (cid uint64, err error) {
 	funcStart := time.Now()
-
-	err = InTransaction(false, func(tx *sql.Tx) (err error) {
+	// Hotpath for closing posts without links or Claude
+	if len(links) == 0 && claude == nil {
 		start := time.Now()
-		if claude != nil {
-			err = sq.Insert("claude").
-				Columns("state", "prompt", "response").
-				Values("waiting", claude.Prompt, claude.Response.String()).
-				Suffix("RETURNING id").
-				RunWith(tx).
-				QueryRow().
-				Scan(&cid)
-			log.Printf("Inserting into claude table took %v", time.Since(start))
-			if err != nil {
-				return
-			}
-			_, err = tx.Stmt(updatePostsStmt).Exec(false, body, commandRow(com), nil, cid, id)
-			if err != nil {
-				return
-			}
-		} else {
-			_, err = tx.Stmt(updatePostsStmt).Exec(false, body, commandRow(com), nil, nil, id)
-			if err != nil {
-				return
-			}
+		_, err = updatePostsStmt.Exec(false, body, commandRow(com), nil, nil, id)
+		log.Printf("updatePostsStmt.Exec took %v", time.Since(start))
+		if err != nil {
+			return
 		}
+	} else {
+		err = InTransaction(false, func(tx *sql.Tx) (err error) {
+			start := time.Now()
+			if claude != nil {
+				err = sq.Insert("claude").
+					Columns("state", "prompt", "response").
+					Values("waiting", claude.Prompt, claude.Response.String()).
+					Suffix("RETURNING id").
+					RunWith(tx).
+					QueryRow().
+					Scan(&cid)
+				log.Printf("Inserting into claude table took %v", time.Since(start))
+				if err != nil {
+					return
+				}
+				_, err = tx.Stmt(updatePostsStmt).Exec(false, body, commandRow(com), nil, cid, id)
+				if err != nil {
+					return
+				}
+			} else {
+				_, err = tx.Stmt(updatePostsStmt).Exec(false, body, commandRow(com), nil, nil, id)
+				if err != nil {
+					return
+				}
+			}
 
-		err = writeLinks(tx, id, links)
-		return
-	})
-	log.Printf("InTransaction took %v", time.Since(funcStart))
+			err = writeLinks(tx, id, links)
+			return
+		})
+		log.Printf("InTransaction took %v", time.Since(funcStart))
+	}
 
 	if err != nil {
 		return
