@@ -178,6 +178,14 @@ func InsertPost(tx *sql.Tx, p *Post) (err error) {
 	}
 	return
 }
+func InsertRegularPost(p *Post) (err error) {
+	err = insertPostStmt.QueryRow(
+		p.Editing, p.Board, p.OP, p.Body, p.Flag,
+		p.Name, p.Trip, p.Auth, p.Sage,
+		p.Password, p.IP,
+	).Scan(&p.ID, &p.Time, &p.Moderated)
+	return
+}
 
 // GetPostPassword retrieves a post's modification password
 func GetPostPassword(id uint64) (p []byte, err error) {

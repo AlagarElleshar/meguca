@@ -94,7 +94,7 @@ func CreateThread(req ThreadCreationRequest, ip string) (
 	if err != nil {
 		return
 	}
-	post, postCommand, err := constructPost(req.ReplyCreationRequest, conf, ip, 0)
+	post, _, err = constructPost(req.ReplyCreationRequest, conf, ip, 0)
 	if err != nil {
 		return
 	}
@@ -130,8 +130,6 @@ func CreateThread(req ThreadCreationRequest, ip string) (
 			if err != nil {
 				return
 			}
-		} else if !conf.TextOnly && req.Image.Token == "" && postCommand != nil {
-			//handlePostCommand(post.ID, post.ID, postCommand)
 		}
 		return
 	})
@@ -204,25 +202,29 @@ func CreatePost(
 
 	// Must ensure image token usage is done atomically, as not to cause
 	// possible data races with unused image cleanup
-	err = db.InTransaction(false, func(tx *sql.Tx) (err error) {
-		err = db.InsertPost(tx, &post)
-		if err != nil {
-			return
-		}
-
-		if hasImage {
-			err = insertImage(tx, req.Image, &post)
+	if hasImage || post.Moderated || post.ID == 0 {
+		err = db.InTransaction(false, func(tx *sql.Tx) (err error) {
+			err = db.InsertPost(tx, &post)
 			if err != nil {
 				return
 			}
-		}
 
+			if hasImage {
+				err = insertImage(tx, req.Image, &post)
+				if err != nil {
+					return
+				}
+			}
+
+			return
+		})
+	} else {
+		// Hot path with no transaction for performance
+		err = db.InsertRegularPost(&post)
+	}
+	if err != nil {
 		return
-	})
-
-	//if !hasImage && postCommand != nil {
-	//	handlePostCommand(post.ID, post.OP, postCommand)
-	//}
+	}
 
 	msg, err = common.EncodeMessage(common.MessageInsertPost, post.Post)
 	return
@@ -253,7 +255,9 @@ func (c *Client) insertPost(data []byte) (err error) {
 
 	_, op, board := feeds.GetSync(c)
 
+	startTime := time.Now()
 	post, msg, err := CreatePost(op, board, c.ip, req)
+	log.Info("CreatePost took: ", time.Since(startTime))
 	if err != nil {
 		return
 	}
