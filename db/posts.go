@@ -2,7 +2,9 @@
 package db
 
 import (
+	"bytes"
 	"database/sql"
+	"encoding/json"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/bakape/meguca/common"
@@ -21,18 +23,28 @@ type Post struct {
 func prepareInsertPostStmt() (err error) {
 
 	insertPostStmt, err = sqlDB.Prepare(`
-        INSERT INTO posts (
-            editing, board, op, body, flag,
-            name, trip, auth, sage,
-            password, ip 
-        )
-        VALUES (
-            $1, $2, $3, $4, $5,
-            $6, $7, $8, $9,
-            $10, $11
-        )
-        RETURNING id, time, moderated
-    `)
+		WITH inserted_post AS (
+		INSERT INTO posts (editing, board, op, body, flag, name, trip, auth, sage, PASSWORD, ip)
+				VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+			RETURNING
+				id, time, moderated)
+			SELECT
+				ip.id,
+				ip.time,
+				ip.moderated,
+				CASE WHEN COUNT(pm.post_id) = 0 THEN
+					'[]'::json
+				ELSE
+					json_agg(json_build_object('type', pm.type, 'length', pm.length, 'by', pm.by, 'data', pm.data))
+				END AS moderations
+			FROM
+				inserted_post ip
+			LEFT JOIN post_moderation pm ON ip.id = pm.post_id
+		GROUP BY
+			ip.id,
+			ip.time,
+			ip.moderated;
+		`)
 	return
 }
 
@@ -154,14 +166,21 @@ func InsertPost(tx *sql.Tx, p *Post) (err error) {
 			return
 		}
 	} else {
+		var moderationData []byte
 		err = tx.Stmt(insertPostStmt).QueryRow(
 			p.Editing, p.Board, p.OP, p.Body, p.Flag,
 			p.Name, p.Trip, p.Auth, p.Sage,
 			p.Password, p.IP,
-		).Scan(&p.ID, &p.Time, &p.Moderated)
+		).Scan(&p.ID, &p.Time, &p.Moderated, &moderationData)
 		if err != nil {
 			return
 		}
+		if bytes.Equal(moderationData, []byte("[]")) {
+			return
+		}
+		p.Moderation = []common.ModerationEntry{}
+		err = json.Unmarshal(moderationData, &p.Moderation)
+		return
 	}
 
 	if p.Moderated {
@@ -179,11 +198,20 @@ func InsertPost(tx *sql.Tx, p *Post) (err error) {
 	return
 }
 func InsertRegularPost(p *Post) (err error) {
+	var moderationData []byte
 	err = insertPostStmt.QueryRow(
 		p.Editing, p.Board, p.OP, p.Body, p.Flag,
 		p.Name, p.Trip, p.Auth, p.Sage,
 		p.Password, p.IP,
-	).Scan(&p.ID, &p.Time, &p.Moderated)
+	).Scan(&p.ID, &p.Time, &p.Moderated, &moderationData)
+	if err != nil {
+		return
+	}
+	if bytes.Equal(moderationData, []byte("[]")) {
+		return
+	}
+	p.Moderation = []common.ModerationEntry{}
+	err = json.Unmarshal(moderationData, &p.Moderation)
 	return
 }
 

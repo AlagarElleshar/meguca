@@ -173,10 +173,10 @@ func cleanUpOpenPostBodies() (err error) {
 	for it.SeekToFirst(); it.Valid(); it.Next() {
 		// Get the key
 		key := it.Key()
-		defer key.Free()
 
 		// Convert the key to uint64
 		keyUint64 := binary.LittleEndian.Uint64(key.Data())
+		key.Free()
 
 		// Append the key to the keys slice
 		ids = append(ids, keyUint64)
@@ -291,10 +291,10 @@ func cleanUpNekoTVValues() (err error) {
 	for it.SeekToFirst(); it.Valid(); it.Next() {
 		// Get the key
 		key := it.Key()
-		defer key.Free()
 
 		// Convert the key to uint64
 		keyUint64 := binary.LittleEndian.Uint64(key.Data())
+		key.Free()
 
 		// Append the key to the keys slice
 		ids = append(ids, keyUint64)
