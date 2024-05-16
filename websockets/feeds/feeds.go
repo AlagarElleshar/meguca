@@ -55,7 +55,6 @@ func addToFeed(id uint64, board string, c common.Client) (
 				moderatePost:             make(chan moderationMessage),
 				setOpenBody:              make(chan postBodyModMessage),
 				insertImage:              make(chan imageInsertionMessage),
-				updateBodyBinary:         make(chan message),
 				messageBuffer:            make([]string, 0, 64),
 				binaryMessages:           make(chan []byte),
 				updatePendingTiktokState: make(chan pendingTiktokState),

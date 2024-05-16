@@ -26,7 +26,7 @@ type imageInsertionMessage struct {
 }
 
 type postBodyModMessage struct {
-	message
+	id   uint64
 	body string
 }
 
@@ -69,8 +69,6 @@ type Feed struct {
 	spoilerImage chan message
 	// Set body of an open post
 	setOpenBody chan postBodyModMessage
-	// channel for updates to post body sent in binary
-	updateBodyBinary chan message
 	// Send message about post moderation
 	moderatePost chan moderationMessage
 	// Let sent sync counter
@@ -127,10 +125,6 @@ func (f *Feed) Start() (err error) {
 			case msg := <-f.send:
 				f.bufferMessage(msg)
 
-			case updateBodyBinaryMessage := <-f.updateBodyBinary:
-				//check if msg.id is in queuedPosts
-				f.sendToAllBinary(updateBodyBinaryMessage.msg)
-
 			// Send any buffered messages to any listening clients
 			case <-f.C:
 				if buf := f.flush(); buf == nil {
@@ -161,9 +155,7 @@ func (f *Feed) Start() (err error) {
 
 			// Set the body of an open post and propagate
 			case msg := <-f.setOpenBody:
-				f.modifyPost(msg.message, func(p *cachedPost) {
-					p.Body = msg.body
-				})
+				f.updateCachedPost(msg.id, msg.body)
 
 			case msg := <-f.insertImage:
 				f.modifyPost(msg.message, func(p *cachedPost) {
@@ -220,6 +212,15 @@ func (f *Feed) modifyPost(msg message, fn func(*cachedPost)) {
 	if msg.msg != nil {
 		f.write(msg.msg)
 	}
+	f.cache.clearMemoized()
+}
+
+// Simply updates the body of a cached post
+func (f *Feed) updateCachedPost(id uint64, newBody string) {
+	f.startIfPaused()
+	p := f.cache.Recent[id]
+	p.Body = newBody
+	f.cache.Recent[id] = p
 	f.cache.clearMemoized()
 }
 
@@ -307,28 +308,11 @@ func (f *Feed) _moderatePost(id uint64, msg []byte,
 	}
 }
 
-// SetOpenBody sets the body of an open post and send update message to clients
-func (f *Feed) SetOpenBody(id uint64, body string, msg []byte) {
-	f.setOpenBody <- postBodyModMessage{
-		message: message{
-			id:  id,
-			msg: msg,
-		},
-		body: body,
-	}
-}
-
-// UpdateBody special hotpath for SetOpenBody
+// UpdateBody sets the body of an open post and send update message to clients
 func (f *Feed) UpdateBody(id uint64, body string, msg []byte) {
-	f.updateBodyBinary <- message{
-		id:  id,
-		msg: msg,
-	}
+	f.binaryMessages <- msg
 	f.setOpenBody <- postBodyModMessage{
-		message: message{
-			id:  id,
-			msg: nil,
-		},
+		id:   id,
 		body: body,
 	}
 }

@@ -144,10 +144,6 @@ func (c *Client) appendRune(data []byte) (err error) {
 	//	[2]uint64{c.post.id, uint64(char)},
 	//)
 
-	if err != nil {
-		return
-	}
-
 	c.post.body = append(c.post.body, data...)
 	c.post.len++
 	return c.updateBodyBinary(msg, 1)
@@ -156,13 +152,6 @@ func (c *Client) appendRune(data []byte) (err error) {
 // Send message to thread update feed and writes the open post's buffer to the
 // embedded database. Requires locking of c.openPost.
 // n specifies the number of characters updated.
-func (c *Client) updateBody(msg []byte, n int) error {
-	c.feed.SetOpenBody(c.post.id, string(c.post.body), msg)
-	c.incrementSpamScore(uint(n) * config.Get().CharScore)
-	return db.SetOpenBody(c.post.id, c.post.body)
-}
-
-// Special case of UpdateBody for appending a single rune to a message
 func (c *Client) updateBodyBinary(msg []byte, n int) error {
 	c.feed.UpdateBody(c.post.id, string(c.post.body), msg)
 	c.incrementSpamScore(uint(n) * config.Get().CharScore)
@@ -396,10 +385,6 @@ func (c *Client) spliceText(data []byte) error {
 		return nil
 	}
 
-	//err := decodeMessage(data, &req)
-	//if err != nil {
-	//	return err
-	//}
 	req := decodeSpliceMessage(data)
 	err := parser.IsPrintableString(req.Text, true)
 	if err != nil {
