@@ -79,10 +79,6 @@ type Feed struct {
 	binaryMessages chan []byte
 	// Tiktok state
 	updatePendingTiktokState chan pendingTiktokState
-	// set of queued post IDs
-	queuedPosts map[uint64]struct{}
-	// queued append body messages
-	queuedAppends [][]byte
 }
 
 // Start read existing posts into cache and start main loop
@@ -133,11 +129,7 @@ func (f *Feed) Start() (err error) {
 
 			case updateBodyBinaryMessage := <-f.updateBodyBinary:
 				//check if msg.id is in queuedPosts
-				if _, ok := f.queuedPosts[updateBodyBinaryMessage.id]; ok {
-					f.queuedAppends = append(f.queuedAppends, updateBodyBinaryMessage.msg)
-				} else {
-					f.sendToAllBinary(updateBodyBinaryMessage.msg)
-				}
+				f.sendToAllBinary(updateBodyBinaryMessage.msg)
 
 			// Send any buffered messages to any listening clients
 			case <-f.C:
@@ -145,19 +137,13 @@ func (f *Feed) Start() (err error) {
 					f.pause()
 				} else {
 					f.sendToAll(buf)
-					//clear queued posts
-					f.queuedPosts = make(map[uint64]struct{})
-					//run sendToAllBinary on queuedAppends
-					for _, msg := range f.queuedAppends {
-						f.sendToAllBinary(msg)
-					}
-					f.queuedAppends = f.queuedAppends[:0]
 				}
 
 			// Insert a new post, cache and propagate
 			case msg := <-f.insertPost:
 				src := msg.post
-				f.queuedPosts[src.ID] = struct{}{}
+				f.sendToAll(msg.msg)
+				msg.msg = nil
 				f.modifyPost(msg.message, func(p *cachedPost) {
 					*p = cachedPost{
 						HasImage:  src.Image != nil,
