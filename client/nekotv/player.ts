@@ -228,6 +228,8 @@ export class Player {
 
     public reload() {
         this.player.removeVideo()
-        this.player.loadVideo(this.videoList.currentItem)
+        if(this.videoList.length > 0) {
+            this.player.loadVideo(this.videoList.currentItem)
+        }
     }
 }
