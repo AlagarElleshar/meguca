@@ -1610,6 +1610,31 @@ var migrations = []func(tx *sql.Tx) error{
 		_, err = tx.Exec(`DROP INDEX image`)
 		return
 	},
+	func(tx *sql.Tx) (err error) {
+		_, err = tx.Exec(`CREATE OR REPLACE FUNCTION close_post(
+  p_body TEXT,
+  p_commands json[],
+  p_id BIGINT,
+  p_claude INTEGER,
+  p_links BIGINT[]
+)
+RETURNS VOID AS $$
+BEGIN
+  -- Update the post
+  UPDATE posts
+  SET editing = false,
+      body = p_body,
+      commands = p_commands,
+      password = null,
+      claude_id = null
+  WHERE id = p_id;
+
+  INSERT INTO links (source, target)
+  SELECT p_id, unnest(p_links) ON CONFLICT DO NOTHING;
+END;
+$$ LANGUAGE plpgsql;`)
+		return
+	},
 }
 
 func createIndex(table string, columns ...string) string {

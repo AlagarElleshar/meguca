@@ -4,12 +4,14 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/bakape/meguca/common"
+	"github.com/lib/pq"
 	"log"
 	"time"
 )
 
 var (
-	updatePostsStmt *sql.Stmt
+	updatePostsStmt     *sql.Stmt
+	updatePostsAndLinks *sql.Stmt
 )
 
 func prepareUpdatePostsStmt() (err error) {
@@ -21,7 +23,8 @@ func prepareUpdatePostsStmt() (err error) {
             password = $4,
             claude_id = $5
         WHERE id = $6
-    `)
+		`)
+	updatePostsAndLinks, err = sqlDB.Prepare(`SELECT close_post($1, $2, $3, $4, $5)`)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -39,36 +42,39 @@ func ClosePost(id, op uint64, body string, links []common.Link, com []common.Com
 		if err != nil {
 			return
 		}
+	} else if claude == nil {
+		linksArray := make([]int64, len(links))
+		for i, link := range links {
+			linksArray[i] = int64(link.ID)
+		}
+		start := time.Now()
+		_, err = updatePostsAndLinks.Exec(body, commandRow(com), id, nil, pq.Array(linksArray))
+		log.Printf("updatePostsAndLinks.Exec took %v", time.Since(start))
 	} else {
 		err = InTransaction(false, func(tx *sql.Tx) (err error) {
 			start := time.Now()
-			if claude != nil {
-				err = sq.Insert("claude").
-					Columns("state", "prompt", "response").
-					Values("waiting", claude.Prompt, claude.Response.String()).
-					Suffix("RETURNING id").
-					RunWith(tx).
-					QueryRow().
-					Scan(&cid)
-				log.Printf("Inserting into claude table took %v", time.Since(start))
-				if err != nil {
-					return
-				}
-				_, err = tx.Stmt(updatePostsStmt).Exec(false, body, commandRow(com), nil, cid, id)
-				if err != nil {
-					return
-				}
-			} else {
-				_, err = tx.Stmt(updatePostsStmt).Exec(false, body, commandRow(com), nil, nil, id)
-				if err != nil {
-					return
+			err = sq.Insert("claude").
+				Columns("state", "prompt", "response").
+				Values("waiting", claude.Prompt, claude.Response.String()).
+				Suffix("RETURNING id").
+				RunWith(tx).
+				QueryRow().
+				Scan(&cid)
+			log.Printf("Inserting into claude table took %v", time.Since(start))
+			if err != nil {
+				return
+			}
+			var linksArray []int64 = nil
+			if len(links) != 0 {
+				linksArray = make([]int64, len(links))
+				for i, link := range links {
+					linksArray[i] = int64(link.ID)
 				}
 			}
-
-			err = writeLinks(tx, id, links)
+			_, err = tx.Stmt(updatePostsAndLinks).Exec(body, commandRow(com), id, cid, pq.Array(linksArray))
 			return
 		})
-		log.Printf("InTransaction took %v", time.Since(funcStart))
+		log.Printf("ClosePost transaction took %v", time.Since(funcStart))
 	}
 
 	if err != nil {
