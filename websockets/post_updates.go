@@ -201,14 +201,14 @@ func (c *Client) closePost() (err error) {
 		return errNoPostOpen
 	}
 	var (
-		links        []common.Link
-		com          []common.Command
-		postCommand  *common.PostCommand
-		mediaCommand common.MediaCommand
+		links         []common.Link
+		com           []common.Command
+		postCommand   *common.PostCommand
+		mediaCommands []common.MediaCommand
 	)
 	var claude *common.ClaudeState = nil
 	if c.post.len != 0 {
-		links, com, claude, postCommand, mediaCommand, err = parser.ParseBody(c.post.body, c.post.board, c.post.op, c.post.id, c.ip, false)
+		links, com, claude, postCommand, mediaCommands, err = parser.ParseBody(c.post.body, c.post.board, c.post.op, c.post.id, c.ip, false)
 		if err != nil {
 			return
 		}
@@ -263,8 +263,14 @@ func (c *Client) closePost() (err error) {
 			claude.Response.WriteString("Rate limit reached, try again later.")
 		}
 	}
-	if mediaCommand.Type != common.NoMediaCommand {
-		feeds.HandleMediaCommand(c.post.op, &mediaCommand)
+	if len(mediaCommands) != 0 {
+		for i, _ := range mediaCommands {
+			// Limited to 10 media commands
+			if i >= 10 {
+				break
+			}
+			feeds.HandleMediaCommand(c.post.op, &mediaCommands[i])
+		}
 	}
 
 	cid, err := db.ClosePost(c.post.id, c.post.op, string(c.post.body), links, com, claude)

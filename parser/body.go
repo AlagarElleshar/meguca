@@ -23,7 +23,7 @@ func init() {
 
 // ParseBody parses the entire post text body for commands and links.
 // internal: function was called by automated upkeep task
-func ParseBody(body []byte, board string, thread uint64, id uint64, ip string, internal bool) (links []common.Link, com []common.Command, claude *common.ClaudeState, postCommand *common.PostCommand, mediaCommand common.MediaCommand, err error) {
+func ParseBody(body []byte, board string, thread uint64, id uint64, ip string, internal bool) (links []common.Link, com []common.Command, claude *common.ClaudeState, postCommand *common.PostCommand, mediaCommands []common.MediaCommand, err error) {
 	err = IsPrintableString(string(body), true)
 	if err != nil {
 		if internal {
@@ -123,33 +123,42 @@ func ParseBody(body []byte, board string, thread uint64, id uint64, ip string, i
 			bytes.Buffer{},
 		}
 	}
-	m = common.MediaComRegexp.FindSubmatch(body)
-	if m != nil {
-		var cmdStr string
-		if m[1] != nil {
-			cmdStr = string(m[1])
-		} else if m[3] != nil {
-			cmdStr = string(m[3])
+	mediaCommands = []common.MediaCommand{}
+	matches := common.MediaComRegexp.FindAllSubmatch(body, -1)
+	if matches != nil {
+		for _, m := range matches {
+			var cmdStr string
+			if m[1] != nil {
+				cmdStr = string(m[1])
+			} else if m[3] != nil {
+				cmdStr = string(m[3])
+			}
+
+			var mediaCommand common.MediaCommand
+
+			switch cmdStr {
+			case "play":
+				mediaCommand.Type = common.AddVideo
+			case "remove":
+				mediaCommand.Type = common.RemoveVideo
+			case "skip":
+				mediaCommand.Type = common.SkipVideo
+			case "pause":
+				mediaCommand.Type = common.Pause
+			case "unpause":
+				mediaCommand.Type = common.Play
+			case "seek":
+				mediaCommand.Type = common.SetTime
+			case "clear":
+				mediaCommand.Type = common.ClearPlaylist
+			default:
+				mediaCommand.Type = common.NoMediaCommand
+			}
+			mediaCommand.Args = string(m[2])
+
+			// Append the command to the slice
+			mediaCommands = append(mediaCommands, mediaCommand)
 		}
-		switch cmdStr {
-		case "play":
-			mediaCommand.Type = common.AddVideo
-		case "remove":
-			mediaCommand.Type = common.RemoveVideo
-		case "skip":
-			mediaCommand.Type = common.SkipVideo
-		case "pause":
-			mediaCommand.Type = common.Pause
-		case "unpause":
-			mediaCommand.Type = common.Play
-		case "seek":
-			mediaCommand.Type = common.SetTime
-		case "clear":
-			mediaCommand.Type = common.ClearPlaylist
-		default:
-			mediaCommand.Type = common.NoMediaCommand
-		}
-		mediaCommand.Args = string(m[2])
 	}
 	return
 }
