@@ -1626,7 +1626,7 @@ BEGIN
       body = p_body,
       commands = p_commands,
       password = null,
-      claude_id = null
+      claude_id = p_claude
   WHERE id = p_id;
 
   INSERT INTO links (source, target)
