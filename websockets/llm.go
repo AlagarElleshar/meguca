@@ -3,10 +3,14 @@ package websockets
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"encoding/json"
 	"github.com/bakape/meguca/common"
 	"github.com/bakape/meguca/config"
 	"github.com/go-playground/log"
+	"github.com/google/generative-ai-go/genai"
+	"google.golang.org/api/iterator"
+	"google.golang.org/api/option"
 	"io"
 	"net/http"
 	"strings"
@@ -18,7 +22,81 @@ const (
 	Claude3Haiku  = "claude-3-haiku-20240307"
 )
 
-var DefaultSystemPrompt = `You are being embedded in a chatroom. Keep your responses brief.`
+var (
+	geminiClient *genai.Client
+	model        *genai.GenerativeModel
+)
+
+func InitGemini() {
+
+	ctx := context.Background()
+	var err error
+	key := &config.Server.GeminiApiKey
+	geminiClient, err = genai.NewClient(ctx, option.WithAPIKey(*key))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	model = geminiClient.GenerativeModel("gemini-1.5-flash-latest")
+
+}
+
+func GeminiStreamMessages(systemPrompt *string, claudeState *common.ClaudeState, img *[]byte, start func(), token func(string), done func()) (err error) {
+
+	model.SystemInstruction = &genai.Content{
+		Parts: []genai.Part{genai.Text(*systemPrompt)},
+	}
+	var iter *genai.GenerateContentResponseIterator
+	ctx := context.Background()
+	if img != nil {
+		imgData := genai.ImageData("webp", *img)
+		prompt := genai.Text(claudeState.Prompt)
+		iter = model.GenerateContentStream(ctx, imgData, prompt)
+	} else {
+		prompt := genai.Text(claudeState.Prompt)
+		iter = model.GenerateContentStream(ctx, prompt)
+	}
+	started := false
+	for {
+		var resp *genai.GenerateContentResponse
+		resp, err = iter.Next()
+		if err == iterator.Done {
+			err = nil
+			claudeState.Status = common.Done
+			done()
+			return
+		}
+		if err != nil {
+			log.Error(err)
+			claudeState.Status = common.Error
+			done()
+			return
+		}
+		if !started {
+			started = true
+			claudeState.Status = common.Generating
+			start()
+		}
+		parts := resp.Candidates[0].Content.Parts
+		for i, _ := range parts {
+			outerBreak := false
+			switch parts[i].(type) {
+			case genai.Text:
+				newToken := string(parts[i].(genai.Text))
+				claudeState.Response.WriteString(newToken)
+				token(newToken)
+				outerBreak = true
+				break
+			}
+			if outerBreak {
+				break
+			}
+		}
+	}
+	return
+}
+
+var DefaultSystemPrompt = `You are being embedded in a chatroom. Keep your responses brief. Respond in plain text, no markdown.`
 
 func encodeMessages(prompt string, img *[]byte) []byte {
 	buf := bytes.Buffer{}

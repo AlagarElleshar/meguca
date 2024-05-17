@@ -103,7 +103,7 @@ func ClosePost(id, op uint64, body string, links []common.Link, com []common.Com
 	return
 }
 func UpdateClaude(id uint64, claude *common.ClaudeState) {
-	_ = InTransaction(false, func(tx *sql.Tx) (err error) {
+	err := InTransaction(false, func(tx *sql.Tx) (err error) {
 		// Update the Claude associated with the post using a subquery
 		result, err := sq.Update("claude").
 			SetMap(map[string]interface{}{
@@ -131,6 +131,9 @@ func UpdateClaude(id uint64, claude *common.ClaudeState) {
 
 		return
 	})
+	if err != nil {
+		log.Println(err)
+	}
 
 	return
 }

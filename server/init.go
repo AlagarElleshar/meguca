@@ -3,6 +3,7 @@
 package server
 
 import (
+	"github.com/bakape/meguca/websockets"
 	"os"
 	"strconv"
 
@@ -21,6 +22,7 @@ import (
 // Start parses command line arguments and initializes the server.
 func Start() (err error) {
 	err = config.Server.Load()
+	websockets.InitGemini()
 	if err != nil {
 		return
 	}
