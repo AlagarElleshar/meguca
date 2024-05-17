@@ -301,8 +301,10 @@ func (c *Client) closePost() (err error) {
 			if err == nil {
 				image = &fileData
 			}
+		} else {
+			err = nil
+			image = nil
 		}
-		err = nil
 		//}
 		go GeminiStreamMessages(&DefaultSystemPrompt, claude, image, &ext, func() {
 			claude.Status = common.Generating

@@ -96,7 +96,7 @@ func GeminiStreamMessages(systemPrompt *string, claudeState *common.ClaudeState,
 	return
 }
 
-var DefaultSystemPrompt = ``
+var DefaultSystemPrompt = `Try to your responses short. Don't use markdown italicized or bold text. Lists are fine.`
 
 func encodeMessages(prompt string, img *[]byte) []byte {
 	buf := bytes.Buffer{}
