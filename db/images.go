@@ -209,6 +209,25 @@ func GetImage(sha1 string) (img common.ImageCommon, err error) {
 	return scanner.Val().ImageCommon, nil
 }
 
+func GetImageByPost(id uint64) (img common.ImageCommon, err error) {
+	// Define a scanner for the image
+	var scanner imageScanner
+
+	// Execute the query with join, selecting all columns from the images table
+	err = sq.Select("images.*").
+		From("images").
+		Join("posts ON posts.sha1 = images.sha1").
+		Where("posts.id = ?", id).
+		QueryRow().
+		Scan(scanner.ScanArgs()...)
+
+	if err != nil {
+		return
+	}
+
+	return scanner.Val().ImageCommon, nil
+}
+
 // SpoilerImage spoilers an already allocated image
 func SpoilerImage(id, op uint64) error {
 	_, err := sq.Update("posts").

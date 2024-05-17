@@ -3,7 +3,6 @@ package websockets
 import (
 	"bytes"
 	"database/sql"
-	"encoding/base64"
 	"encoding/binary"
 	"encoding/json"
 	"errors"
@@ -282,29 +281,30 @@ func (c *Client) closePost() (err error) {
 		id := c.post.id
 		feed := c.feed
 
-		imgSha1, err := db.GetPostSha1(id)
+		var img common.ImageCommon
 		var image *[]byte = nil
-		if err == nil && imgSha1 != nil {
-			*imgSha1 += ".webp"
-			file := filepath.Join("images/thumb/", *imgSha1)
-			cwd, _ := os.Getwd()
-			log.Info("CWD: ", cwd)
-			log.Info("img: ", file)
-
+		img, err = db.GetImageByPost(id)
+		var ext string
+		if err == nil {
+			var file string
+			if img.FileType == common.PNG || img.FileType == common.JPEG || img.FileType == common.WEBP {
+				file = fmt.Sprintf("images/src/%s.%s", img.SHA1, common.Extensions[img.FileType])
+				ext = common.Extensions[img.FileType]
+			} else {
+				file = filepath.Join("images/thumb/", img.SHA1+".webp")
+				ext = common.Extensions[common.WEBP]
+			}
+			//imgSha1, err := db.GetPostSha1(id)
+			//if err == nil && imgSha1 != nil {
+			//
 			fileData, err := os.ReadFile(file)
 			if err == nil {
-				size := len(preImageJson) + base64.StdEncoding.EncodedLen(len(fileData)) + len(postImageJson)
-				buf := make([]byte, size)
-				offset := 0
-				offset += copy(buf[offset:], preImageJson)
-				base64.StdEncoding.Encode(buf[offset:], fileData)
-				offset = size - len(postImageJson)
-				copy(buf[offset:], postImageJson)
-
-				image = &buf
+				image = &fileData
 			}
 		}
-		go GeminiStreamMessages(&DefaultSystemPrompt, claude, image, func() {
+		err = nil
+		//}
+		go GeminiStreamMessages(&DefaultSystemPrompt, claude, image, &ext, func() {
 			claude.Status = common.Generating
 			db.UpdateClaude(cid, claude)
 		}, func(token string) {

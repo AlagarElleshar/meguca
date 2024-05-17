@@ -41,7 +41,7 @@ func InitGemini() {
 
 }
 
-func GeminiStreamMessages(systemPrompt *string, claudeState *common.ClaudeState, img *[]byte, start func(), token func(string), done func()) (err error) {
+func GeminiStreamMessages(systemPrompt *string, claudeState *common.ClaudeState, img *[]byte, ext *string, start func(), token func(string), done func()) (err error) {
 
 	model.SystemInstruction = &genai.Content{
 		Parts: []genai.Part{genai.Text(*systemPrompt)},
@@ -49,7 +49,7 @@ func GeminiStreamMessages(systemPrompt *string, claudeState *common.ClaudeState,
 	var iter *genai.GenerateContentResponseIterator
 	ctx := context.Background()
 	if img != nil {
-		imgData := genai.ImageData("webp", *img)
+		imgData := genai.ImageData(*ext, *img)
 		prompt := genai.Text(claudeState.Prompt)
 		iter = model.GenerateContentStream(ctx, imgData, prompt)
 	} else {
@@ -96,7 +96,7 @@ func GeminiStreamMessages(systemPrompt *string, claudeState *common.ClaudeState,
 	return
 }
 
-var DefaultSystemPrompt = `You are being embedded in a chatroom. Keep your responses brief. Respond in plain text, no markdown.`
+var DefaultSystemPrompt = ``
 
 func encodeMessages(prompt string, img *[]byte) []byte {
 	buf := bytes.Buffer{}
