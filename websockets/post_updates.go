@@ -287,7 +287,7 @@ func (c *Client) closePost() (err error) {
 		var ext string
 		if err == nil {
 			var file string
-			if img.FileType == common.PNG || img.FileType == common.JPEG || img.FileType == common.WEBP {
+			if img.Size < 20e6 && (img.FileType == common.PNG || img.FileType == common.JPEG || img.FileType == common.WEBP) {
 				file = fmt.Sprintf("images/src/%s.%s", img.SHA1, common.Extensions[img.FileType])
 				ext = common.Extensions[img.FileType]
 			} else {
