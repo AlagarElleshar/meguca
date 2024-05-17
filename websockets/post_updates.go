@@ -304,19 +304,17 @@ func (c *Client) closePost() (err error) {
 				image = &buf
 			}
 		}
-		go StreamMessages(Claude3Haiku, &DefaultSystemPrompt, 300, claude, image,
-			func() {
-				claude.Status = common.Generating
-				db.UpdateClaude(cid, claude)
-			},
-			func(token string) {
-				feed.SendClaudeToken(id, token)
-			},
-			func() {
-				isError := claude.Status == common.Error
-				feed.SendClaudeComplete(id, isError, &claude.Response)
-				db.UpdateClaude(cid, claude)
-			})
+		go GeminiStreamMessages(&DefaultSystemPrompt, claude, image, func() {
+			claude.Status = common.Generating
+			db.UpdateClaude(cid, claude)
+		}, func(token string) {
+			log.Info("Token: ", token)
+			feed.SendClaudeToken(id, token)
+		}, func() {
+			isError := claude.Status == common.Error
+			feed.SendClaudeComplete(id, isError, &claude.Response)
+			db.UpdateClaude(cid, claude)
+		})
 	}
 	if postCommand != nil {
 		hasImage, err := c.hasImage()
