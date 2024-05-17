@@ -53,25 +53,30 @@ func ClosePost(id, op uint64, body string, links []common.Link, com []common.Com
 	} else {
 		err = InTransaction(false, func(tx *sql.Tx) (err error) {
 			start := time.Now()
-			err = sq.Insert("claude").
-				Columns("state", "prompt", "response").
-				Values("waiting", claude.Prompt, claude.Response.String()).
-				Suffix("RETURNING id").
-				RunWith(tx).
-				QueryRow().
-				Scan(&cid)
-			log.Printf("Inserting into claude table took %v", time.Since(start))
-			if err != nil {
-				return
-			}
-			var linksArray []int64 = nil
-			if len(links) != 0 {
-				linksArray = make([]int64, len(links))
-				for i, link := range links {
-					linksArray[i] = int64(link.ID)
+			if claude != nil {
+				err = sq.Insert("claude").
+					Columns("state", "prompt", "response").
+					Values("waiting", claude.Prompt, claude.Response.String()).
+					Suffix("RETURNING id").
+					RunWith(tx).
+					QueryRow().
+					Scan(&cid)
+				log.Printf("Inserting into claude table took %v", time.Since(start))
+				if err != nil {
+					return
+				}
+				_, err = tx.Stmt(updatePostsStmt).Exec(false, body, commandRow(com), nil, cid, id)
+				if err != nil {
+					return
+				}
+			} else {
+				_, err = tx.Stmt(updatePostsStmt).Exec(false, body, commandRow(com), nil, nil, id)
+				if err != nil {
+					return
 				}
 			}
-			_, err = tx.Stmt(updatePostsAndLinks).Exec(body, commandRow(com), id, cid, pq.Array(linksArray))
+
+			err = writeLinks(tx, id, links)
 			return
 		})
 		log.Printf("ClosePost transaction took %v", time.Since(funcStart))
