@@ -8,9 +8,6 @@ UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
 	ROCKSDB_CFLAGS := $(shell pkg-config --cflags-only-I rocksdb liblz4 libzstd) -I/opt/homebrew/opt/snappy/include
 	ROCKSDB_LDFLAGS := $(shell pkg-config --libs-only-l --libs-only-L rocksdb liblz4 libzstd) -L/opt/homebrew/opt/snappy/lib
-else ifeq ($(UNAME_S),Linux)
-	ROCKSDB_CFLAGS := -I$(HOME)/rocksdb/include
-	ROCKSDB_LDFLAGS := -L$(HOME)/rocksdb -lrocksdb -lstdc++ -lm -lz -lsnappy -llz4 -lzstd -lbz2
 endif
 
 ifeq ($(UNAME_S),Linux)

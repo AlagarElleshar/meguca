@@ -1635,6 +1635,51 @@ END;
 $$ LANGUAGE plpgsql;`)
 		return
 	},
+	func(tx *sql.Tx) (err error) {
+		_, err = tx.Exec(`
+CREATE OR REPLACE FUNCTION cleanup_images()
+RETURNS TABLE (SHA1 CHARACTER(40), file_type SMALLINT, thumb_type SMALLINT) AS $$
+BEGIN
+  -- Drop temp table if it exists
+  DROP TABLE IF EXISTS temp_posts_sha1;
+
+  -- Create temp table
+  CREATE TEMP TABLE temp_posts_sha1 (post_SHA1 TEXT);
+
+  -- Create index on temp table
+  CREATE INDEX idx_temp_posts_sha1 ON temp_posts_sha1 USING HASH (post_SHA1);
+
+  -- Insert data into temp_posts table, ignore duplicates
+  WITH cte_posts_sha1 AS (
+    SELECT p.SHA1
+    FROM posts p
+    WHERE p.SHA1 IS NOT NULL
+  )
+  INSERT INTO temp_posts_sha1 (post_SHA1)
+  SELECT cte_posts_sha1.SHA1
+  FROM cte_posts_sha1;
+
+  -- Perform the delete operation and return results
+  RETURN QUERY
+  WITH cte_temp_posts_sha1 AS (
+    SELECT tp.post_SHA1
+    FROM temp_posts_sha1 tp
+  ),
+  cte_image_tokens AS (
+    SELECT it.SHA1
+    FROM image_tokens it
+  )
+  DELETE FROM images i
+  WHERE i.SHA1 NOT IN (SELECT cte_temp_posts_sha1.post_SHA1 FROM cte_temp_posts_sha1)
+  AND i.SHA1 NOT IN (SELECT cte_image_tokens.SHA1 FROM cte_image_tokens)
+  RETURNING i.SHA1, i.file_type, i.thumb_type;
+
+  -- Drop the temp table after the operations
+  DROP TABLE IF EXISTS temp_posts_sha1;
+END;
+$$ LANGUAGE plpgsql;`)
+		return
+	},
 }
 
 func createIndex(table string, columns ...string) string {

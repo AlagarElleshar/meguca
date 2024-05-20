@@ -363,13 +363,7 @@ func VideoPlaylist(board string) (videos []Video, err error) {
 
 // Delete images not used in any posts
 func deleteUnusedImages() (err error) {
-	r, err := sqlDB.Query(`
-		delete from images
-		where (
-			(select count(*) from posts where SHA1 = images.SHA1)
-			+ (select count(*) from image_tokens where SHA1 = images.SHA1)
-		) = 0
-		returning SHA1, file_type, thumb_type`)
+	r, err := sqlDB.Query(`select * from cleanup_images()`)
 	if err != nil {
 		return
 	}
