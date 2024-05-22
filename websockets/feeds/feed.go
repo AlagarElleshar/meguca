@@ -136,9 +136,7 @@ func (f *Feed) Start() (err error) {
 			// Insert a new post, cache and propagate
 			case msg := <-f.insertPost:
 				src := msg.post
-				f.sendToAll(msg.msg)
-				msg.msg = nil
-				f.modifyPost(msg.message, func(p *cachedPost) {
+				f.modifyPostImmediate(msg.message, func(p *cachedPost) {
 					*p = cachedPost{
 						HasImage:  src.Image != nil,
 						Spoilered: src.Image != nil && src.Image.Spoiler,
@@ -158,18 +156,18 @@ func (f *Feed) Start() (err error) {
 				f.updateCachedPost(msg.id, msg.body)
 
 			case msg := <-f.insertImage:
-				f.modifyPost(msg.message, func(p *cachedPost) {
+				f.modifyPostImmediate(msg.message, func(p *cachedPost) {
 					p.HasImage = true
 					p.Spoilered = msg.spoilered
 				})
 
 			case msg := <-f.spoilerImage:
-				f.modifyPost(msg, func(p *cachedPost) {
+				f.modifyPostImmediate(msg, func(p *cachedPost) {
 					p.Spoilered = true
 				})
 
 			case msg := <-f.closePost:
-				f.modifyPost(msg, func(p *cachedPost) {
+				f.modifyPostImmediate(msg, func(p *cachedPost) {
 					p.Closed = true
 				})
 			case msg := <-f.updatePendingTiktokState:
@@ -211,6 +209,19 @@ func (f *Feed) modifyPost(msg message, fn func(*cachedPost)) {
 
 	if msg.msg != nil {
 		f.write(msg.msg)
+	}
+	f.cache.clearMemoized()
+}
+
+func (f *Feed) modifyPostImmediate(msg message, fn func(*cachedPost)) {
+	f.startIfPaused()
+
+	p := f.cache.Recent[msg.id]
+	fn(&p)
+	f.cache.Recent[msg.id] = p
+
+	if msg.msg != nil {
+		f.sendToAll(msg.msg)
 	}
 	f.cache.clearMemoized()
 }
