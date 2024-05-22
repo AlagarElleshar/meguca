@@ -169,12 +169,9 @@ func (f *Feed) Start() (err error) {
 				})
 
 			case msg := <-f.closePost:
-				msgBuf := msg.msg
-				msg.msg = nil
 				f.modifyPost(msg, func(p *cachedPost) {
 					p.Closed = true
 				})
-				f.sendToAll(msgBuf)
 			case msg := <-f.updatePendingTiktokState:
 				f.modifyPost(msg.message, func(p *cachedPost) {
 					p.PendingTikToks = msg.state

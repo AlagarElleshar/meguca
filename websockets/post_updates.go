@@ -202,11 +202,12 @@ func (c *Client) closePost() (err error) {
 	var (
 		links         []common.Link
 		com           []common.Command
+		postCommand   *common.PostCommand
 		mediaCommands []common.MediaCommand
 	)
 	var claude *common.ClaudeState = nil
 	if c.post.len != 0 {
-		links, com, claude, _, mediaCommands, err = parser.ParseBody(c.post.body, c.post.board, c.post.op, c.post.id, c.ip, false)
+		links, com, claude, postCommand, mediaCommands, err = parser.ParseBody(c.post.body, c.post.board, c.post.op, c.post.id, c.ip, false)
 		if err != nil {
 			return
 		}
@@ -316,6 +317,12 @@ func (c *Client) closePost() (err error) {
 			feed.SendClaudeComplete(id, isError, &claude.Response)
 			db.UpdateClaude(cid, claude)
 		})
+	}
+	if postCommand != nil {
+		hasImage, err := c.hasImage()
+		if err == nil && !hasImage {
+			//handlePostCommand(c.post.id, c.post.op, postCommand)
+		}
 	}
 	c.post = openPost{}
 	return
