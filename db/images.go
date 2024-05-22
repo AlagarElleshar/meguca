@@ -323,41 +323,35 @@ func TransferImage(fromPost, toPost, thread uint64) (
 
 // VideoPlaylist returns a video playlist for a board
 func VideoPlaylist(board string) (videos []Video, err error) {
-	videos = make([]Video, 0, 128)
-	var (
-		v   Video
-		dur uint64
-	)
-	err = queryAll(
-		sq.Select("i.SHA1", "i.file_type", "i.length").
-			From("images as i").
-			Where(`
-				exists(select 1
-					from posts as p
-					where p.sha1 = i.sha1
-						and p.board = ?
-						and not is_deleted(p.id)
-						and not p.spoiler)
-				and file_type in (?, ?)
-				and audio = true
-				and video = true
-				and length between 10 and 60
-                and codec != 'hevc'`,
-				board,
-				int(common.WEBM),
-				int(common.MP4),
-			).
-			OrderBy("random()"),
-		func(r *sql.Rows) (err error) {
-			err = r.Scan(&v.SHA1, &v.FileType, &dur)
-			if err != nil {
-				return
-			}
-			v.Duration = time.Duration(dur) * time.Second
-			videos = append(videos, v)
-			return
-		},
-	)
+
+	// Prepare the query
+	query := "SELECT sha1, file_type, length FROM get_megu_playlist($1)"
+
+	// Execute the query
+	rows, err := sqlDB.Query(query, board)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	// Process the result set
+	for rows.Next() {
+		var v Video
+		var dur int64
+
+		err := rows.Scan(&v.SHA1, &v.FileType, &dur)
+		if err != nil {
+			return nil, err
+		}
+
+		v.Duration = time.Duration(dur) * time.Second
+		videos = append(videos, v)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
 	return
 }
 

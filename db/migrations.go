@@ -1680,6 +1680,54 @@ END;
 $$ LANGUAGE plpgsql;`)
 		return
 	},
+	func(tx *sql.Tx) (err error) {
+		err = execAll(tx, `DROP FUNCTION cleanup_images`, `CREATE OR REPLACE FUNCTION cleanup_images()
+RETURNS TABLE (SHA1 CHARACTER(40), file_type SMALLINT, thumb_type SMALLINT) AS $$
+BEGIN
+  CREATE INDEX posts_sha1_hash_idx ON posts USING hash (sha1)
+  WHERE sha1 IS NOT NULL;
+
+  -- Perform the delete operation and return results
+  RETURN QUERY
+       DELETE FROM images as i
+       WHERE (
+          (SELECT COUNT(*) FROM posts as p WHERE p.SHA1 = i.SHA1)
+          + (SELECT COUNT(*) FROM image_tokens as it WHERE it.SHA1 = i.SHA1)
+       ) = 0
+       RETURNING i.SHA1, i.file_type, i.thumb_type;
+
+  DROP INDEX posts_sha1_hash_idx;
+END;
+$$ LANGUAGE plpgsql;`,
+			`CREATE OR REPLACE FUNCTION get_megu_playlist(board VARCHAR(10))
+RETURNS TABLE (SHA1 CHARACTER(40), file_type SMALLINT, length INTEGER) AS $$
+BEGIN
+  CREATE INDEX posts_sha1_hash_idx ON posts USING hash (sha1)
+  WHERE sha1 IS NOT NULL;
+
+  RETURN QUERY
+  SELECT i.SHA1, i.file_type, i.length
+  FROM images AS i
+  WHERE EXISTS (
+    SELECT 1
+    FROM posts AS p
+    WHERE p.sha1 = i.sha1
+      AND p.board = $1
+      AND NOT is_deleted(p.id)
+      AND NOT p.spoiler
+  )
+  AND i.file_type IN (3, 6)
+  AND i.audio = true
+  AND i.video = true
+  AND i.length BETWEEN 10 AND 60
+  AND i.codec != 'hevc'
+  ORDER BY random();
+
+  DROP INDEX posts_sha1_hash_idx;
+END;
+$$ LANGUAGE plpgsql;`)
+		return
+	},
 }
 
 func createIndex(table string, columns ...string) string {
