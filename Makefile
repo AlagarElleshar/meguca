@@ -6,8 +6,8 @@ export GO111MODULE=on
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
-	ROCKSDB_CFLAGS := $(shell pkg-config --cflags-only-I rocksdb liblz4 libzstd) -I/opt/homebrew/opt/snappy/include
-	ROCKSDB_LDFLAGS := $(shell pkg-config --libs-only-l --libs-only-L rocksdb liblz4 libzstd) -L/opt/homebrew/opt/snappy/lib
+	ROCKSDB_CFLAGS := $(shell pkg-config --cflags-only-I liblz4 libzstd) -I/opt/homebrew/opt/snappy/include
+	ROCKSDB_LDFLAGS := $(shell pkg-config --libs-only-l --libs-only-L liblz4 libzstd) -L/opt/homebrew/opt/snappy/lib
 endif
 
 ifeq ($(UNAME_S),Linux)
