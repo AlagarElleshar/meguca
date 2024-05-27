@@ -5,8 +5,7 @@ package util
 import (
 	"crypto/md5"
 	"encoding/base64"
-	"strings"
-	"unicode/utf8"
+	"github.com/rivo/uniseg"
 )
 
 // WrapError wraps error types to create compound error chains
@@ -161,10 +160,21 @@ func SplitPunctuationString(word string) (
 // Trim string, while making sure it's still valid unicode, in case a rune was
 // split in half
 func TrimString(s *string, maxLen int) {
-	if len(*s) > maxLen {
-		*s = (*s)[:maxLen]
-		if !utf8.ValidString(*s) {
-			*s = strings.ToValidUTF8(*s, "?")
+	if s == nil || maxLen <= 0 || len(*s) < maxLen {
+		return
+	}
+
+	gr := uniseg.NewGraphemes(*s)
+	var start, end int
+	for gr.Next() {
+		start, end = gr.Positions()
+		if end >= maxLen {
+			if end > maxLen {
+				*s = (*s)[:start]
+			} else {
+				*s = (*s)[:end]
+			}
+			return
 		}
 	}
 }
