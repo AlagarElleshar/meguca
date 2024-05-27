@@ -429,12 +429,11 @@ func constructPost(
 // Trim on the last dot in the file name, but also strip for .tar.gz and
 // .tar.xz as special cases.
 func formatImageName(name *string) {
-	util.TrimString(name, 200)
-
 	if i := strings.LastIndexByte(*name, '.'); i != -1 {
 		*name = (*name)[:i]
 		if strings.HasSuffix(*name, ".tar") {
 			*name = (*name)[:len(*name)-4]
 		}
 	}
+	util.TrimString(name, 200)
 }
