@@ -57,7 +57,6 @@ func (f *NekoTVFeed) mainLoop() {
 		case c := <-f.add:
 			f.addClient(c)
 			f.sendConnectedMessage(c)
-			log.Info("Client added")
 		case c := <-f.remove:
 			if f.removeClient(c) {
 				f.isRunning = false
@@ -133,7 +132,6 @@ func (f *NekoTVFeed) sendConnectedMessage(c common.Client) {
 		return
 	}
 	c.SendBinary(data)
-	log.Info("Sent connected message to client.")
 }
 
 func (f *NekoTVFeed) AddVideo(v *pb.VideoItem, atEnd bool) {
