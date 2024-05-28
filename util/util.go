@@ -157,24 +157,36 @@ func SplitPunctuationString(word string) (
 	return
 }
 
-// Trim string, while making sure it's still valid unicode, in case a rune was
+// TrimString trims the input string to the specified maximum length
+// while making sure it's still valid unicode, in case a rune was
 // split in half
-func TrimString(s *string, maxLen int) {
-	if s == nil || maxLen <= 0 || len(*s) < maxLen {
+func TrimString(inputStr *string, maxLen int) {
+	// Check for invalid input or if the string is already within the required length.
+	if inputStr == nil || maxLen <= 0 || len(*inputStr) < maxLen {
 		return
 	}
 
-	gr := uniseg.NewGraphemes(*s)
-	var start, end int
-	for gr.Next() {
-		start, end = gr.Positions()
-		if end >= maxLen {
-			if end > maxLen {
-				*s = (*s)[:start]
-			} else {
-				*s = (*s)[:end]
-			}
-			return
+	remainingStr := *inputStr
+	state := -1
+	currentLength := 0
+
+	// Loop through the string to measure grapheme clusters.
+	for len(remainingStr) > 0 {
+		// Extract the first grapheme cluster and the rest of the string.
+		graphemeCluster, restOfString, _, updatedState := uniseg.FirstGraphemeClusterInString(remainingStr, state)
+		clusterLength := len(graphemeCluster)
+
+		// Break if adding the next grapheme cluster exceeds maxLen.
+		if currentLength+clusterLength > maxLen {
+			break
 		}
+
+		// Update the length and state.
+		currentLength += clusterLength
+		remainingStr = restOfString
+		state = updatedState
 	}
+
+	// Trim the original string to the calculated length.
+	*inputStr = (*inputStr)[:currentLength]
 }
