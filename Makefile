@@ -18,7 +18,7 @@ endif
 
 all: client server
 
-client: client_deps
+client: client_deps proto_client
 	node esbuild.config.js --css --js
 
 client_deps:
@@ -30,11 +30,19 @@ css:
 js:
 	node esbuild.config.js --js
 
-generate:
-	go generate . ./pb
-	npx protoc --ts_out client/typings --proto_path pb pb/messages.proto
+proto: proto_client proto_server
 
-server:
+proto_client:
+	npx protoc --ts_out client/typings --proto_path pb pb/nekotv.proto pb/posts.proto
+
+proto_server:
+	protoc --go_out=. --proto_path=pb --go_opt=paths=source_relative pb/*.proto
+
+generate:
+	go generate .
+
+
+server: proto_server
 	go generate
 	CGO_CFLAGS="$(ROCKSDB_CFLAGS)" CGO_LDFLAGS="$(ROCKSDB_LDFLAGS)" go build -v $(GO_BUILD_TAGS)
 
