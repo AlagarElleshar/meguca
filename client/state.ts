@@ -50,12 +50,12 @@ const tenDays = 10 * 24 * 60 * 60 * 1000
 export const config: Configs = (window as any).config
 
 // Currently existing boards
-export let boards: string[] = (window as any).boards
+export const boards: string[] = (window as any).boards
 
 export let boardConfig: BoardConfigs
 
 // Currently existing background videos
-export let bgVideos: string[] = (window as any).bgVideos
+export const bgVideos: string[] = (window as any).bgVideos
 
 // Load initial page state
 export const page = read(location.href)

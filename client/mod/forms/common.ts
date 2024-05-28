@@ -65,7 +65,7 @@ export abstract class AccountForm extends FormView {
 		const els = this.el
 			.querySelectorAll("input[name], select[name], textarea[name]") as
 			NodeListOf<HTMLInputElement>
-		for (let el of els) {
+		for (const el of els) {
 			let val: any
 			switch (el.type) {
 				case "submit":
@@ -84,7 +84,7 @@ export abstract class AccountForm extends FormView {
 		}
 
 		// Read all key-value maps
-		for (let map of this.el.querySelectorAll(".map-form")) {
+		for (const map of this.el.querySelectorAll(".map-form")) {
 			const fields = map
 				.querySelectorAll(".map-field") as NodeListOf<HTMLInputElement>
 			if (!fields.length) {
@@ -99,7 +99,7 @@ export abstract class AccountForm extends FormView {
 		}
 
 		// Read all array forms
-		for (let ar of this.el.querySelectorAll(".array-form")) {
+		for (const ar of this.el.querySelectorAll(".array-form")) {
 			const fields =
 				[...ar.querySelectorAll(".array-field")] as HTMLInputElement[]
 			if (fields.length) {

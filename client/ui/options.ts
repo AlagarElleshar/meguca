@@ -44,7 +44,7 @@ export default class OptionsPanel extends TabbedModal {
 	// Assign loaded option settings to the respective elements in the options
 	// panel
 	private assignValues() {
-		for (let id in models) {
+		for (const id in models) {
 			const model = models[id],
 				val = model.get()
 			this.assignValue(id, model.spec.type, val)
@@ -162,7 +162,7 @@ export default class OptionsPanel extends TabbedModal {
 		}
 
 		localStorage.clear()
-		for (let key in json) {
+		for (const key in json) {
 			localStorage.setItem(key, json[key])
 		}
 		alert(lang.ui["importDone"])

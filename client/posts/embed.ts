@@ -59,7 +59,7 @@ const formatters: { [key: number]: (s: string) => string } = {}
 // Map of providers to information fetcher functions
 const fetchers: { [key: number]: (el: Element) => Promise<any> } = {}
 
-for (let p of [
+for (const p of [
 	"YouTube",
 	"SoundCloud",
 	"Vimeo",
@@ -222,7 +222,7 @@ function format(s: string, type: provider): string {
 // Match and parse URL against embeddable formats. If matched, returns the
 // generated HTML embed string, otherwise returns empty string.
 export function parseEmbeds(s: string): string {
-	for (let [type, patt] of patterns) {
+	for (const [type, patt] of patterns) {
 		if (patt.test(s)) {
 			return formatters[type](s)
 		}
@@ -275,7 +275,7 @@ async function toggleExpansion(e: MouseEvent) {
 		frag = makeFrag(html)
 
 	// Restrict embedded iframe access to the page. Improves privacy.
-	for (let el of frag.querySelectorAll("iframe")) {
+	for (const el of frag.querySelectorAll("iframe")) {
 		el.setAttribute("referrerpolicy", "no-referrer")
 		el.setAttribute(
 			"sandbox",

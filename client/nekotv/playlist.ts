@@ -4,8 +4,8 @@ import {
     secondsToTimeExact,
 } from "./nekotv";
 
-let playlistOl = document.getElementById('watch-playlist-entries') as HTMLOListElement;
-let playlistDiv = document.getElementById('watch-playlist') as HTMLDivElement;
+const playlistOl = document.getElementById('watch-playlist-entries') as HTMLOListElement;
+const playlistDiv = document.getElementById('watch-playlist') as HTMLDivElement;
 let playerTimeInterval: number | null = null;
 let isPlaylistVisible = false;
 
@@ -90,7 +90,7 @@ export function updatePlayerTime() {
         return;
     }
 
-    let playerTime = player.getTime();
+    const playerTime = player.getTime();
 
     if (playerTime === undefined || playerTime === null) {
         console.error('Player time undefined');

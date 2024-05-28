@@ -30,7 +30,7 @@ export default class CollectionView extends View<PostCollection> {
 		// Append posts to view
 		data = data.sort((a, b) =>
 			a.id - b.id)
-		for (let d of data) {
+		for (const d of data) {
 			let model = PostCollection.getFromAll(d.id)
 			if (!model) {
 				model = new Post(d)
@@ -47,7 +47,7 @@ export default class CollectionView extends View<PostCollection> {
 	}
 
 	public remove() {
-		for (let m of this.borrowed) {
+		for (const m of this.borrowed) {
 			// TODO: Method for returning cross-thread inlined posts back into
 			// their old position
 			if (posts.get(m.id)) {

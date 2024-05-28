@@ -52,7 +52,7 @@ async function extractCatalogModels() {
 	const data = extractPageData<BoardData>();
 	await loadFromDB(...(data.threads.threads).map(t => t.id));
 	
-	for (let t of data.threads.threads) {
+	for (const t of data.threads.threads) {
 		threads[t.id] = t;
 		extractPost(t, t.id, t.board, data.backlinks)
 		if (hidden.has(t.id)) {
@@ -65,7 +65,7 @@ async function extractThreads() {
 	const data = extractPageData<BoardData>();
 	await loadFromDB(...(data.threads.threads).map(t => t.id));
 
-	for (let thread of data.threads.threads) {
+	for (const thread of data.threads.threads) {
 		const { posts } = thread
 		delete thread.posts
 		threads[thread.id] = thread;
@@ -74,7 +74,7 @@ async function extractThreads() {
 			document.querySelector(`section[data-id="${thread.id}"]`).classList.add("hidden")
 			continue
 		}
-		for (let post of posts) {
+		for (const post of posts) {
 			extractPost(post, thread.id, thread.board, data.backlinks)
 		}
 	}
@@ -113,7 +113,7 @@ export function sortThreads(initial: boolean) {
 
 	// Index board pages use the same localization functions as threads
 	if (page.catalog && (options.hideThumbs || options.workModeToggle)) {
-		for (let el of cont.querySelectorAll("img.catalog") as NodeListOf<HTMLElement>) {
+		for (const el of cont.querySelectorAll("img.catalog") as NodeListOf<HTMLElement>) {
 			el.style.display = "none"
 		}
 	}
@@ -182,7 +182,7 @@ function filterThreads(filter: string) {
 	const [, threads] = getThreads(),
 		r = new RegExp(filter, "i"),
 		matched = new Set<number>()
-	for (let m of posts) {
+	for (const m of posts) {
 		const match = (m.board && r.test(`/${m.board}/`))
 			|| r.test(m.subject)
 			|| r.test(m.body)
@@ -191,7 +191,7 @@ function filterThreads(filter: string) {
 		}
 	}
 
-	for (let el of threads) {
+	for (const el of threads) {
 		const id = parseInt(el.getAttribute("data-id"))
 		el.style.display = matched.has(id) ? "" : "none"
 	}

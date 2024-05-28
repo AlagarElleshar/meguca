@@ -126,7 +126,7 @@ handlers[message.synchronise] = async (data: SyncData) => {
 	let minID = 0
 	if (page.lastN) {
 		minID = Infinity
-		for (let { id } of posts) {
+		for (const { id } of posts) {
 			if (id < minID && id !== page.thread) {
 				minID = id
 			}
@@ -140,25 +140,25 @@ handlers[message.synchronise] = async (data: SyncData) => {
 	const { recent, moderation } = data,
 		proms: Promise<void>[] = []
 
-	for (let post of posts) {
+	for (const post of posts) {
 		if (post.editing && !(post.id in recent)) {
 			proms.push(fetchUnclosed(post))
 		}
 	}
-	for (let key in recent) {
+	for (const key in recent) {
 		const id = parseInt(key)
 		if (id >= minID) {
 			proms.push(syncRecentPost(id, recent[key]))
 		}
 	}
-	for (let id in moderation) {
+	for (const id in moderation) {
 		const p = posts.get(parseInt(id));
 		if (!p) {
 			continue;
 		}
 		if (!p.moderation || p.moderation.length !== moderation[id].length) {
 			p.moderation = [];
-			for (let e of moderation[id]) {
+			for (const e of moderation[id]) {
 				p.applyModeration(e)
 			}
 		}

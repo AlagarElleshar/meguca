@@ -3,7 +3,7 @@ import {setAttrs} from "../util";
 import {openFlvPlayer} from "./flvplayer";
 // import Mpegts from "mpegts.js";
 export default () => {
-	for (let id of ["options", "FAQ", "identity", "account", "watcher" ]) {
+	for (const id of ["options", "FAQ", "identity", "account", "watcher" ]) {
 		highlightBanner(id)
 	}
 	new BannerModal(document.getElementById("FAQ"))

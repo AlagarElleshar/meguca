@@ -32,7 +32,7 @@ export default function () {
     image_count = data.image_count
     bump_time = data.bump_time
     if (data.moderation) {
-        for (let { type } of data.moderation) {
+        for (const { type } of data.moderation) {
             if (type === ModerationAction.deletePost) {
                 isDeleted = true;
                 break;
@@ -43,7 +43,7 @@ export default function () {
 
     extractPost(data, data.id, data.board, backlinks)
 
-    for (let post of posts) {
+    for (const post of posts) {
         extractPost(post, data.id, data.board, backlinks)
     }
     hidePosts()

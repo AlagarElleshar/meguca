@@ -60,7 +60,7 @@ interface Options extends ChangeEmitter {
 let options = {} as Options
 // Need to define all properties ahead of time for the ES5 Proxy polyfill to
 // work
-for (let k in specs) {
+for (const k in specs) {
 	options[k] = undefined
 }
 export default options = emitChanges({} as Options)
@@ -192,7 +192,7 @@ export function initOptions() {
 	}
 
 	// Populate option model collection and central model
-	for (let id in specs) {
+	for (const id in specs) {
 		new OptionModel(id, specs[id])
 	}
 
@@ -200,7 +200,7 @@ export function initOptions() {
 	const bgElement = document.getElementById("bgVideo")
 	bgElement.innerHTML = ""
 
-	for (let val of bgVideos) {
+	for (const val of bgVideos) {
 		const opt = document.createElement("option")
 		opt.value = val
 		opt.innerText = val
@@ -208,7 +208,7 @@ export function initOptions() {
 	}
 
 	// Conditionally load and execute optional modules
-	for (let opt of ["userBG", "bgVideo", "mascot", "customCSSToggle", "meguTV"]) {
+	for (const opt of ["userBG", "bgVideo", "mascot", "customCSSToggle", "meguTV"]) {
 		if (options[opt]) {
 			models[opt].execute(true)
 		}

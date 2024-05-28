@@ -13,8 +13,8 @@ export default () =>
 function handleShortcut(event: KeyboardEvent) {
 	let caught = false
 
-	let anyModifier = event.altKey || event.metaKey || event.ctrlKey || event.shiftKey;
-	let inInput = 'selectionStart' in event.target
+	const anyModifier = event.altKey || event.metaKey || event.ctrlKey || event.shiftKey;
+	const inInput = 'selectionStart' in event.target
 	let altGr = event.getModifierState && event.getModifierState("AltGraph")
 	if (navigator.platform.includes("Mac")) {
 		altGr = false;
@@ -157,7 +157,7 @@ function getArticleClosestToCenter(articles: Element[]): Element {
 // move focus to next or previous visible post in document order.
 // starts with first post if none is selected via current url fragment
 function navigatePost(reverse: boolean) {
-	let all: Element[] = Array.from(document.querySelectorAll(postSelector))
+	const all: Element[] = Array.from(document.querySelectorAll(postSelector))
 	let current: Element = document.querySelector(postSelector + ":target");
 
 	if (!current) {

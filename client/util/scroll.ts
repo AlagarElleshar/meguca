@@ -39,7 +39,7 @@ function getTheaterModeRightDiv() {
 // Scroll to particular element and compensate for the banner height
 export function scrollToElement(el: HTMLElement) {
 	if(isTheaterModeActive()){
-		let rightDiv = getTheaterModeRightDiv()
+		const rightDiv = getTheaterModeRightDiv()
 		rightDiv.scrollTo(0, el.offsetTop - rightDiv.offsetTop - 5)
 	}
 	else {
@@ -49,7 +49,7 @@ export function scrollToElement(el: HTMLElement) {
 
 function scrollToTop() {
 	if(isTheaterModeActive()){
-		let rightDiv = getTheaterModeRightDiv()
+		const rightDiv = getTheaterModeRightDiv()
 		rightDiv.scrollTo(0, 0)
 	}
 	else {
@@ -61,7 +61,7 @@ function scrollToTop() {
 // Scroll to the bottom of the thread
 export function scrollToBottom() {
 	if(isTheaterModeActive()){
-		let rightDiv = getTheaterModeRightDiv()
+		const rightDiv = getTheaterModeRightDiv()
 		rightDiv.scrollTo(0, rightDiv.scrollHeight)
 	}
 	else {
@@ -90,8 +90,8 @@ export function checkBottom() {
 // Return, if scrolled to bottom of page
 export function isAtBottom(): boolean {
 	if(isTheaterModeActive()){
-		let rightDiv = getTheaterModeRightDiv()
-		let {scrollTop, scrollHeight, offsetHeight} = rightDiv
+		const rightDiv = getTheaterModeRightDiv()
+		const {scrollTop, scrollHeight, offsetHeight} = rightDiv
 		console.log(scrollTop, scrollHeight, offsetHeight)
 		return Math.abs(rightDiv.scrollTop - (rightDiv.scrollHeight - rightDiv.offsetHeight)) < 2
 	}
@@ -111,7 +111,7 @@ document.addEventListener("scroll", () => {
 }, { passive: true })
 
 export function addTheaterModeScrollListener(){
-	let rightDiv = getTheaterModeRightDiv()
+	const rightDiv = getTheaterModeRightDiv()
 	rightDiv.addEventListener("scroll", () => {
 		scrolled = !isAtBottom()
 		locked = !scrolled;
@@ -121,9 +121,9 @@ export function addTheaterModeScrollListener(){
 
 // Use a MutationObserver to jump to the bottom of the page when a new
 // post is made, we are locked to the bottom or the user set the alwaysLock option
-let threadContainer = document.getElementById("thread-container")
+const threadContainer = document.getElementById("thread-container")
 if (threadContainer !== null) {
-	let threadObserver = new MutationObserver((mut) => {
+	const threadObserver = new MutationObserver((mut) => {
 		if (locked || (trigger("getOptions").alwaysLock)) {
 			scrollToBottom()
 		}

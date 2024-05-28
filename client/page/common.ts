@@ -91,7 +91,7 @@ function localizeLinks(post: Post) {
 	}
 	let el: HTMLElement,
 		isReply = false
-	for (let id of new Set(post.links.map(l => l.id))) {
+	for (const id of new Set(post.links.map(l => l.id))) {
 		if (!mine.has(id)) {
 			continue
 		}
@@ -109,7 +109,7 @@ function localizeLinks(post: Post) {
 }
 
 function addYous(id: number, el: HTMLElement) {
-	for (let a of el.querySelectorAll(`a[data-id="${id}"]`)) {
+	for (const a of el.querySelectorAll(`a[data-id="${id}"]`)) {
 		a.textContent += " " + lang.posts["you"]
 	}
 }
@@ -120,7 +120,7 @@ function localizeBacklinks(post: Post) {
 		return
 	}
 	let el: HTMLElement
-	for (let idStr in post.backlinks) {
+	for (const idStr in post.backlinks) {
 		const id = parseInt(idStr)
 		if (!mine.has(id)) {
 			continue
@@ -137,7 +137,7 @@ function localizeBacklinks(post: Post) {
 // Hide posts, that have been hidden (or linked hidden posts recursively, if
 // enabled)
 export function hidePosts() {
-	for (let post of posts) {
+	for (const post of posts) {
 		if (hidden.has(post.id)) {
 			hideRecursively(post)
 		}
@@ -148,7 +148,7 @@ export function hidePosts() {
 // Needs to be done after models are populated to resolve temporary image links
 // in open posts.
 export function reparseOpenPosts() {
-	for (let m of posts) {
+	for (const m of posts) {
 		if (m.editing) {
 			m.view.reparseBody()
 		}

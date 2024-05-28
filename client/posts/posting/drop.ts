@@ -39,7 +39,7 @@ async function onDrop(e: DragEvent) {
 	} else if (url) {
 		// Fetch file from link
 		try {
-			let u = new URL(url);
+			const u = new URL(url);
 
 			// Prevent URLs from meguca accidentally being posted with drag&drop
 			if (u.origin === location.origin) {
@@ -86,7 +86,7 @@ function stopDefault(e: Event) {
 
 // Bind listeners
 export default () => {
-	for (let event of ["dragenter", "dragexit", "dragover"]) {
+	for (const event of ["dragenter", "dragexit", "dragover"]) {
 		document.addEventListener(event, stopDefault);
 	}
 	document.addEventListener("drop", onDrop);

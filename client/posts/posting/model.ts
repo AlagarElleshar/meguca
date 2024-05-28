@@ -95,8 +95,8 @@ export default class FormModel extends Post {
 			// Commit a character appendage to the end of the line to the server
 			const char = val.slice(-1);
 			this.inputBody += char
-			let bytes = FormModel.textEncoder.encode(char);
-			let newBytes = new Uint8Array(bytes.length + 1);
+			const bytes = FormModel.textEncoder.encode(char);
+			const newBytes = new Uint8Array(bytes.length + 1);
 			newBytes.set(bytes, 0);
 			newBytes[bytes.length] = message.append;
 			// newBytes.set(bytes.length, message.append);
@@ -107,7 +107,7 @@ export default class FormModel extends Post {
 			// Send a message about removing the last character of the line to
 			// the server
 			this.inputBody = this.inputBody.slice(0, -1)
-			let backspaceMessage = new Uint8Array([message.backspace]);
+			const backspaceMessage = new Uint8Array([message.backspace]);
 			this.sendBinary(backspaceMessage);
 		} else {
 			this.commitSplice(val)
@@ -162,9 +162,9 @@ export default class FormModel extends Post {
 			)
 
 		// create a new typed array
-		let offsets = new Uint16Array([start,old.length - till - start]);
-		let text = FormModel.textEncoder.encode(val.slice(start, -till || undefined).join(""));
-		let newBytes = new Uint8Array(text.byteLength + 5);
+		const offsets = new Uint16Array([start,old.length - till - start]);
+		const text = FormModel.textEncoder.encode(val.slice(start, -till || undefined).join(""));
+		const newBytes = new Uint8Array(text.byteLength + 5);
 		newBytes.set(new Uint8Array(offsets.buffer), 0);
 		newBytes.set(text, offsets.byteLength);
 		newBytes[offsets.byteLength + text.byteLength] = message.splice;
@@ -225,7 +225,7 @@ export default class FormModel extends Post {
 
 		// If we do have a selection of text, then quote all lines.
 		if (sel) {
-			for (let line of sel.split('\n')) {
+			for (const line of sel.split('\n')) {
 				s += `>${line}\n`
 			}
 
@@ -247,7 +247,7 @@ export default class FormModel extends Post {
 		const start = this.view.input.selectionStart,
 			end = this.view.input.selectionEnd,
 			old = this.view.input.value
-		let p = modPaste(old, sel, end)
+		const p = modPaste(old, sel, end)
 
 		if (!p) {
 			return

@@ -11,7 +11,7 @@ export function importTemplate(name: string): DocumentFragment {
 }
 
 // Load HTML templates
-for (let el of document.head.querySelectorAll("template")) {
+for (const el of document.head.querySelectorAll("template")) {
     templates[el.getAttribute("name")] = (el as HTMLTemplateElement).content
 }
 

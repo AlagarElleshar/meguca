@@ -39,7 +39,7 @@ function render() {
 	// Should help caching.
 	const existing: { [sha1: string]: HTMLVideoElement } = {};
 	if(cont.children != null) {
-		for (let ch of [...cont.children] as HTMLVideoElement[]) {
+		for (const ch of [...cont.children] as HTMLVideoElement[]) {
 			if (ch.tagName === "VIDEO") {
 				ch.remove();
 				existing[ch.getAttribute("data-sha1")] = ch;
@@ -121,14 +121,14 @@ export default function () {
 		const el = document.getElementById("megu-tv");
 		if (el) {
 			if (on) {
-				for (let ch of [...el.children] as HTMLVideoElement[]) {
+				for (const ch of [...el.children] as HTMLVideoElement[]) {
 					ch.muted = true;
 				}
 				render();
 			} else {
 				render();
 				el.setAttribute("style", "display: block");
-				let ch = el.firstChild as HTMLVideoElement;
+				const ch = el.firstChild as HTMLVideoElement;
 				ch.muted = false;
 			}
 		}

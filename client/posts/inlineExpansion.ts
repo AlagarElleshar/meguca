@@ -33,7 +33,7 @@ async function onClick(e: MouseEvent) {
 		return contractPost(id, parent)
 	}
 
-	var model = posts.get(id) || inlinedPosts.get(id),
+	let model = posts.get(id) || inlinedPosts.get(id),
 		found = false
 
 	if (model) {
@@ -90,7 +90,7 @@ function contractPost(id: number, parent: HTMLElement) {
 			return
 		}
 
-		for (let em of el.getElementsByTagName("EM")) {
+		for (const em of el.getElementsByTagName("EM")) {
 			contractArticles(em)
 		}
 
@@ -98,7 +98,7 @@ function contractPost(id: number, parent: HTMLElement) {
 	}
 
 	function contractArticles(el: Element) {
-		for (let art of el.getElementsByTagName("ARTICLE")) {
+		for (const art of el.getElementsByTagName("ARTICLE")) {
 			contractPost(parseInt(art.id.slice(1)), el as HTMLElement)
 		}
 	}
@@ -110,7 +110,7 @@ export function toggleLinkReferences(parent: Element, childID: number, on: boole
 		ch = document.getElementById(`p${childID}`),
 		pID = p.closest("article").id.slice(1)
 
-	for (let el of p.querySelectorAll(".post-link")) {
+	for (const el of p.querySelectorAll(".post-link")) {
 		// Check, if not from a post inlined in the child
 		if (
 			el.closest("article") === ch &&

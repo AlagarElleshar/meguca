@@ -36,7 +36,7 @@ export function postAdded(post: Post) {
 }
 
 function processQueue() {
-	for (let post of queue) {
+	for (const post of queue) {
 		if (!post.seen()) {
 			unseenPosts++
 		}
@@ -81,7 +81,7 @@ function recalc() {
 	recalcPending = false
 	unseenPosts = 0
 	unseenReplies = false
-	for (let post of posts) {
+	for (const post of posts) {
 		if (post.seen()) {
 			continue;
 		}
@@ -149,7 +149,7 @@ export default () => {
 
 	// Connection change listeners
 	connSM.on(connState.synced, resolve)
-	for (let state of [connState.dropped, connState.desynced]) {
+	for (const state of [connState.dropped, connState.desynced]) {
 		connSM.on(state, delayedDiscoRender)
 	}
 

@@ -6,16 +6,16 @@ import {startPlayerTimeInterval, stopPlayerTimeInterval, togglePlaylist, updateP
 
 
 export let player: Player;
-export let watchVideoDiv = document.getElementById('watch-video') as HTMLVideoElement;
+export const watchVideoDiv = document.getElementById('watch-video') as HTMLVideoElement;
 
-let playerDiv = document.getElementById('watch-player') as HTMLDivElement;
-let playlistStatus = document.getElementById('watch-playlist-status')!;
-let watchStatus = document.getElementById('status-watch')!;
-let watchDiv = document.getElementById("watch-panel");
+const playerDiv = document.getElementById('watch-player') as HTMLDivElement;
+const playlistStatus = document.getElementById('watch-playlist-status')!;
+const watchStatus = document.getElementById('status-watch')!;
+const watchDiv = document.getElementById("watch-panel");
 let nekoTVBannerIcon : HTMLElement;
 
-let subscribeMessage = new Uint8Array([1,message.nekoTV]).buffer
-let unsubMessage = new Uint8Array([0,message.nekoTV]).buffer
+const subscribeMessage = new Uint8Array([1,message.nekoTV]).buffer
+const unsubMessage = new Uint8Array([0,message.nekoTV]).buffer
 
 let isMuted : boolean;
 let isNekoTVEnabled : boolean;
@@ -27,7 +27,7 @@ export function initNekoTV() {
 
     nekoTVBannerIcon = document.getElementById("banner-nekotv");
     playerDiv.addEventListener("click",()=>{
-        let is_coarse = matchMedia('(pointer:coarse)').matches
+        const is_coarse = matchMedia('(pointer:coarse)').matches
         if(is_coarse){
             return
         }
@@ -45,10 +45,10 @@ export function initNekoTV() {
         setNekoTVEnabled(!isNekoTVEnabled)
     });
 
-    let watchCloseButton = document.getElementById('watch-close-button');
+    const watchCloseButton = document.getElementById('watch-close-button');
     watchMuteButton = document.getElementById('watch-mute-button');
     watchPlaylistButton = document.getElementById('watch-playlist-button');
-    let watchTheaterButton = document.getElementById('watch-theater-button');
+    const watchTheaterButton = document.getElementById('watch-theater-button');
     watchCloseButton.addEventListener('click',()=>{
         setNekoTVEnabled(false)
     })

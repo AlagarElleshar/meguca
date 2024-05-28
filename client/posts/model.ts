@@ -176,7 +176,7 @@ export class Post extends Model implements PostData {
             notifyAboutReply(this)
         }
         if (this.links) {
-            for (let {id} of this.links) {
+            for (const {id} of this.links) {
                 const post = posts.get(id)
                 if (post) {
                     post.insertBacklink({
@@ -197,7 +197,7 @@ export class Post extends Model implements PostData {
         if (!this.links) {
             return false
         }
-        for (let {id} of this.links) {
+        for (const {id} of this.links) {
             if (mine.has(id)) {
                 return true
             }
@@ -306,7 +306,7 @@ export class Post extends Model implements PostData {
         if (!this.moderation || mine.has(this.id)) {
             return false;
         }
-        for (let {type} of this.moderation) {
+        for (const {type} of this.moderation) {
             if (type === ModerationAction.deletePost) {
                 return true;
             }

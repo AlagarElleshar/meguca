@@ -38,7 +38,7 @@ class IdentityPanel extends BannerModal {
 	}
 
 	private assignValues() {
-		for (let el of this.el.querySelectorAll("input") as NodeListOf<HTMLInputElement>) {
+		for (const el of this.el.querySelectorAll("input") as NodeListOf<HTMLInputElement>) {
 			const name = el.getAttribute("name")
 			switch (el.getAttribute("type")) {
 				case "text":
@@ -77,7 +77,7 @@ class IdentityPanel extends BannerModal {
 // Generate a new base post allocation request
 export function newAllocRequest() {
 	const req: { [key: string]: any } = { password: identity.postPassword }
-	for (let key of ["name", "sage"]) {
+	for (const key of ["name", "sage"]) {
 		if (identity[key]) {
 			req[key] = identity[key]
 		}

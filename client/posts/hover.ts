@@ -72,19 +72,19 @@ class PostPreview extends ImageHandler {
 		}
 
 		// Remove any inline expanded posts
-		for (let el of this.el.querySelectorAll("article")) {
+		for (const el of this.el.querySelectorAll("article")) {
 			el.remove()
 		}
 
 		// Remove any existing reverse post link highlights due to link inline
 		// expansion
-		for (let el of this.el.querySelectorAll("a.post-link.referenced")) {
+		for (const el of this.el.querySelectorAll("a.post-link.referenced")) {
 			el.classList.remove("referenced")
 		}
 
 		// Underline reverse post links in preview
 		const patt = new RegExp(`[>\/]` + getClosestID(this.parent))
-		for (let el of this.el.querySelectorAll("a.post-link")) {
+		for (const el of this.el.querySelectorAll("a.post-link")) {
 			if (!patt.test(el.textContent)) {
 				continue
 			}

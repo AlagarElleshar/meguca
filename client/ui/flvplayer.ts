@@ -15,9 +15,9 @@ let playerOpen = false;
 let player: Mpegts.Player;
 
 export function openFlvPlayer() {
-    let cont = document.getElementById("flv-player-cont")
+    const cont = document.getElementById("flv-player-cont")
     if (!cont) {
-        let playerElement = importTemplate("flv-player")
+        const playerElement = importTemplate("flv-player")
         document.getElementById("modal-overlay").prepend(playerElement);
         document.getElementById("flv-close-button").addEventListener("click", closeFlvPlayer)
         document.getElementById("flv-reload-button").addEventListener("click", reloadPlayer)
@@ -33,7 +33,7 @@ async function reloadPlayer() {
 
 function closeFlvPlayer() {
     destroyPlayer()
-    let cont = document.getElementById("flv-player-cont")
+    const cont = document.getElementById("flv-player-cont")
     cont.remove()
     playerOpen = false
 }
@@ -50,14 +50,14 @@ function destroyPlayer() {
 
 export async function playLive(url: string) {
     await loadMpegtsjs()
-    let playerConfig : Mpegts.Config = {
+    const playerConfig : Mpegts.Config = {
         enableWorker: false,
         liveBufferLatencyChasing: true,
         liveBufferLatencyMaxLatency: 2,
         liveBufferLatencyMinRemain: 1,
     }
     if (mpegts.getFeatureList().mseLivePlayback) {
-        var videoElement = document.getElementById('flv-player');
+        const videoElement = document.getElementById('flv-player');
         destroyPlayer()
         player = mpegts.createPlayer({
             type: 'flv',  // could also be mpegts, m2ts, flv

@@ -111,7 +111,7 @@ export class TwitchPlayer implements IPlayer {
     public removeVideo(): void {
         if (!this.twitchPlayer) return;
         this.twitchPlayer = null;
-        let twitchIframe = watchVideoDiv.querySelector(`iframe[title="Twitch"]`)
+        const twitchIframe = watchVideoDiv.querySelector(`iframe[title="Twitch"]`)
         twitchIframe.remove()
         watchPlaylistButton.style.display = "none";
         watchMuteButton.style.display = "";

@@ -119,8 +119,8 @@ export default () => {
 
 	handlers[message.append] = (message: ArrayBuffer) => {
 		const view = new DataView(message);
-		let id = view.getFloat64(0, true);
-		let append = decoder.decode(message.slice(8));
+		const id = view.getFloat64(0, true);
+		const append = decoder.decode(message.slice(8));
 		if(debug)
 			console.log(`>binary append ${id} ${append}`)
 		handle(id, m =>
@@ -129,7 +129,7 @@ export default () => {
 
 	handlers[message.backspace] = (message: ArrayBuffer) => {
 		const view = new DataView(message);
-		let id = view.getFloat64(0, true);
+		const id = view.getFloat64(0, true);
 		if(debug)
 			console.log(`>binary backspace ${id}`)
 		handle(id, m =>
@@ -138,7 +138,7 @@ export default () => {
 
 	handlers[message.splice] = (binaryMessage: ArrayBuffer) => {
 		const view = new DataView(binaryMessage);
-		let msg: SpliceResponse = {
+		const msg: SpliceResponse = {
 			id: view.getFloat64(0, true),
 			start: view.getUint16(8, true),
 			len: view.getUint16(10, true),
@@ -196,24 +196,24 @@ export default () => {
 		})
 	handlers[message.claudeAppend] = (message: ArrayBuffer) => {
 		const view = new DataView(message);
-		let id = view.getFloat64(0, true);
-		let append = decoder.decode(message.slice(8));
+		const id = view.getFloat64(0, true);
+		const append = decoder.decode(message.slice(8));
 		if(debug)
 			console.log(`>binary claude append: ${id} ${append}`)
 		handle(id,(m) => m.claudeAppend(append))
 	}
 	handlers[message.claudeDone] = (message: ArrayBuffer) => {
 		const view = new DataView(message);
-		let id = view.getFloat64(0, true);
-		let response = decoder.decode(message.slice(8));
+		const id = view.getFloat64(0, true);
+		const response = decoder.decode(message.slice(8));
 		if(debug)
 			console.log(`>binary claude done: ${id} ${response}`)
 		handle(id,(m) => m.claudeDone(response))
 	}
 	handlers[message.claudeError] = (message: ArrayBuffer) => {
 		const view = new DataView(message);
-		let id = view.getFloat64(0, true);
-		let response = decoder.decode(message.slice(8));
+		const id = view.getFloat64(0, true);
+		const response = decoder.decode(message.slice(8));
 		if(debug)
 			console.log(`>binary claude error: ${id} ${response}`)
 		handle(id,(m) => m.claudeError(response))
@@ -259,7 +259,7 @@ export default () => {
 	handlers[message.setCookie] = ({ key, value }: CookieMessage) =>
 		setCookie(key, value, 30)
 	handlers[message.nekoTV] = (message : ArrayBuffer) => {
-		let msg = WebSocketMessage.fromBinary(new Uint8Array(message));
+		const msg = WebSocketMessage.fromBinary(new Uint8Array(message));
 		if (debug && msg.messageType.oneofKind !== "getTimeEvent") {
 			console.log(WebSocketMessage.toJsonString(msg))
 			console.log(msg)

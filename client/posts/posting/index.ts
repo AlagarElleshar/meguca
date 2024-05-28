@@ -175,8 +175,8 @@ function quotePost(e: MouseEvent) {
 }
 
 function addMeguHash(e: MouseEvent) {
-    let meguDiv = document.getElementById("megu-tv")
-    let hash = meguDiv.querySelector("video").getAttribute("data-sha1");
+    const meguDiv = document.getElementById("megu-tv")
+    const hash = meguDiv.querySelector("video").getAttribute("data-sha1");
     // On board pages do nothing
     if (!state.page.thread) {
         return
@@ -188,12 +188,12 @@ function addMeguHash(e: MouseEvent) {
 }
 
 function addFlvFrame(e: MouseEvent) {
-    let videoElement: HTMLVideoElement = <HTMLVideoElement>document.getElementById("flv-player")
+    const videoElement: HTMLVideoElement = <HTMLVideoElement>document.getElementById("flv-player")
     addStreamFrame(videoElement)
 }
 
 function addMeguFrame(e: MouseEvent) {
-    let videoElement: HTMLVideoElement = <HTMLVideoElement>document.getElementById("megu-tv-video")
+    const videoElement: HTMLVideoElement = <HTMLVideoElement>document.getElementById("megu-tv-video")
     addStreamFrame(videoElement)
 }
 
@@ -363,7 +363,7 @@ export default () => {
 
     // Server requested captcha. This rejects the previous post or image
     // allocation request.
-    for (let s of [postState.draft, postState.allocating]) {
+    for (const s of [postState.draft, postState.allocating]) {
         postSM.act(s, postEvent.captchaRequested, () => {
             postModel.inputBody = "";
             renderCaptchaForm(postSM.feeder(postEvent.captchaSolved));
@@ -382,7 +382,7 @@ export default () => {
     })
 
     // Attempt to resume post after solving captcha
-    for (let s of [postState.draft, postState.allocating, postState.alloc]) {
+    for (const s of [postState.draft, postState.allocating, postState.alloc]) {
         // Capture variable in inner scope
         ((s: postState) => {
             postSM.act(s, postEvent.captchaSolved, () => {
@@ -453,7 +453,7 @@ export default () => {
     })
 
     // Trigger post form updates on post option change
-    for (let id of ["name", "auth", "sage"]) {
+    for (const id of ["name", "auth", "sage"]) {
         identity.onChange(id, updateIdentity)
     }
 

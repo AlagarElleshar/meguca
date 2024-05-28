@@ -12,7 +12,7 @@ let socket: WebSocket,
 	attempts: number,
 	attemptTimer: number
 
-let decoder = new TextDecoder('utf-8')
+const decoder = new TextDecoder('utf-8')
 // Websocket connection and synchronization with server states
 export const enum syncStatus {
 	disconnected, connecting, syncing, synced, desynced,
@@ -104,8 +104,8 @@ function leftPad(type: message): string {
 function onMessage(data: string | ArrayBuffer, extracted: boolean) {
 	//if data is an array buffer
 	if (data instanceof ArrayBuffer) {
-		let view = new Uint8Array(data)
-		let msgType = view[data.byteLength - 1]
+		const view = new Uint8Array(data)
+		const msgType = view[data.byteLength - 1]
 		if (debug && msgType !== message.nekoTV) {
 			console.log("> binary message: ", view);
 		}
@@ -123,7 +123,7 @@ function onMessage(data: string | ArrayBuffer, extracted: boolean) {
 
 	// Split several concatenated messages
 	if (type === message.concat) {
-		for (let msg of JSON.parse(data)) {
+		for (const msg of JSON.parse(data)) {
 			onMessage(msg, true)
 		}
 		return
@@ -189,7 +189,7 @@ connSM.act(connState.loading, connEvent.start, () => {
 	return connState.connecting
 })
 
-for (let state of [connState.connecting, connState.reconnecting]) {
+for (const state of [connState.connecting, connState.reconnecting]) {
 	connSM.act(state, connEvent.open, prepareToSync)
 }
 

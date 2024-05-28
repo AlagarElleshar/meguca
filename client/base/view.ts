@@ -57,7 +57,7 @@ export default class View<M extends Model> {
 	// We use those the most, so nice to have. Also prevents default behavior
 	// from triggering.
 	protected onClick(events: { [selector: string]: EventListener }) {
-		for (let selector in events) {
+		for (const selector in events) {
 			this.on('click', events[selector], { selector, capture: true })
 		}
 	}
@@ -70,7 +70,7 @@ export default class View<M extends Model> {
 	// Extract duration from input elements in seconds
 	protected extractDuration(): number {
 		let duration = 0;
-		for (let el of this.el.querySelectorAll("input[type=number]")) {
+		for (const el of this.el.querySelectorAll("input[type=number]")) {
 			let times = 1;
 			switch (el.getAttribute("name")) {
 				case "day":

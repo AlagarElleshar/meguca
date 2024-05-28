@@ -9,7 +9,7 @@ import { expandThreadForm } from "./threads";
 function onPaste(e: ClipboardEvent) {
 	const text = e.clipboardData.getData("text"),
 		files = e.clipboardData.files
-	var threadForm: HTMLFormElement,
+	let threadForm: HTMLFormElement,
 		m: FormModel
 
 	if (files.length !== 1) {
@@ -48,7 +48,7 @@ function onPaste(e: ClipboardEvent) {
 			const start = area.selectionStart;
 			const end = area.selectionEnd;
 			const old = area.value;
-			let p = modPaste(old, text, end)
+			const p = modPaste(old, text, end)
 
 			if (!p) {
 				return

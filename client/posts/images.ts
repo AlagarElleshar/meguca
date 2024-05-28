@@ -107,23 +107,23 @@ export default class ImageHandler extends View<Post> {
 	}
 
 	public renderSource(id: string, el : Element, postingTime: Element){
-		let matches = el.getElementsByClassName("sourcelink")
+		const matches = el.getElementsByClassName("sourcelink")
 		if(matches.length > 0) {
 			return
 		}
-		let sourceButton = document.createElement("a")
-		let downloadButton = el.getElementsByClassName("download-link")[0] as HTMLAnchorElement
+		const sourceButton = document.createElement("a")
+		const downloadButton = el.getElementsByClassName("download-link")[0] as HTMLAnchorElement
 		sourceButton.href = `https://www.tiktok.com/@/video/${id}`;
 		sourceButton.className = "sourcelink";
 		sourceButton.innerText = "􀉣";
 		sourceButton.target = "_blank";
 		sourceButton.rel = "noopener noreferrer";
-		let unixTime = parseInt(id, 10) / Math.pow(2,32);
-		let postingTimeText = relativeTime(unixTime);
+		const unixTime = parseInt(id, 10) / Math.pow(2,32);
+		const postingTimeText = relativeTime(unixTime);
 		sourceButton.title = `Posted ${postingTimeText}`
 		const now = Date.now() / 1000
 
-		let timeElapsed = now - unixTime
+		const timeElapsed = now - unixTime
 		if( timeElapsed < 172800 && timeElapsed > -60) {
 			postingTime.firstElementChild.textContent = "􀆿 ";
 			postingTime.classList.add("fileinfo-newtiktok")
@@ -131,7 +131,7 @@ export default class ImageHandler extends View<Post> {
 		postingTime.insertAdjacentText('beforeend', postingTimeText);
 		el.insertBefore(sourceButton, downloadButton.nextSibling)
 
-		let tikwmButton = document.createElement("a")
+		const tikwmButton = document.createElement("a")
 		tikwmButton.href = `https://tikwm.com/video/${id}.html`;
 		tikwmButton.classList.add("tikwm-link");
 		tikwmButton.classList.add("symbol");
@@ -152,8 +152,8 @@ export default class ImageHandler extends View<Post> {
 
 		// const [hToggle, , , , info] = Array.from(el.children) as HTMLElement[]
 		const hToggle = el.getElementsByClassName("image-toggle")[0] as HTMLElement
-		let link = el.getElementsByClassName("filename-link")[0] as HTMLAnchorElement
-		let dlButton = el.getElementsByClassName("download-link")[0] as HTMLAnchorElement
+		const link = el.getElementsByClassName("filename-link")[0] as HTMLAnchorElement
+		const dlButton = el.getElementsByClassName("download-link")[0] as HTMLAnchorElement
 		if (!options.hideThumbs && !options.workModeToggle) {
 			hToggle.hidden = true
 		} else {
@@ -219,7 +219,7 @@ export default class ImageHandler extends View<Post> {
 			mediaMetadataString += `[${data.title}]`;
 		}
 		el.querySelector(".media-metadata").textContent = mediaMetadataString;
-		let tokID = getTokID(data.name);
+		const tokID = getTokID(data.name);
 		if(tokID != null){
 			this.renderSource(tokID,el,postingTime)
 		}
@@ -562,7 +562,7 @@ export function toggleExpandAll() {
 	}
 
 	// Loop over all models and apply changes
-	for (let post of posts) {
+	for (const post of posts) {
 		if (!shouldAutoExpand(post)) {
 			continue
 		}

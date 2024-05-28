@@ -59,7 +59,7 @@ export class Player {
         this.videoList.setPos(i);
         this.isLoaded = false;
 
-        let matchedPlayer : IPlayer = this.players[item.type];
+        const matchedPlayer : IPlayer = this.players[item.type];
         if(matchedPlayer != this.player){
             if(this.player !== null) {
                 this.player.removeVideo();

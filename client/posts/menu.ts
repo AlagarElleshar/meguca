@@ -61,7 +61,7 @@ class RedirectForm extends MenuForm {
 	}
 
 	protected async send() {
-		let url = (this.el
+		const url = (this.el
 			.querySelector("input[type=text]") as HTMLInputElement)
 			.value;
 		await postJSON(`/api/redirect/${this.apiPath}`, {
@@ -143,10 +143,10 @@ const actions: { [key: string]: ItemSpec } = {
             return position >= ModerationLevel.admin
         },
         handler(m, el) {
-            let confirmBan = confirm(`Are you sure you want to ban this user?\nID: ${m.id}\nPost: ${m.body}`);
+            const confirmBan = confirm(`Are you sure you want to ban this user?\nID: ${m.id}\nPost: ${m.body}`);
 
             if (confirmBan) {
-                let bans = [
+                const bans = [
                     {
                         "id": m.id,
                         "censor": {
@@ -207,7 +207,7 @@ class MenuView extends View<Post> {
 	}
 
 	private render() {
-		for (let key in actions) {
+		for (const key in actions) {
 			const { shouldRender, text } = actions[key]
 			if (!shouldRender(this.model)) {
 				continue

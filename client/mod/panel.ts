@@ -146,7 +146,7 @@ export default class ModPanel extends View<null> {
 			return;
 		}
 		const id = getClosestID(checked);
-		let data: ModerationData = {
+		const data: ModerationData = {
 			id: id,
 		}
 
@@ -284,10 +284,10 @@ export default class ModPanel extends View<null> {
 	}
 
 	private async sendLockPlaylist() {
-		let message = SetPlaylistLock.create();
+		const message = SetPlaylistLock.create();
 		message.post = page.thread
 		message.isOpen = false
-		let msg = SetPlaylistLock.toBinary(message);
+		const msg = SetPlaylistLock.toBinary(message);
 		await fetch("/api/lock-playlist", {
 			method: 'POST',
 			headers: {
@@ -297,10 +297,10 @@ export default class ModPanel extends View<null> {
 		})
 	}
 	private async sendUnlockPlaylist() {
-		let message = SetPlaylistLock.create();
+		const message = SetPlaylistLock.create();
 		message.post = page.thread
 		message.isOpen = true
-		let msg = SetPlaylistLock.toBinary(message);
+		const msg = SetPlaylistLock.toBinary(message);
 		await fetch("/api/lock-playlist", {
 			method: 'POST',
 			headers: {

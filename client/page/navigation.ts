@@ -106,7 +106,7 @@ class BoardSelectionPanel extends View<null> {
 
 		// Check all selected boards.
 		// Assert all selected boards still exist.If not, deselect them.
-		for (let s of selected) {
+		for (const s of selected) {
 			if (boards.includes(s)) {
 				inputElement(frag, s).checked = true
 				continue
@@ -126,7 +126,7 @@ class BoardSelectionPanel extends View<null> {
 		}
 
 		this.parentEl.textContent = "-"
-		for (let el of document.querySelectorAll(".board-selection-panel")) {
+		for (const el of document.querySelectorAll(".board-selection-panel")) {
 			el.remove()
 		}
 		document.getElementById("modal-overlay").prepend(this.el);
@@ -142,7 +142,7 @@ class BoardSelectionPanel extends View<null> {
 	private submit(event: Event) {
 		event.preventDefault()
 		selected.clear()
-		for (let el of this.el.querySelectorAll(".board input")) {
+		for (const el of this.el.querySelectorAll(".board input")) {
 			if ((el as HTMLInputElement).checked) {
 				selected.add(el.getAttribute("name"))
 			}
@@ -157,7 +157,7 @@ class BoardSelectionPanel extends View<null> {
 		const term = (event.target as HTMLInputElement).value.trim(),
 			regexp = new RegExp(term, 'i')
 
-		for (let el of this.el.querySelectorAll(".board-list label") as NodeListOf<HTMLElement>) {
+		for (const el of this.el.querySelectorAll(".board-list label") as NodeListOf<HTMLElement>) {
 			let display: string
 			if (regexp.test(el.querySelector("a").textContent)) {
 				display = "block"
@@ -170,7 +170,7 @@ class BoardSelectionPanel extends View<null> {
 
 	// Transform links to point to catalog pages and persist
 	private applyCatalogLinking(on: boolean) {
-		for (let input of this.el.querySelectorAll(".board input")) {
+		for (const input of this.el.querySelectorAll(".board input")) {
 			let url = `/${input.getAttribute("name")}/`
 			if (on) {
 				url += "catalog"
@@ -202,7 +202,7 @@ export default () => {
 		} else {
 			arr = sel.split(',');
 		}
-		for (let b of arr) {
+		for (const b of arr) {
 			selected.add(b)
 		}
 	}

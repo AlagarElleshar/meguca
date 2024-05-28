@@ -60,14 +60,14 @@ export class TabbedModal extends BannerModal {
 		const el = event.target as Element
 
 		// Deselect previous tab
-		for (let selected of this.el.querySelectorAll('.tab-sel')) {
+		for (const selected of this.el.querySelectorAll('.tab-sel')) {
 			selected.classList.remove('tab-sel')
 		}
 
 		// Select the new one
 		el.classList.add('tab-sel')
 		const id = el.getAttribute('data-id')
-		for (let el of this.el.querySelectorAll(`.tab-cont > div`)) {
+		for (const el of this.el.querySelectorAll(`.tab-cont > div`)) {
 			if (el.getAttribute("data-id") !== id) {
 				continue
 			}

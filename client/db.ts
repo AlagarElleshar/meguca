@@ -53,7 +53,7 @@ export function open(): Promise<void> {
 
 			// Delay for quicker starts
 			setTimeout(() => {
-				for (let name of postStores.concat(threadStores)) {
+				for (const name of postStores.concat(threadStores)) {
 					deleteExpired(name)
 				}
 			}, 10000)
@@ -75,11 +75,11 @@ function upgradeDB(event: IDBVersionChangeEvent) {
 		case 2:
 		case 3:
 			// Delete all previous object stores
-			for (let name of Array.from(db.objectStoreNames)) {
+			for (const name of Array.from(db.objectStoreNames)) {
 				db.deleteObjectStore(name)
 			}
 
-			for (let name of postStores) {
+			for (const name of postStores) {
 				createOPStore(db, name)
 			}
 
@@ -89,7 +89,7 @@ function upgradeDB(event: IDBVersionChangeEvent) {
 		case 5:
 		case 6:
 			// Recreate all previous post ID stores
-			for (let name of postStores) {
+			for (const name of postStores) {
 				if (db.objectStoreNames.contains(name)) {
 					db.deleteObjectStore(name);
 				}
@@ -104,7 +104,7 @@ function upgradeDB(event: IDBVersionChangeEvent) {
 				.createIndex("id", "id");
 		case 9:
 			// Recreate all postStores, so that their primary key is the post ID
-			for (let name of postStores) {
+			for (const name of postStores) {
 				db.deleteObjectStore(name);
 				createOPStore(db, name);
 			}

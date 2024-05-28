@@ -20,7 +20,7 @@ export default () => {
 		hideBinned: toggleHideBinned,
 		relativeTime: renderTime,
 	}
-	for (let key in handlers) {
+	for (const key in handlers) {
 		options.onChange(key, handlers[key])
 	}
 }
@@ -38,7 +38,7 @@ function loopPosts(test: (post: Post) => boolean, fn: (post: Post) => void) {
 	if (page.catalog) {
 		return
 	}
-	for (let post of posts) {
+	for (const post of posts) {
 		if (test(post)) {
 			fn(post)
 		}
@@ -53,7 +53,7 @@ function renderImages() {
 		if (options.hideThumbs || options.workModeToggle) {
 			display = "none"
 		}
-		for (let el of document.querySelectorAll("img.catalog") as NodeListOf<HTMLElement>) {
+		for (const el of document.querySelectorAll("img.catalog") as NodeListOf<HTMLElement>) {
 			el.style.display = display
 		}
 	} else {
@@ -123,7 +123,7 @@ function toggleHideBinned() {
 
 // Rerender all timestamps on posts, if set to relative time
 function renderTime() {
-	for (let { view } of posts) {
+	for (const { view } of posts) {
 		view.renderTime()
 	}
 }

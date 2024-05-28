@@ -254,7 +254,7 @@ export default class UploadForm extends View<Post> {
             try {
                 response = await res.json();
             } catch (error) {
-                let text = await res.text()
+                const text = await res.text()
                 if (this.handleResponse(res.status, text)) {
                 } else {
                     return null;

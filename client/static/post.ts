@@ -106,7 +106,7 @@ export class Post {
     }
 
     private renderModerationLog() {
-        for (let { type, length, by, data } of this.moderation) {
+        for (const { type, length, by, data } of this.moderation) {
             let s: string;
             switch (type) {
                 case ModerationAction.banPost:
@@ -214,7 +214,7 @@ export class Post {
         this.el.querySelector("header").after(el);
 
         const [info, ...tmp] = Array.from(el.children) as HTMLElement[];
-        let link = tmp[tmp.length - 1];
+        const link = tmp[tmp.length - 1];
 
         const arr = [];
 
@@ -258,7 +258,7 @@ export class Post {
         }
 
         let html = "";
-        for (let s of arr) {
+        for (const s of arr) {
             html += `<span>${escape(s)}</span>`;
         }
         info.innerHTML = html;
@@ -275,7 +275,7 @@ export class Post {
         if (!this.moderation) {
             return false;
         }
-        for (let { type } of this.moderation) {
+        for (const { type } of this.moderation) {
             switch (type) {
                 case ModerationAction.deletePost:
                 case ModerationAction.purgePost:
@@ -297,7 +297,7 @@ export class Post {
 // Copy all properties from the source object to the destination object. Nested
 // objects are extended recursively.
 function extend(dest: {}, source: {}) {
-	for (let key in source) {
+	for (const key in source) {
 		const val = source[key]
 		if (typeof val === "object" && val !== null) {
 			const d = dest[key]

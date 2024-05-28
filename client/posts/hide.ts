@@ -18,7 +18,7 @@ export function clearHidden() {
 	hidden.clear()
 	trigger("renderHiddenCount", 0)
 	clearStore("hidden")
-	for (let p of posts) {
+	for (const p of posts) {
 		p.unhide()
 		if (p.id == p.op) {
 			if (page.catalog) {
@@ -43,7 +43,7 @@ export function hideRecursively(post: Post) {
 	hidden.add(post.id)
 
 	if (post.backlinks && options.hideRecursively) {
-		for (let id in post.backlinks) {
+		for (const id in post.backlinks) {
 			const p = posts.get(parseInt(id))
 			if (p) {
 				hideRecursively(p)

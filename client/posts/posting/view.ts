@@ -63,12 +63,12 @@ export default class FormView extends PostView {
 
     public onAttachTiktokButton() {
         this.upload.attachTiktokButton.hidden = true;
-        let template = importTemplate("attach-tiktok-form")
+        const template = importTemplate("attach-tiktok-form")
         this.el.append(template);
-        let templateEl = this.el.querySelector(".attach-tiktok-form")
-        let input = <HTMLInputElement>templateEl.querySelector(".attach-tiktok-form-row1 > input")
+        const templateEl = this.el.querySelector(".attach-tiktok-form")
+        const input = <HTMLInputElement>templateEl.querySelector(".attach-tiktok-form-row1 > input")
         const lastHDSetting = localStorage.getItem('attach-hd-tiktoks');
-        let hdCheck = (<HTMLInputElement>templateEl.querySelector(".attach-tiktok-form-params input"))
+        const hdCheck = (<HTMLInputElement>templateEl.querySelector(".attach-tiktok-form-params input"))
         hdCheck.checked = JSON.parse(lastHDSetting)
 
         templateEl.querySelector(".attach-tiktok-cancel").addEventListener("click",()=>{
@@ -79,8 +79,8 @@ export default class FormView extends PostView {
             navigator.clipboard.readText().then(text => {input.value = text})
         })
         templateEl.querySelector(".attach-tiktok-attach").addEventListener("click",()=>{
-            let inputVal = input.value
-            let rotation = templateEl.querySelector("select").value
+            const inputVal = input.value
+            const rotation = templateEl.querySelector("select").value
             this.model.attachTiktok(inputVal,hdCheck.checked,rotation)
             localStorage.setItem('attach-hd-tiktoks', JSON.stringify(hdCheck.checked));
             templateEl.remove()
@@ -243,7 +243,7 @@ export default class FormView extends PostView {
         if (oldBody) {
             this.model.body = oldBody
         }
-        let attachForm = this.el.querySelector(".attach-tiktok-form")
+        const attachForm = this.el.querySelector(".attach-tiktok-form")
         if (attachForm) {
             attachForm.remove()
         }

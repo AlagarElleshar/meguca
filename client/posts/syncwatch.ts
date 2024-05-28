@@ -25,7 +25,7 @@ class Syncwatch {
 	constructor(el: HTMLElement) {
 		this.el = el
 		this.el.classList.add("ticking")
-		for (let id of ["hour", "min", "sec", "start", "end"]) {
+		for (const id of ["hour", "min", "sec", "start", "end"]) {
 			this[id] = parseInt(this.el.getAttribute("data-" + id))
 		}
 		this.render()
@@ -63,7 +63,7 @@ class Syncwatch {
 
 // Find and start any non-running synchronized time counters
 export function findSyncwatches(qs: QuerySelector) {
-	for (let el of qs.querySelectorAll(".syncwatch:not(.ticking)")) {
+	for (const el of qs.querySelectorAll(".syncwatch:not(.ticking)")) {
 		new Syncwatch(el)
 	}
 }

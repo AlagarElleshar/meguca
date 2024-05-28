@@ -37,7 +37,7 @@ const colourMap: { [key: string]: BackgroundGradients } = {
 
 // Listen to  changes in related options, that do not call render() directly
 export default () => {
-	for (let param of ['theme', 'workModeToggle']) {
+	for (const param of ['theme', 'workModeToggle']) {
 		options.onChange(param, render)
 	}
 }

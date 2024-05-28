@@ -85,7 +85,7 @@ export default class PostView extends ImageHandler {
     private buffer(): Element {
         const { state: { spoiler, quote, bold, italic, red, blue } } = this.model
         let buf = this.el.querySelector("blockquote") as Element
-        for (let b of [quote, spoiler, bold, italic, red, blue]) {
+        for (const b of [quote, spoiler, bold, italic, red, blue]) {
             if (b) {
                 buf = buf.lastElementChild
             }
@@ -137,13 +137,13 @@ export default class PostView extends ImageHandler {
 
         // Get already rendered backlink IDs
         const rendered = new Set<number>()
-        for (let em of Array.from(el.children)) {
+        for (const em of Array.from(el.children)) {
             const id = (em.firstChild as HTMLElement).getAttribute("data-id")
             rendered.add(parseInt(id))
         }
 
         let html = ""
-        for (let idStr in this.model.backlinks) {
+        for (const idStr in this.model.backlinks) {
             const id = parseInt(idStr)
             // Confirm link not already rendered
             if (rendered.has(id)) {
@@ -224,7 +224,7 @@ export default class PostView extends ImageHandler {
         }
 
         const currentTime = Date.now() / 1000;
-        let timeDelta = currentTime - this.model.time;
+        const timeDelta = currentTime - this.model.time;
 
         let intervalPeriod = 86400000
         let nextInterval = null
@@ -241,11 +241,11 @@ export default class PostView extends ImageHandler {
             intervalPeriod = 3600000
             nextInterval = 86400000
         }
-        let timeUntilInterval = intervalPeriod - (timeDelta * 1000) % intervalPeriod
+        const timeUntilInterval = intervalPeriod - (timeDelta * 1000) % intervalPeriod
         setTimeout(() => {
             this.renderTimeOnce()
-            let id = setInterval(() => {this.renderTimeOnce()}, intervalPeriod)
-            let timeUntilNextInterval = nextInterval - ((timeDelta * 1000) % nextInterval)
+            const id = setInterval(() => {this.renderTimeOnce()}, intervalPeriod)
+            const timeUntilNextInterval = nextInterval - ((timeDelta * 1000) % nextInterval)
             if(nextInterval) {
                 setTimeout(() => {
                     clearInterval(id)
@@ -267,7 +267,7 @@ export default class PostView extends ImageHandler {
     // Close an open post and clean up
     public closePost() {
         // Check for Claude messages
-        let claude = this.model.claude_state
+        const claude = this.model.claude_state
         const claudeExists = claude != null
         if (!claudeExists) {
             this.setEditing(false);
@@ -323,7 +323,7 @@ export default class PostView extends ImageHandler {
             return;
         }
         const pc = this.el.querySelector(".post-container");
-        for (let el of Array.from(pc.children)) {
+        for (const el of Array.from(pc.children)) {
             if (el.classList.contains("post-moderation")) {
                 el.remove();
             }
@@ -332,7 +332,7 @@ export default class PostView extends ImageHandler {
         if (!this.model.moderation) {
             return;
         }
-        for (let { type, length, by, data } of this.model.moderation) {
+        for (const { type, length, by, data } of this.model.moderation) {
             let s: string;
             switch (type) {
                 case ModerationAction.banPost:
@@ -441,7 +441,7 @@ export default class PostView extends ImageHandler {
         if (!sec) {
             return
         }
-        for (let el of Array.from(sec.children)) {
+        for (const el of Array.from(sec.children)) {
             switch (el.tagName) {
                 case "ARTICLE":
                     if (getID(el) > id) {
@@ -482,7 +482,7 @@ export default class PostView extends ImageHandler {
     }
 
     public removeTiktokForm(){
-        let form = this.el.querySelector(".attach-tiktok-form")
+        const form = this.el.querySelector(".attach-tiktok-form")
         if(form != null){
             form.remove()
         }
@@ -494,11 +494,11 @@ export default class PostView extends ImageHandler {
         }
         this.#loadingBarOn = value
         if(value){
-            let loadingBar = importTemplate("loading-bar");
+            const loadingBar = importTemplate("loading-bar");
             this.el.append(loadingBar)
         }
         else{
-            let loadingBar = this.el.querySelector(".loading-bar")
+            const loadingBar = this.el.querySelector(".loading-bar")
             if(loadingBar != null){
                 loadingBar.remove()
             }

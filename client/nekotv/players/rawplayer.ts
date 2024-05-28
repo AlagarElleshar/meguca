@@ -19,7 +19,7 @@ export class RawPlayer implements IPlayer {
             this.videoElement = document.createElement('video');
             this.videoElement.id = 'raw-player';
             this.loaded = false
-            let rp = this
+            const rp = this
             this.videoElement.addEventListener('loadeddata', function() {
                 rp.loaded = true;
             }, false);

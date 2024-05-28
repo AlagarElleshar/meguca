@@ -19,7 +19,7 @@ export default class PostCollection extends Model {
 	// Retrieve a model by ID from all PostCollections in reverse collection
 	// creation order
 	public static getFromAll(id: number): Post {
-		for (let col of [...PostCollection.all].reverse()) {
+		for (const col of [...PostCollection.all].reverse()) {
 			const m = col.get(id)
 			if (m) {
 				return m
@@ -47,7 +47,7 @@ export default class PostCollection extends Model {
 
 	// Remove all models from collection
 	public clear() {
-		for (let id in this.models) {
+		for (const id in this.models) {
 			delete this.models[id].collection
 		}
 		this.models = {}

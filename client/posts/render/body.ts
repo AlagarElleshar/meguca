@@ -31,7 +31,7 @@ export default function renderBody(data: PostData): string {
 
     const fn = data.editing ? parseOpenLine : parseTerminatedLine
     let claudeAdded = false
-    for (let l of data.body.split("\n")) {
+    for (const l of data.body.split("\n")) {
         state.quote = false
 
         // Prevent successive empty lines
@@ -387,8 +387,8 @@ function parseFragment(frag: string, data: PostData): string {
             continue
         }
         if ((word.indexOf("(") >= 0) && (word.indexOf("http") >= 0)) {
-            let countOpen = (word.match(/[(]/g)).length
-            let countClosed = (word.match(/[)]/g) || []).length
+            const countOpen = (word.match(/[(]/g)).length
+            const countClosed = (word.match(/[)]/g) || []).length
             if ((countOpen == countClosed + 1) && (trailPunct == ")")) {
                 word += ")"
                 trailPunct = " "
@@ -481,7 +481,7 @@ function parsePostLink(m: string[], links: PostLink[]): string {
     }
     const id = parseInt(m[2])
     let data: PostLink
-    for (let l of links) {
+    for (const l of links) {
         if (l.id === id) {
             data = l
             break
@@ -530,8 +530,8 @@ function parseURL(bit: string): string {
             return bit.link(bit)
         }
         if (bit.startsWith("https://pull") && bit.includes(".flv")) {
-            let link = newTabLink(bit, bit)
-            let attrs = {
+            const link = newTabLink(bit, bit)
+            const attrs = {
                 type : "button",
                 class : "live-button",
                 "data-live-url" : bit,

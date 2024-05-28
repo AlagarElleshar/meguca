@@ -90,7 +90,7 @@ export default class FSM<S extends Stringable, E extends Stringable> {
 		this.state = result;
 		this.stateHandlers.forEach(r, fn =>
 			fn());
-		for (let fn of this.changeHandlers) {
+		for (const fn of this.changeHandlers) {
 			fn();
 		}
 

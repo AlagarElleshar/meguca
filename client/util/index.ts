@@ -87,7 +87,7 @@ export function HTML(base: TemplateStringsArray, ...args: string[]): string {
 // value will be considered "true"
 export function makeAttrs(attrs: { [key: string]: string }): string {
 	let html = ''
-	for (let key in attrs) {
+	for (const key in attrs) {
 		html += ' ' + key
 		const val = attrs[key]
 		if (val) {
@@ -99,7 +99,7 @@ export function makeAttrs(attrs: { [key: string]: string }): string {
 
 // Set attributes from a key-value map to the element
 export function setAttrs(el: Element, attrs: { [key: string]: string }) {
-	for (let key in attrs) {
+	for (const key in attrs) {
 		el.setAttribute(key, attrs[key])
 	}
 }
@@ -107,7 +107,7 @@ export function setAttrs(el: Element, attrs: { [key: string]: string }) {
 // Copy all properties from the source object to the destination object. Nested
 // objects are extended recursively.
 export function extend(dest: {}, source: {}) {
-	for (let key in source) {
+	for (const key in source) {
 		const val = source[key]
 		if (typeof val === "object" && val !== null) {
 			const d = dest[key]
@@ -176,7 +176,7 @@ type SameSiteValue = "none" | "lax" | "strict"
 
 // Set a global cookie, that expires after `days`
 export function setCookie(key: string, val: string, days: number, samesite: SameSiteValue = "strict") {
-	let date = new Date()
+	const date = new Date()
 	date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000))
 	document.cookie = `${key}=${val}; expires=${date.toUTCString()}; path=/; samesite=${samesite}`
 }
@@ -229,7 +229,7 @@ export function modPaste(old: string, sel: string, pos: number): Paste {
 		}
 
 		if (sel.includes('\n')) {
-			for (let line of sel.split('\n')) {
+			for (const line of sel.split('\n')) {
 				s += line == '' ? '\n' : normalizePostQuote(line)
 			}
 		} else {
