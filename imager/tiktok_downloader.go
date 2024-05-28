@@ -132,7 +132,7 @@ func GetTikTokFilename(videoID string, caption string) string {
 		return r
 	}, norm.NFC.String(caption))
 	if len(normalizedCaption) <= remainingLength {
-		return idPrefix + normalizedCaption
+		return idPrefix + normalizedCaption + ".mp4"
 	}
 
 	truncationSuffix := "… "
@@ -152,7 +152,7 @@ func GetTikTokFilename(videoID string, caption string) string {
 	}
 
 	truncatedCaption := string(captionBytes[:truncationPosition])
-	return idPrefix + strings.TrimSpace(truncatedCaption) + truncationSuffix
+	return idPrefix + strings.TrimSpace(truncatedCaption) + truncationSuffix + ".mp4"
 }
 
 func GetTikTokMetadata(input string) (tokData *TWMTikTokData, err error) {
