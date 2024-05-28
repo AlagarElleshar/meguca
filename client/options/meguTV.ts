@@ -1,5 +1,5 @@
 import options from ".";
-import {importTemplate, setAttrs} from "../util";
+import {importTemplate} from "../util";
 import { page } from "../state";
 import { sourcePath, serverNow } from "../posts";
 import { fileTypes } from "../common"

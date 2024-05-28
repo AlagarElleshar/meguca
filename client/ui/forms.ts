@@ -9,7 +9,7 @@ export interface FormAttrs extends ViewAttrs {
 // Generic input form view with optional captcha support
 abstract class FormView extends View<Model> {
 	public el: HTMLFormElement
-	private needCaptcha: boolean = false;
+	private readonly needCaptcha: boolean = false;
 
 	protected abstract send(): void
 

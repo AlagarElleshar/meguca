@@ -2,7 +2,7 @@ import { View } from "../base"
 import { postJSON, toggleHeadStyle, getClosestID } from "../util"
 import collectionView from "../posts/collectionView"
 import { ModerationLevel } from "../common"
-import {SetPlaylistLock, TogglePlaylistLockEvent} from "../typings/messages";
+import {SetPlaylistLock} from "../typings/messages";
 import {page} from "../state";
 
 type ModerationData = {

@@ -1,6 +1,4 @@
 import { BannerModal } from "../base"
-import {setAttrs} from "../util";
-import {openFlvPlayer} from "./flvplayer";
 // import Mpegts from "mpegts.js";
 export default () => {
 	for (const id of ["options", "FAQ", "identity", "account", "watcher" ]) {

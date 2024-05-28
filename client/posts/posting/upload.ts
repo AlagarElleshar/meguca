@@ -48,7 +48,7 @@ export default class UploadForm extends View<Post> {
     private mask: HTMLElement;
     private button: HTMLElement;
 
-    private micButton: HTMLElement | null;
+    private readonly micButton: HTMLElement | null;
     private audioChunks: any[] = [];
     private recorder: MediaRecorder | null;
 
@@ -306,7 +306,7 @@ export default class UploadForm extends View<Post> {
     public async retry(): Promise<FileData | null> {
         if (this.bufferedFile) {
             this.reset();
-            return await this.uploadFile(this.bufferedFile);
+            return this.uploadFile(this.bufferedFile);
         }
         return null;
     }

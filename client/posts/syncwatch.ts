@@ -15,7 +15,7 @@ export function serverNow(): number {
 
 // Synchronized time counter for things like watching animu together and such
 class Syncwatch {
-	private el: HTMLElement
+	private readonly el: HTMLElement
 	private hour: number
 	private min: number
 	private sec: number

@@ -90,7 +90,7 @@ async function logout(url: string) {
 
 // Common functionality of login and registration forms
 class LoginForm extends FormView {
-	private url: string
+	private readonly url: string
 
 	constructor(id: string, url: string) {
 		super({

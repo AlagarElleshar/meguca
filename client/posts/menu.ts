@@ -25,8 +25,8 @@ type ItemSpec = {
 abstract class MenuForm extends FormView {
 	protected parentID: number;
 
-	constructor(parent: Element, parentID: number, html: string,
-		attrs: { [key: string]: any } = {},
+	protected constructor(parent: Element, parentID: number, html: string,
+						  attrs: { [key: string]: any } = {},
 	) {
 		attrs["tag"] = "form"
 		super(attrs);
@@ -50,7 +50,7 @@ abstract class MenuForm extends FormView {
 
 // Form with one text field for submitting redirects
 class RedirectForm extends MenuForm {
-	private apiPath: string;
+	private readonly apiPath: string;
 
 	constructor(parent: Element, parentID: number, apiPath: string) {
 		super(parent, parentID,

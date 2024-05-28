@@ -12,7 +12,7 @@ export let panel: OptionsPanel
 
 // View of the options panel
 export default class OptionsPanel extends TabbedModal {
-	private hidden: HTMLElement
+	private readonly hidden: HTMLElement
 	private import: HTMLInputElement
 
 	constructor() {

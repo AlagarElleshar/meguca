@@ -30,10 +30,10 @@ const mouseMove = emitChanges<MouseMove>({
 // Post hover preview view
 class PostPreview extends ImageHandler {
 	public el: HTMLElement
-	private clickHandler: EventListener
+	private readonly clickHandler: EventListener
 	private observer: MutationObserver
-	private parent: HTMLElement
-	private source: HTMLElement
+	private readonly parent: HTMLElement
+	private readonly source: HTMLElement
 	private sourceModel: Post
 
 	constructor(model: Post, parent: HTMLElement) {

@@ -1,4 +1,3 @@
-import options from "../../options";
 import {IPlayer} from "./iplayer";
 import {VideoItem} from "../../typings/messages";
 import {watchVideoDiv} from "../nekotv";

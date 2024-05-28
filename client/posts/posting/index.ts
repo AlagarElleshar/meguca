@@ -11,7 +11,7 @@ import initDrop from "./drop"
 import initPaste from "./paste"
 import initImageErr from "./image"
 import initThreads from "./threads"
-import {captchaLoaded, renderCaptchaForm} from "../../ui/captcha";
+import {captchaLoaded, renderCaptchaForm} from "../../ui";
 import * as page from "../../page";
 import options from "../../options";
 import {initUpload} from "./upload"

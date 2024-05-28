@@ -2,7 +2,7 @@ import {
     PostData, PostLink, ModerationLevel, ModerationEntry, Command, ImageData,
     ModerationAction, fileTypes
 } from "../common"
-import { importTemplate } from "../util/render"
+import { importTemplate } from "../util"
 import countries from "../posts/countries"
 import lang from "../lang"
 import { secondsToTime } from "../util/time"

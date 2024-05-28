@@ -53,7 +53,7 @@ abstract class SelectedBoardForm extends AccountForm {
 
 	public abstract renderNext(board: string): void
 
-	constructor(attrs: FormAttrs) {
+	protected constructor(attrs: FormAttrs) {
 		attrs.needCaptcha = true;
 		attrs.tag = "form"
 		super(attrs)
@@ -127,8 +127,8 @@ export class StaffAssignmentForm extends SelectedBoardForm {
 // Submits data to the server as multipart form
 export class FormDataForm extends SelectedBoardForm {
 	public el: HTMLFormElement
-	private srcURL: string
-	private destURL: string
+	private readonly srcURL: string
+	private readonly destURL: string
 
 	// Downloads form HTML from src and sends input to dest on submission
 	constructor(src: string, dest: string) {
