@@ -10,7 +10,7 @@ import { getPostName } from "./options"
 import { OverlayNotification } from "./ui"
 import { setCookie }  from './util';
 import { debug } from "./state"
-import {WebSocketMessage} from "./typings/messages";
+import {WebSocketMessage} from "./typings/nekotv";
 import {handleMessage} from "./nekotv/handlers";
 
 // Message for splicing the contents of the current line

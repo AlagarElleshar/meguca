@@ -1,5 +1,5 @@
 import {RawPlayer} from "./rawplayer";
-import {VideoItem} from "../../typings/messages";
+import {VideoItem} from "../../typings/nekotv";
 import {isCuck} from "../../common";
 
 export class TikTokPlayer extends RawPlayer {

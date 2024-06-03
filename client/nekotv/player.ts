@@ -1,6 +1,6 @@
 import {Youtube} from "./players/youtube";
 import {VideoList} from "./videolist";
-import {VideoItem, VideoType} from "../typings/messages";
+import {VideoItem, VideoType} from "../typings/nekotv";
 import {IPlayer} from "./players/iplayer";
 import {TwitchPlayer} from "./players/twitch";
 import {RawPlayer} from "./players/rawplayer";

@@ -8,7 +8,7 @@ import {
     SetRateEvent,
     SetTimeEvent, SkipVideoEvent, TogglePlaylistLockEvent,
     UpdatePlaylistEvent, WebSocketMessage
-} from "../typings/messages";
+} from "../typings/nekotv";
 
 import {player, updateNekoTVPanel} from "./nekotv";
 

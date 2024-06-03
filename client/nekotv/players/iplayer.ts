@@ -1,4 +1,4 @@
-import {VideoItem} from "../../typings/messages";
+import {VideoItem} from "../../typings/nekotv";
 
 export enum PlayerState {
     UNINITIALIZED = 0,

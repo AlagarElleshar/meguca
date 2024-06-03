@@ -1,5 +1,5 @@
 import {IPlayer} from "./iplayer";
-import {VideoItem} from "../../typings/messages";
+import {VideoItem} from "../../typings/nekotv";
 import {watchVideoDiv} from "../nekotv";
 
 const iframeElement: HTMLIFrameElement = document.createElement('iframe');

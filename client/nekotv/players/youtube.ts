@@ -1,4 +1,4 @@
-import {VideoItem} from "../../typings/messages";
+import {VideoItem} from "../../typings/nekotv";
 import {tempNotify} from "../../ui/notification";
 import {isNekoTVMuted, watchVideoDiv} from "../nekotv";
 import options from "../../options";
