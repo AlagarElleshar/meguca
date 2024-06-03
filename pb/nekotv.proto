@@ -1,0 +1,127 @@
+syntax = "proto3";
+
+option go_package = "./pb";
+
+enum VideoType {
+  RAW = 0;
+  YOUTUBE = 1;
+  TWITCH = 2;
+  IFRAME = 3;
+  TIKTOK = 4;
+  TIKTOK_LIVE = 5;
+}
+
+message VideoItem {
+  string url = 1;
+  string title = 2;
+  string author = 3;
+  float duration = 4;
+  string id = 5;
+  VideoType type = 6;
+}
+
+message VideoItemList {
+  repeated VideoItem items = 1;
+}
+
+message WebSocketMessage {
+  oneof message_type {
+    ConnectedEvent connected_event = 1;
+    AddVideoEvent add_video_event = 2;
+    RemoveVideoEvent remove_video_event = 3;
+    SkipVideoEvent skip_video_event = 4;
+    PauseEvent pause_event = 5;
+    PlayEvent play_event = 6;
+    GetTimeEvent get_time_event = 7;
+    SetTimeEvent set_time_event = 8;
+    SetRateEvent set_rate_event = 9;
+    RewindEvent rewind_event = 10;
+    PlayItemEvent play_item_event = 11;
+    SetNextItemEvent set_next_item_event = 12;
+    UpdatePlaylistEvent update_playlist_event = 13;
+    TogglePlaylistLockEvent toggle_playlist_lock_event = 14;
+    DumpEvent dump_event = 15;
+    ClearPlaylistEvent clear_playlist_event = 16;
+  }
+}
+
+message ConnectedEvent {
+  repeated VideoItem video_list = 1;
+  int32 item_pos = 2;
+  bool is_playlist_open = 3;
+  GetTimeEvent get_time = 4;
+}
+
+message AddVideoEvent {
+  VideoItem item = 1;
+  bool at_end = 2;
+}
+
+message RemoveVideoEvent {
+  string url = 1;
+}
+
+message SkipVideoEvent {
+  string url = 1;
+}
+
+message PauseEvent {
+  float time = 1;
+}
+message ClearPlaylistEvent {
+
+}
+
+message PlayEvent {
+  float time = 1;
+}
+
+message GetTimeEvent {
+  float time = 1;
+  bool paused = 2;
+  float rate = 3;
+}
+
+message SetTimeEvent {
+  float time = 1;
+}
+
+message SetRateEvent {
+  float rate = 1;
+}
+
+message RewindEvent {
+  float time = 1;
+}
+
+message PlayItemEvent {
+  int32 pos = 1;
+}
+
+message SetNextItemEvent {
+  int32 pos = 1;
+}
+
+message UpdatePlaylistEvent {
+  VideoItemList video_list = 1;
+}
+
+message TogglePlaylistLockEvent {
+  bool is_open = 1;
+}
+
+message SetPlaylistLock{
+  double post = 1;
+  bool is_open = 2;
+}
+
+message DumpEvent {
+  string data = 1;
+}
+
+message VoteSkip {
+  double post = 1;
+  uint32 yes_votes = 2;
+  uint32 no_votes = 3;
+  float time = 4;
+}

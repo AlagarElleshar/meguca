@@ -1,0 +1,76 @@
+syntax = "proto3";
+option go_package = "./pb";
+
+enum PendingTikToks {
+  None = 0;
+  Loading = 1;
+  Done = 2;
+  Error = 3;
+}
+
+message CachedPost {
+  bool has_image = 1;
+  bool spoilered = 2;
+  bool closed = 3;
+  double time = 4;
+  string body = 5;
+  PendingTikToks pending_tiktoks = 6;
+}
+
+enum ModerationAction {
+  BAN_POST = 0;
+  UNBAN_POST = 1;
+  DELETE_POST = 2;
+  DELETE_IMAGE = 3;
+  SPOILER_IMAGE = 4;
+  LOCK_THREAD = 5;
+  DELETE_BOARD = 6;
+  MEIDO_VISION = 7;
+  PURGE_POST = 8;
+  SHADOW_BIN_POST = 9;
+  REDIRECT_IP = 10;
+  REDIRECT_THREAD = 11;
+  TOGGLE_STICKY = 12;
+  CONFIGURE_BOARD = 13;
+  ASSIGN_STAFF = 14;
+  BOARD_ASSETS = 15;
+  CONFIGURE_SERVER = 16;
+  ADMIN_NOTIFICATION = 17;
+  PLAYLIST_LOCK = 18;
+}
+
+message ModerationEntry {
+  ModerationAction type = 1;
+  double length = 2;
+  string by = 3;
+  string data = 4;
+}
+
+message SyncMessage {
+  map<uint64, CachedPost> recent = 1;
+  map<uint64, ModEntries> moderation = 2;
+}
+
+message ModEntries {
+  repeated ModerationEntry entries = 1;
+}
+
+message PostCreationImage {
+  string token = 1;
+  string name = 2;
+  bool spoiler = 3;
+}
+message PostSessionCreds {
+  string session = 1;
+  string userID = 2;
+}
+
+message PostCreationRequest {
+  bool open = 1;
+  optional string body = 2;
+  optional string password = 3;
+  optional string name = 4;
+  bool sage = 5;
+  optional PostSessionCreds session_creds = 6;
+  PostCreationImage image = 7;
+}
