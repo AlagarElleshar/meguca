@@ -1,6 +1,6 @@
 syntax = "proto3";
 import "google/protobuf/timestamp.proto";
-import "messages.proto";
+import "nekotv.proto";
 option go_package = "./pb";
 
 message VideoTimer {

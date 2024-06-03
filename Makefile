@@ -36,7 +36,7 @@ proto_client:
 	npx protoc --ts_out client/typings --proto_path pb pb/nekotv.proto pb/posts.proto
 
 proto_server:
-	protoc --go_out=. --proto_path=pb --go_opt=paths=source_relative pb/*.proto
+	protoc --go_out=pb --proto_path=pb --go_opt=paths=source_relative pb/*.proto
 
 generate:
 	go generate .
@@ -44,7 +44,7 @@ generate:
 
 server: proto_server
 	go generate
-	CGO_CFLAGS="$(ROCKSDB_CFLAGS)" CGO_LDFLAGS="$(ROCKSDB_LDFLAGS)" go build -v $(GO_BUILD_TAGS)
+	CGO_CFLAGS="$(ROCKSDB_CFLAGS)" CGO_LDFLAGS="$(ROCKSDB_LDFLAGS) -v" go build -v $(GO_BUILD_TAGS)
 
 client_clean:
 	rm -rf www/js www/css/*.css www/css/maps node_modules manifest.json
