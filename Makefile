@@ -33,10 +33,10 @@ js:
 proto: proto_client proto_server
 
 proto_client:
-	npx protoc --ts_out client/typings --proto_path pb pb/nekotv.proto pb/posts.proto
+	npx protoc --ts_out client/typings --proto_path pb --experimental_allow_proto3_optional pb/nekotv.proto pb/posts.proto
 
 proto_server:
-	protoc --go_out=pb --proto_path=pb --go_opt=paths=source_relative pb/*.proto
+	protoc --go_out=pb --proto_path=pb --go_opt=paths=source_relative --experimental_allow_proto3_optional pb/*.proto
 
 generate:
 	go generate .
