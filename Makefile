@@ -44,7 +44,7 @@ generate:
 
 server: proto_server
 	go generate
-	CGO_CFLAGS="$(ROCKSDB_CFLAGS)" CGO_LDFLAGS="$(ROCKSDB_LDFLAGS) -v" go build -v $(GO_BUILD_TAGS)
+	CGO_CFLAGS="$(ROCKSDB_CFLAGS)" CGO_LDFLAGS="$(ROCKSDB_LDFLAGS)" go build -v $(GO_BUILD_TAGS)
 
 client_clean:
 	rm -rf www/js www/css/*.css www/css/maps node_modules manifest.json
