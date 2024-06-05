@@ -123,7 +123,7 @@ function upgradeDB(event: IDBVersionChangeEvent) {
 			// Reset and recreate
 			db.deleteObjectStore("watchedThreads");
 			createExpiringStore(db, "watchedThreads", true);
-		case 14:
+		case 13:
 			if (!db.objectStoreNames.contains("mine")) {
 				console.error("Object store 'mine' does not exist.");
 				return;
