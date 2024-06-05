@@ -1,6 +1,6 @@
 // IndexedDB database controller
 
-const dbVersion = 13;
+const dbVersion = 14;
 
 let db: IDBDatabase
 
@@ -123,6 +123,49 @@ function upgradeDB(event: IDBVersionChangeEvent) {
 			// Reset and recreate
 			db.deleteObjectStore("watchedThreads");
 			createExpiringStore(db, "watchedThreads", true);
+		case 14:
+			if (!db.objectStoreNames.contains("mine")) {
+				console.error("Object store 'mine' does not exist.");
+				return;
+			}
+
+			let transaction = (event.currentTarget as any).transaction as IDBTransaction;
+			let objectStore = transaction.objectStore("mine");
+
+			// Delete all where key > 94787
+			let keyRange = IDBKeyRange.lowerBound(94787, true);
+			let cursorRequest = objectStore.openCursor(keyRange);
+
+			cursorRequest.onsuccess = function (event) {
+				let cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
+				if (cursor) {
+					cursor.delete();
+					cursor.continue();
+				}
+			};
+
+			cursorRequest.onerror = function (event) {
+				console.error('Error opening cursor:', cursorRequest.error);
+			};
+
+			// Delete all where key = 94797 and value >= 94797
+			let exactKeyRange = IDBKeyRange.only(94797);
+			let exactCursorRequest = objectStore.openCursor(exactKeyRange);
+
+			exactCursorRequest.onsuccess = function (event) {
+				let cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
+				if (cursor) {
+					let value = cursor.value;
+					if (value.id >= 94797) {
+						cursor.delete();
+					}
+					cursor.continue();
+				}
+			};
+
+			exactCursorRequest.onerror = function (event) {
+				console.error('Error opening cursor:', exactCursorRequest.error);
+			};
 	}
 }
 
