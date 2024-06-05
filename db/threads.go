@@ -17,7 +17,20 @@ var (
 	postCountCacheMu         sync.RWMutex
 	errTooManyWatchedThreads = common.StatusError{
 		errors.New("too many watched threads"), 400}
+	stmtGetLatestGeneral *sql.Stmt
 )
+
+func PrepareGetGeneralStatement() error {
+	var err error
+	stmtGetLatestGeneral, err = sqlDB.Prepare(`
+		SELECT board, id
+		FROM threads
+		WHERE subject LIKE $1
+		ORDER BY bump_time DESC
+		LIMIT 1
+	`)
+	return err
+}
 
 // Diff of passed and actual thread posts counts
 type ThreadPostCountDiff struct {
@@ -225,16 +238,7 @@ func CheckIpPostCount(ip string) (count int, err error) {
 }
 
 func GetLatestGeneral(generalName *string) (board string, id uint64, err error) {
-	err = sq.Select("board", "id").
-		From("threads").
-		Where(squirrel.Like{"subject": "%" + *generalName + "%"}).
-		OrderBy("bump_time DESC").
-		QueryRow().
-		Scan(&board, &id)
-
+	query := "%" + *generalName + "%"
+	err = stmtGetLatestGeneral.QueryRow(query).Scan(&board, &id)
 	return
-}
-
-func Read() {
-
 }
