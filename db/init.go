@@ -141,7 +141,7 @@ func loadDB(connURL, dbSuffix string) (err error) {
 	tasks = append(
 		tasks,
 		func() error {
-			tasks := []func() error{loadConfigs, loadBans, handleSpamScores, prepareUpdatePostsStmt, prepareInsertPostStmt, prepareLinkStatement, prepareInsertImageStmt}
+			tasks := []func() error{loadConfigs, loadBans, handleSpamScores, prepareUpdatePostsStmt, prepareInsertPostStmt, prepareLinkStatement, prepareInsertImageStmt, PrepareGetGeneralStatement}
 			if config.Server.ImagerMode != config.ImagerOnly {
 				tasks = append(tasks, loadBanners, loadLoadingAnimations,
 					loadThreadPostCounts)
