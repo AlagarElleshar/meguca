@@ -27,7 +27,6 @@ import (
 	"github.com/bakape/meguca/db"
 	"github.com/bakape/meguca/util"
 	"github.com/bakape/thumbnailer/v2"
-	"github.com/chai2010/webp"
 	"github.com/go-playground/log"
 )
 
@@ -501,21 +500,18 @@ func processFile(f multipart.File, filename string, img *common.ImageCommon, tik
 	}
 
 	if thumbImage != nil {
-		w := bytes.NewBuffer(largeBufPool.Get().([]byte))
 		if jpegThumb {
+			w := bytes.NewBuffer(largeBufPool.Get().([]byte))
 			err = jpeg.Encode(w, thumbImage, &jpeg.Options{
 				Quality: 90,
 			})
+			thumb = w.Bytes()
 		} else {
-			err = webp.Encode(w, thumbImage, &webp.Options{
-				Lossless: false,
-				Quality:  90,
-			})
+			thumb, err = EncodeWebP(thumbImage, 90)
 		}
 		if err != nil {
 			return
 		}
-		thumb = w.Bytes()
 	}
 
 	return

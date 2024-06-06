@@ -29,8 +29,6 @@ github.com/bakape/boorufetch v1.1.6/go.mod h1:xswMjqJ3hp2UAsE0XOidw/qkKHoA7mwF/4
 github.com/bakape/captchouli/v2 v2.2.2 h1:bDsz7f4/aBL2ZcaMwlkB4qGRjUtzrGSs+3NranZxBJU=
 github.com/bakape/captchouli/v2 v2.2.2/go.mod h1:DV7BCGr1MzeJqIJ+ARKP84/7Z3bc3Ri381AX3ueflOY=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
-github.com/chai2010/webp v1.1.1 h1:jTRmEccAJ4MGrhFOrPMpNGIJ/eybIgwKpcACsrTEapk=
-github.com/chai2010/webp v1.1.1/go.mod h1:0XVwvZWdjjdxpUEIf7b9g9VkHFnInUSYujwqTLEuldU=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGXZJjfX53e64911xZQV5JYwmTeXPW+k8Sc=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

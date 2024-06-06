@@ -7,7 +7,9 @@ export GO111MODULE=on
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
 	ROCKSDB_CFLAGS := $(shell pkg-config --cflags-only-I liblz4 libzstd) -I/opt/homebrew/opt/snappy/include
-	ROCKSDB_LDFLAGS := $(shell pkg-config --libs-only-l --libs-only-L liblz4 libzstd) -L/opt/homebrew/opt/snappy/lib
+	ROCKSDB_LDFLAGS := $(shell pkg-config --libs-only-L liblz4 libzstd) -L/opt/homebrew/opt/snappy/lib
+	WEBP_CFLAGS = $(shell pkg-config --cflags libwebp)
+    WEBP_LDFLAGS = $(shell pkg-config --libs-only-L libwebp)
 endif
 
 ifeq ($(UNAME_S),Linux)
@@ -44,7 +46,7 @@ generate:
 
 server: proto_server
 	go generate
-	CGO_CFLAGS="$(ROCKSDB_CFLAGS)" CGO_LDFLAGS="$(ROCKSDB_LDFLAGS)" go build -v $(GO_BUILD_TAGS)
+	CGO_CFLAGS="$(ROCKSDB_CFLAGS) $(WEBP_CFLAGS)" CGO_LDFLAGS="$(ROCKSDB_LDFLAGS) $(WEBP_LDFLAGS)" go build -v $(GO_BUILD_TAGS)
 
 client_clean:
 	rm -rf www/js www/css/*.css www/css/maps node_modules manifest.json

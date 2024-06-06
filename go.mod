@@ -15,7 +15,6 @@ require (
 	github.com/badoux/goscraper v0.0.0-20190827161153-36995ce6b19f
 	github.com/bakape/captchouli/v2 v2.2.2
 	github.com/bakape/thumbnailer/v2 v2.7.1
-	github.com/chai2010/webp v1.1.1
 	github.com/dimfeld/httptreemux v5.0.1+incompatible
 	github.com/facebookgo/grace v0.0.0-20180706040059-75cf19382434
 	github.com/fsnotify/fsnotify v1.7.0
