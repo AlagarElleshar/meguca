@@ -1,6 +1,6 @@
 // IndexedDB database controller
 
-const dbVersion = 15;
+const dbVersion = 16;
 
 let db: IDBDatabase
 
@@ -166,7 +166,7 @@ function upgradeDB(event: IDBVersionChangeEvent) {
             exactCursorRequest.onerror = function (event) {
                 console.error('Error opening cursor:', exactCursorRequest.error);
             };
-        case 14:
+        case 15:
             (() => {
                 if (!db.objectStoreNames.contains("seen")) {
                     console.error("Object store 'mine' does not exist.");
@@ -174,7 +174,7 @@ function upgradeDB(event: IDBVersionChangeEvent) {
                 }
 
                 let transaction = (event.currentTarget as any).transaction as IDBTransaction;
-                let objectStore = transaction.objectStore("mine");
+                let objectStore = transaction.objectStore("seen");
 
                 // Delete all where key > 94787
                 let keyRange = IDBKeyRange.lowerBound(94787, true);
