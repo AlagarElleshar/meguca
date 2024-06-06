@@ -52,7 +52,12 @@ body {
   background-color: @bgColor;
   font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
   font-size: 10pt;
-  background-image: url('/assets/css/neko_bg_2x.jpg');
+  background-image: image-set(
+          url('/assets/css/neko_bg.avif') type('image/avif') 1x,
+          url('/assets/css/neko_bg.jpg') type('image/jpeg') 1x,
+          url('/assets/css/neko_bg_2x.avif') type('image/avif') 2x,
+          url('/assets/css/neko_bg_2x.jpg') type('image/jpeg') 2x
+  );
   background-size: 580px 726px;
   background-attachment: fixed;
   min-height: 100vh;

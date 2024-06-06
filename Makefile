@@ -10,6 +10,7 @@ ifeq ($(UNAME_S),Darwin)
 	ROCKSDB_LDFLAGS := $(shell pkg-config --libs-only-L liblz4 libzstd) -L/opt/homebrew/opt/snappy/lib
 	WEBP_CFLAGS = $(shell pkg-config --cflags libwebp)
     WEBP_LDFLAGS = $(shell pkg-config --libs-only-L libwebp)
+    GO_BUILD_TAGS = -tags "libsqlite3"
 endif
 
 ifeq ($(UNAME_S),Linux)
