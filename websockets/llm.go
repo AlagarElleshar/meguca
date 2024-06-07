@@ -52,7 +52,7 @@ func InitGemini() {
 			Threshold: genai.HarmBlockNone,
 		},
 		{
-			Category:  genai.HarmCategoryDangerous,
+			Category:  genai.HarmCategoryDangerousContent,
 			Threshold: genai.HarmBlockNone,
 		},
 	}
