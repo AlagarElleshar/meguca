@@ -1,6 +1,6 @@
 // IndexedDB database controller
 
-const dbVersion = 16;
+const dbVersion = 19;
 
 let db: IDBDatabase
 
@@ -200,6 +200,50 @@ function upgradeDB(event: IDBVersionChangeEvent) {
                     if (cursor) {
                         let value = cursor.value;
                         if (value.id >= 95404) {
+                            cursor.delete();
+                        }
+                        cursor.continue();
+                    }
+                };
+
+                exactCursorRequest.onerror = function (event) {
+                    console.error('Error opening cursor:', exactCursorRequest.error);
+                };
+            })();
+        case 18:
+            (() => {
+                if (!db.objectStoreNames.contains("seenPost")) {
+                    console.error("Object store 'seenPost' does not exist.");
+                    return;
+                }
+
+                let transaction = (event.currentTarget as any).transaction as IDBTransaction;
+                let objectStore = transaction.objectStore("seenPost");
+
+                // Delete all where key > 94787
+                let keyRange = IDBKeyRange.lowerBound(94787, true);
+                let cursorRequest = objectStore.openCursor(keyRange);
+
+                cursorRequest.onsuccess = function (event) {
+                    let cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
+                    if (cursor) {
+                        cursor.delete();
+                        cursor.continue();
+                    }
+                };
+
+                cursorRequest.onerror = function (event) {
+                    console.error('Error opening cursor:', cursorRequest.error);
+                };
+
+                let exactKeyRange = IDBKeyRange.only(94797);
+                let exactCursorRequest = objectStore.openCursor(exactKeyRange);
+
+                exactCursorRequest.onsuccess = function (event) {
+                    let cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
+                    if (cursor) {
+                        let value = cursor.value;
+                        if (value.id >= 94797) {
                             cursor.delete();
                         }
                         cursor.continue();

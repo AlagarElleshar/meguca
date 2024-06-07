@@ -38,6 +38,24 @@ func InitGemini() {
 	}
 
 	model = geminiClient.GenerativeModel("gemini-1.5-flash-latest")
+	model.SafetySettings = []*genai.SafetySetting{
+		{
+			Category:  genai.HarmCategoryHarassment,
+			Threshold: genai.HarmBlockNone,
+		},
+		{
+			Category:  genai.HarmCategoryHateSpeech,
+			Threshold: genai.HarmBlockNone,
+		},
+		{
+			Category:  genai.HarmCategorySexuallyExplicit,
+			Threshold: genai.HarmBlockNone,
+		},
+		{
+			Category:  genai.HarmCategoryDangerous,
+			Threshold: genai.HarmBlockNone,
+		},
+	}
 
 }
 
