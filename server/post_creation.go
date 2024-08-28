@@ -4,6 +4,7 @@ package server
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/go-playground/log"
 	"net/http"
@@ -166,6 +167,10 @@ func createReply(w http.ResponseWriter, r *http.Request) {
 			return
 		case !ok:
 			return common.ErrInvalidThread(op, board)
+		}
+		count, err := db.CheckIpPostCount(ip)
+		if count < 1 {
+			return common.StatusError{errors.New("Posting via direct POST requests is not allowed for new users. Please post once via a WebSocket connection."), 403}
 		}
 
 		post, msg, err := websockets.CreatePost(op, board, ip, req)
