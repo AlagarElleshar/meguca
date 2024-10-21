@@ -22,7 +22,7 @@ require (
 	github.com/google/generative-ai-go v0.12.0
 	github.com/gorilla/websocket v1.5.3
 	github.com/lib/pq v1.10.9
-	github.com/linxGnu/grocksdb v1.9.5
+	github.com/linxGnu/grocksdb v1.9.7
 	github.com/oschwald/geoip2-golang v1.11.0
 	github.com/rakyll/statik v0.1.7
 	github.com/rivo/uniseg v0.4.7
