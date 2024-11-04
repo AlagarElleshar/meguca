@@ -254,13 +254,13 @@ func (c *Client) closePost() (err error) {
 		}
 	}
 	claudeOk := true
-	if claude != nil {
-		claudeOk = db.CheckIfClaudeAllowed(c.ip)
-		if !claudeOk {
-			claude.Status = common.Error
-			claude.Response.WriteString("Rate limit reached, try again later.")
-		}
-	}
+	//if claude != nil {
+	//	claudeOk = db.CheckIfClaudeAllowed(c.ip)
+	//	if !claudeOk {
+	//		claude.Status = common.Error
+	//		claude.Response.WriteString("Rate limit reached, try again later.")
+	//	}
+	//}
 	if len(mediaCommands) != 0 {
 		for i, _ := range mediaCommands {
 			// Limited to 10 media commands
