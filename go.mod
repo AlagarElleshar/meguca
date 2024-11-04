@@ -33,7 +33,7 @@ require (
 	google.golang.org/api v0.204.0
 	google.golang.org/protobuf v1.35.1
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
-	gopkg.in/vansante/go-ffprobe.v2 v2.1.1
+	gopkg.in/vansante/go-ffprobe.v2 v2.2.0
 )
 
 require (
