@@ -344,6 +344,10 @@ func handlePostCommand(id uint64, op uint64, input *common.PostCommand, feed *fe
 			return
 		}
 		formatImageName(&filename)
+		hasImage, err := db.HasImage(id)
+		if err != nil || hasImage {
+			return
+		}
 
 		var msg []byte
 		err = db.InTransaction(false, func(tx *sql.Tx) (err error) {
