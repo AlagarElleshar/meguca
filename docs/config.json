@@ -10,5 +10,11 @@
 	"test": {
 		"database": "postgres://meguca:meguca@localhost:5432/meguca_test?sslmode=disable"
 	},
-	"anthropic_api_key" : "PLACEHOLDER"
+	"gemini_api_key": "key",
+	"default_general_thread": "set the name of the general thread to redirect website.com -> general thread",
+	"youtube_api_key": "[used for nekotv]",
+	"mp4_whitelist": [
+		"list of websites that you can attach mp4s from on nekotv"
+	],
+	"media_convert_pass": "[this is related to attaching tiktoks]"
 }
