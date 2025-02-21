@@ -22,7 +22,6 @@ import (
 // Start parses command line arguments and initializes the server.
 func Start() (err error) {
 	err = config.Server.Load()
-	websockets.InitGemini()
 	if err != nil {
 		return
 	}
@@ -54,6 +53,7 @@ func Start() (err error) {
 	}
 	mlog.Init(mlog.Console)
 	mlog.ConsoleHandler.SetDisplayColor(config.Server.Debug)
+	websockets.InitGemini()
 
 	err = util.Parallel(db.LoadDB, assets.CreateDirs)
 	if err != nil {
