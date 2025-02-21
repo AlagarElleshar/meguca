@@ -49,7 +49,7 @@ func PurgePost(tx *sql.Tx, id uint64, by, reason string, by_ip bool) (
 	}
 	var posts []Post
 	var board string
-	var ip string
+	var ip sql.NullString
 
 	err = sq.Select("board", "ip").
 		From("posts").
@@ -66,7 +66,9 @@ func PurgePost(tx *sql.Tx, id uint64, by, reason string, by_ip bool) (
 		LeftJoin("images as i on p.SHA1 = i.SHA1").
 		RunWith(tx)
 
-	if by_ip {
+	if by_ip && !ip.Valid {
+		return fmt.Errorf("cannot query by IP because IP is null for post id %d", id)
+	} else if by_ip {
 		getPosts = getPosts.Where("p.ip = ?", ip).
 			Where("post_board(p.id) = ?", board)
 	} else {
