@@ -69,7 +69,7 @@ func PurgePost(tx *sql.Tx, id uint64, by, reason string, by_ip bool) (
 	if by_ip && !ip.Valid {
 		return fmt.Errorf("cannot query by IP because IP is null for post id %d", id)
 	} else if by_ip {
-		getPosts = getPosts.Where("p.ip = ?", ip).
+		getPosts = getPosts.Where("p.ip = ?", ip.String).
 			Where("post_board(p.id) = ?", board)
 	} else {
 		getPosts = getPosts.Where("id = ?", id)
