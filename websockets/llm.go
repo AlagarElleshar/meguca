@@ -37,7 +37,13 @@ func InitGemini() {
 		log.Fatal(err)
 	}
 
-	model = geminiClient.GenerativeModel("gemini-1.5-flash-latest")
+	modelName := "gemini-2.0-flash"
+	if config.Server.GeminiModel != nil {
+		modelName = *config.Server.GeminiModel
+	}
+	model = geminiClient.GenerativeModel(modelName)
+	modelInfo, err := model.Info(ctx)
+	log.Info("Client model: ", modelInfo.Name)
 	model.SafetySettings = []*genai.SafetySetting{
 		{
 			Category:  genai.HarmCategoryHarassment,

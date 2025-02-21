@@ -43,6 +43,7 @@ type ServerConfigs struct {
 	YoutubeApiKey        *string  `json:"youtube_api_key"`
 	Mp4Whitelist         []string `json:"mp4_whitelist"`
 	GeminiApiKey         string   `json:"gemini_api_key"`
+	GeminiModel          *string  `json:"gemini_model"`
 }
 
 // Load configs from JSON or defaults, if none present
