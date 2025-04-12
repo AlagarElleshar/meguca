@@ -300,6 +300,9 @@ func (c *Client) closePost() (err error) {
 			if err == nil {
 				image = &fileData
 			}
+			if ext == "jpg" {
+				ext = "jpeg"
+			}
 		} else {
 			err = nil
 			image = nil
