@@ -1,19 +1,18 @@
 package imager
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/bakape/meguca/common"
 	"github.com/go-playground/log"
 	"golang.org/x/text/unicode/norm"
-	"gopkg.in/vansante/go-ffprobe.v2"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -84,13 +83,95 @@ type TikWMResponse struct {
 }
 
 func rotateVideoFile(filename string, rotation int) error {
-	cmd := exec.Command("exiftool", fmt.Sprintf("-rotation=%d", rotation), "overwrite_original", filename)
+	cmd := exec.Command("exiftool", fmt.Sprintf("-rotation=%d", rotation), "-overwrite_original_in_place", filename)
 
 	err := cmd.Run()
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func downloadFileWithSizeCheck(url *string, file string, maxSize int64) (fileSize int64, status int, err error) {
+
+	client := &http.Client{
+		Timeout: 30 * time.Second, // Timeout for each request
+	}
+
+	headReq, err := http.NewRequest("HEAD", *url, nil)
+	if err != nil {
+		return 0, 0, fmt.Errorf("failed to create HEAD request: %w", err)
+	}
+
+	headResp, err := client.Do(headReq)
+	if err != nil {
+		return 0, 0, fmt.Errorf("http HEAD error: %w", err)
+	}
+	headResp.Body.Close()
+
+	status = headResp.StatusCode
+	if status != http.StatusOK {
+		return 0, status, fmt.Errorf("HEAD request failed with status: %d", status)
+	}
+
+	contentLengthStr := headResp.Header.Get("Content-Length")
+	var expectedSize int64 = -1
+
+	if contentLengthStr != "" {
+		expectedSize, err = strconv.ParseInt(contentLengthStr, 10, 64)
+		if err != nil {
+			fmt.Printf("Warning: Invalid Content-Length '%s' in HEAD response: %v. Proceeding without size check.\n", contentLengthStr, err)
+			expectedSize = -1
+			err = nil // Not fatal for download attempt itself
+		}
+	} else {
+		fmt.Println("Warning: Content-Length missing in HEAD response. Proceeding without size check.")
+	}
+
+	if maxSize > 0 && expectedSize > 0 && expectedSize > maxSize {
+		return 0, status, fmt.Errorf("file size (%d bytes from HEAD) exceeds maximum allowed size (%d bytes)", expectedSize, maxSize)
+	}
+
+	response, err := client.Get(*url)
+	if err != nil {
+		return 0, 0, fmt.Errorf("http GET error: %w", err)
+	}
+	defer response.Body.Close()
+
+	status = response.StatusCode
+	if status != http.StatusOK {
+		return 0, status, fmt.Errorf("GET request failed with status: %d", status)
+	}
+
+	outputFile, err := os.Create(file)
+	if err != nil {
+		return 0, status, fmt.Errorf("failed to create temp file '%s': %w", file, err)
+	}
+	shouldCleanupFile := true
+	defer func() {
+		closeErr := outputFile.Close()
+		if err != nil && shouldCleanupFile {
+			removeErr := os.Remove(file)
+			if removeErr != nil {
+				log.Infof("Warning: Failed to remove partially downloaded file '%s': %v\n", file, removeErr)
+			}
+		} else if err == nil && closeErr != nil {
+			err = fmt.Errorf("failed to close output file: %w", closeErr)
+		}
+	}()
+
+	fileSize, err = io.Copy(outputFile, response.Body)
+	if err != nil {
+		return 0, status, fmt.Errorf("error saving file during copy: %w", err)
+	}
+
+	if expectedSize != -1 && fileSize != expectedSize {
+		shouldCleanupFile = true
+		return 0, status, fmt.Errorf("download size mismatch: expected %d bytes (from HEAD), got %d bytes", expectedSize, fileSize)
+	}
+
+	shouldCleanupFile = false
+	return fileSize, status, nil
 }
 
 func downloadToTemp(url string, file string) (fileSize int64, status int, err error) {
@@ -179,49 +260,22 @@ func DownloadTikTok(input *common.PostCommand) (token string, filename string, e
 	}
 	tmpFilename := fmt.Sprintf("tmp/%s.mp4", tokData.ID)
 	var size int64
-	if tokData.Duration > 30 {
-		input.HD = false
-	}
-	if input.HD {
-		// Test to see if hdplay is actually h264
-		var probeData *ffprobe.ProbeData
-		probeData, err = ffprobe.ProbeURL(context.Background(), tokData.HDPlay)
-		if probeData == nil {
-			input.HD = false
-		} else if probeData.FirstVideoStream().CodecName == "h264" {
-			// Treat hdplay like an SD video
-			input.HD = false
-			tokData.Play = tokData.HDPlay
+	urls := []*string{&tokData.HDPlay, &tokData.Play, &tokData.Wmplay}
+	for _, url := range urls {
+		size, _, err = downloadFileWithSizeCheck(url, tmpFilename, 104857600)
+		if err == nil {
+			break
 		} else {
-			size, err = downloadConverted(tokData.HDPlay, &tokData.ID, tmpFilename, input.Rotation)
-			if err != nil {
-				defer os.Remove(tmpFilename)
-				return
-			}
-		}
-	}
-	if !input.HD {
-		var status int
-		size, status, err = downloadToTemp(tokData.Play, tmpFilename)
-		if err != nil {
-			if status == http.StatusNotFound {
-				size, status, err = downloadToTemp(tokData.Wmplay, tmpFilename)
-				if err != nil {
-					defer os.Remove(tmpFilename)
-					return
-				}
-			} else {
-				defer os.Remove(tmpFilename)
-				return
-			}
-		}
-		if input.Rotation != 0 {
-			err = rotateVideoFile(tmpFilename, input.Rotation)
+			log.Error(err)
 		}
 	}
 	tmpFile, err := os.Open(tmpFilename)
 	defer tmpFile.Close()
 	defer os.Remove(tmpFilename)
+	log.Info("Rotation: ", input.Rotation)
+	if input.Rotation > 0 {
+		rotateVideoFile(tmpFilename, input.Rotation)
+	}
 	if err != nil {
 		return
 	}
