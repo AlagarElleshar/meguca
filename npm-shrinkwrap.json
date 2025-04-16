@@ -10,16 +10,16 @@
       "license": "AGPL-3.0",
       "dependencies": {
         "@types/youtube-player": "^5.5.11",
-        "mpegts.js": "^1.7.3"
+        "mpegts.js": "^1.8.0"
       },
       "devDependencies": {
-        "@protobuf-ts/plugin": "^2.9.4",
+        "@protobuf-ts/plugin": "^2.9.6",
         "@types/youtube": "^0.0.50",
         "cssnano": "^7.0.4",
         "esbuild": "^0.25.2",
         "esbuild-plugin-less": "^1.3.8",
-        "glob": "^11.0.0",
-        "postcss": "^8.4.41"
+        "glob": "^11.0.1",
+        "postcss": "^8.5.3"
       }
     },
     "node_modules/@esbuild/aix-ppc64": {
@@ -466,16 +466,16 @@
       }
     },
     "node_modules/@protobuf-ts/plugin": {
-      "version": "2.9.4",
-      "resolved": "https://registry.npmjs.org/@protobuf-ts/plugin/-/plugin-2.9.4.tgz",
-      "integrity": "sha512-Db5Laq5T3mc6ERZvhIhkj1rn57/p8gbWiCKxQWbZBBl20wMuqKoHbRw4tuD7FyXi+IkwTToaNVXymv5CY3E8Rw==",
+      "version": "2.9.6",
+      "resolved": "https://registry.npmjs.org/@protobuf-ts/plugin/-/plugin-2.9.6.tgz",
+      "integrity": "sha512-Wpv5rkXeu6E5Y4r0TjWE0bzRGddiTYl/RM+tLgVlS0r8CqOBqNAmlWv+s8ltf/F75rVrahUal0cpyhFwha9GRA==",
       "dev": true,
       "license": "Apache-2.0",
       "dependencies": {
-        "@protobuf-ts/plugin-framework": "^2.9.4",
-        "@protobuf-ts/protoc": "^2.9.4",
-        "@protobuf-ts/runtime": "^2.9.4",
-        "@protobuf-ts/runtime-rpc": "^2.9.4",
+        "@protobuf-ts/plugin-framework": "^2.9.6",
+        "@protobuf-ts/protoc": "^2.9.6",
+        "@protobuf-ts/runtime": "^2.9.6",
+        "@protobuf-ts/runtime-rpc": "^2.9.6",
         "typescript": "^3.9"
       },
       "bin": {
@@ -484,20 +484,20 @@
       }
     },
     "node_modules/@protobuf-ts/plugin-framework": {
-      "version": "2.9.4",
-      "resolved": "https://registry.npmjs.org/@protobuf-ts/plugin-framework/-/plugin-framework-2.9.4.tgz",
-      "integrity": "sha512-9nuX1kjdMliv+Pes8dQCKyVhjKgNNfwxVHg+tx3fLXSfZZRcUHMc1PMwB9/vTvc6gBKt9QGz5ERqSqZc0++E9A==",
+      "version": "2.9.6",
+      "resolved": "https://registry.npmjs.org/@protobuf-ts/plugin-framework/-/plugin-framework-2.9.6.tgz",
+      "integrity": "sha512-w7A1RXrDCiVzcaRE6YJP7FCARuAFe/Vc4SNQnHAi4CF0V6mEtyjAYEIC5BNYgIRaJEqB26zzsBQjIem3R02SCA==",
       "dev": true,
       "license": "(Apache-2.0 AND BSD-3-Clause)",
       "dependencies": {
-        "@protobuf-ts/runtime": "^2.9.4",
+        "@protobuf-ts/runtime": "^2.9.6",
         "typescript": "^3.9"
       }
     },
     "node_modules/@protobuf-ts/protoc": {
-      "version": "2.9.4",
-      "resolved": "https://registry.npmjs.org/@protobuf-ts/protoc/-/protoc-2.9.4.tgz",
-      "integrity": "sha512-hQX+nOhFtrA+YdAXsXEDrLoGJqXHpgv4+BueYF0S9hy/Jq0VRTVlJS1Etmf4qlMt/WdigEes5LOd/LDzui4GIQ==",
+      "version": "2.9.6",
+      "resolved": "https://registry.npmjs.org/@protobuf-ts/protoc/-/protoc-2.9.6.tgz",
+      "integrity": "sha512-c0XvAPDIBAovH9HxV8gBv8gzOTreQIqibcusrB1+DxvFiSvy+2V1tjbUmG5gJEbjk3aAOaoj0a3+QuE+P28xUw==",
       "dev": true,
       "license": "Apache-2.0",
       "bin": {
@@ -505,20 +505,20 @@
       }
     },
     "node_modules/@protobuf-ts/runtime": {
-      "version": "2.9.4",
-      "resolved": "https://registry.npmjs.org/@protobuf-ts/runtime/-/runtime-2.9.4.tgz",
-      "integrity": "sha512-vHRFWtJJB/SiogWDF0ypoKfRIZ41Kq+G9cEFj6Qm1eQaAhJ1LDFvgZ7Ja4tb3iLOQhz0PaoPnnOijF1qmEqTxg==",
+      "version": "2.9.6",
+      "resolved": "https://registry.npmjs.org/@protobuf-ts/runtime/-/runtime-2.9.6.tgz",
+      "integrity": "sha512-C0CfpKx4n4LBbUrajOdRj2BTbd3qBoK0SiKWLq7RgCoU6xiN4wesBMFHUOBp3fFzKeZwgU8Q2KtzaqzIvPLRXg==",
       "dev": true,
       "license": "(Apache-2.0 AND BSD-3-Clause)"
     },
     "node_modules/@protobuf-ts/runtime-rpc": {
-      "version": "2.9.4",
-      "resolved": "https://registry.npmjs.org/@protobuf-ts/runtime-rpc/-/runtime-rpc-2.9.4.tgz",
-      "integrity": "sha512-y9L9JgnZxXFqH5vD4d7j9duWvIJ7AShyBRoNKJGhu9Q27qIbchfzli66H9RvrQNIFk5ER7z1Twe059WZGqERcA==",
+      "version": "2.9.6",
+      "resolved": "https://registry.npmjs.org/@protobuf-ts/runtime-rpc/-/runtime-rpc-2.9.6.tgz",
+      "integrity": "sha512-0UeqDRzNxgsh08lY5eWzFJNfD3gZ8Xf+WG1HzbIAbVAigzigwjwsYNNhTeas5H3gco1U5owTzCg177aambKOOw==",
       "dev": true,
       "license": "Apache-2.0",
       "dependencies": {
-        "@protobuf-ts/runtime": "^2.9.4"
+        "@protobuf-ts/runtime": "^2.9.6"
       }
     },
     "node_modules/@trysound/sax": {
@@ -1114,9 +1114,9 @@
       }
     },
     "node_modules/glob": {
-      "version": "11.0.0",
-      "resolved": "https://registry.npmjs.org/glob/-/glob-11.0.0.tgz",
-      "integrity": "sha512-9UiX/Bl6J2yaBbxKoEBRm4Cipxgok8kQYcOPEhScPwebu2I0HoQOuYdIO6S3hLuWoZgpDpwQZMzTFxgpkyT76g==",
+      "version": "11.0.1",
+      "resolved": "https://registry.npmjs.org/glob/-/glob-11.0.1.tgz",
+      "integrity": "sha512-zrQDm8XPnYEKawJScsnM0QzobJxlT/kHOOlRTio8IH/GrmxRE5fjllkzdaHclIuNjUQTJYH2xHNIGfdpJkDJUw==",
       "dev": true,
       "license": "ISC",
       "dependencies": {
@@ -1340,13 +1340,13 @@
       }
     },
     "node_modules/mpegts.js": {
-      "version": "1.7.3",
-      "resolved": "https://registry.npmjs.org/mpegts.js/-/mpegts.js-1.7.3.tgz",
-      "integrity": "sha512-kqZ1C1IsbAQN72cK8vMrzKeM7hwrwSBbFAwVAc7PPweOeoZxCANrc7fAVDKMfYUzxdNkMTnec9tVmlxmKZB0TQ==",
+      "version": "1.8.0",
+      "resolved": "https://registry.npmjs.org/mpegts.js/-/mpegts.js-1.8.0.tgz",
+      "integrity": "sha512-ZtujqtmTjWgcDDkoOnLvrOKUTO/MKgLHM432zGDI8oPaJ0S+ebPxg1nEpDpLw6I7KmV/GZgUIrfbWi3qqEircg==",
       "license": "Apache-2.0",
       "dependencies": {
         "es6-promise": "^4.2.5",
-        "webworkify-webpack": "^2.1.5"
+        "webworkify-webpack": "github:xqq/webworkify-webpack"
       }
     },
     "node_modules/nanoid": {
@@ -1469,9 +1469,9 @@
       }
     },
     "node_modules/postcss": {
-      "version": "8.4.47",
-      "resolved": "https://registry.npmjs.org/postcss/-/postcss-8.4.47.tgz",
-      "integrity": "sha512-56rxCq7G/XfB4EkXq9Egn5GCqugWvDFjafDOThIdMBsI15iqPqR5r15TfSr1YPYeEI19YeaXMCbY6u88Y76GLQ==",
+      "version": "8.5.3",
+      "resolved": "https://registry.npmjs.org/postcss/-/postcss-8.5.3.tgz",
+      "integrity": "sha512-dle9A3yYxlBSrt8Fu+IpjGT8SY8hN0mlaA6GY8t0P5PjIOZemULz/E2Bnm/2dcUOena75OTNkHI76uZBNUUq3A==",
       "dev": true,
       "funding": [
         {
@@ -1489,8 +1489,8 @@
       ],
       "license": "MIT",
       "dependencies": {
-        "nanoid": "^3.3.7",
-        "picocolors": "^1.1.0",
+        "nanoid": "^3.3.8",
+        "picocolors": "^1.1.1",
         "source-map-js": "^1.2.1"
       },
       "engines": {
@@ -2256,8 +2256,7 @@
     },
     "node_modules/webworkify-webpack": {
       "version": "2.1.5",
-      "resolved": "https://registry.npmjs.org/webworkify-webpack/-/webworkify-webpack-2.1.5.tgz",
-      "integrity": "sha512-2akF8FIyUvbiBBdD+RoHpoTbHMQF2HwjcxfDvgztAX5YwbZNyrtfUMgvfgFVsgDhDPVTlkbb5vyasqDHfIDPQw==",
+      "resolved": "git+ssh://git@github.com/xqq/webworkify-webpack.git#24d1e719b4a6cac37a518b2bb10fe124527ef4ef",
       "license": "MIT"
     },
     "node_modules/which": {

@@ -9,7 +9,6 @@
 		"newLine": "LF",
 		"removeComments": true,
 		"noImplicitThis": true,
-		"suppressImplicitAnyIndexErrors": true,
 		"esModuleInterop" : true,
 	},
 	"skipLibCheck": true
