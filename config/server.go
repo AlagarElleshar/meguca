@@ -38,7 +38,6 @@ type ServerConfigs struct {
 		Database string
 	}
 	AnthropicApiKey      string   `json:"anthropic_api_key"`
-	MediaConvertPass     string   `json:"media_convert_pass"`
 	DefaultGeneralThread *string  `json:"default_general_thread"`
 	YoutubeApiKey        *string  `json:"youtube_api_key"`
 	Mp4Whitelist         []string `json:"mp4_whitelist"`

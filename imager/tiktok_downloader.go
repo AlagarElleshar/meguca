@@ -72,7 +72,6 @@ var (
 	twmResponseChannel chan *TWMTikTokData
 	twmErrChannel      chan error
 	twmMutex           sync.Mutex
-	//transloaditClient  transloadit.Client
 )
 
 type TikWMResponse struct {
@@ -289,24 +288,6 @@ func DownloadTikTok(input *common.PostCommand) (token string, filename string, e
 }
 
 func init() {
-	//options := transloadit.DefaultConfig
-	//
-	//var config struct {
-	//	TransloaditAPIKey    string `json:"transloadit_api_key"`
-	//	TransloaditAPISecret string `json:"transloadit_api_secret"`
-	//}
-	//
-	//configBytes, err := os.ReadFile("config.json")
-	//if err == nil {
-	//	err = json.Unmarshal(configBytes, &config)
-	//	if err == nil {
-	//		options.AuthKey = config.TransloaditAPIKey
-	//		options.AuthSecret = config.TransloaditAPISecret
-	//	} else {
-	//		fmt.Println(err.Error())
-	//	}
-	//}
-	//transloaditClient = transloadit.NewClient(options)
 	twmRequestChannel = make(chan *common.PostCommand)
 	twmResponseChannel = make(chan *TWMTikTokData)
 	twmErrChannel = make(chan error)
