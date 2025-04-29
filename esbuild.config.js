@@ -68,7 +68,6 @@ async function doBuildJS() {
         outdir: path.resolve(__dirname, 'www', 'js'),
         bundle: true,
         sourcemap: true,
-        splitting: true,
         minify: true,
         format: 'esm',
         target: 'es2015',
