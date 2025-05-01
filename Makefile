@@ -14,6 +14,7 @@ ifeq ($(UNAME_S),Darwin)
 endif
 
 ifeq ($(UNAME_S),Linux)
+	ROCKSDB_LDFLAGS := -lbz2
     GO_BUILD_TAGS = -tags "libsqlite3 linux"
 endif
 
