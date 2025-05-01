@@ -15,7 +15,7 @@ endif
 
 ifeq ($(UNAME_S),Linux)
 	ROCKSDB_CFLAGS := $(shell pkg-config --cflags-only-I rocksdb)
-	ROCKSDB_LDFLAGS := $(shell pkg-config --libs rocksdb -lbz2)
+	ROCKSDB_LDFLAGS := $(shell pkg-config --libs rocksdb) -lbz2
     GO_BUILD_TAGS = -tags "libsqlite3 linux"
 endif
 
