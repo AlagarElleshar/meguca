@@ -47,7 +47,7 @@ func EncodeWebP(img image.Image, quality float32) ([]byte, error) {
 		return nil, errors.New("WebP encoding of thumbnail failed")
 	}
 
-	defer C.free(unsafe.Pointer(output))
+	defer C.freeWebP(output)
 
 	encodedData := C.GoBytes(unsafe.Pointer(output), C.int(outputSize))
 	return encodedData, nil

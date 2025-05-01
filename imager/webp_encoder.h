@@ -6,3 +6,7 @@ int encodeWebP(uint8_t* data, int width, int height, float quality, uint8_t** ou
     *output_size = WebPEncodeRGBA(data, width, height, width * 4, quality, output);
     return *output != NULL;
 }
+
+void freeWebP(uint8_t* output) {
+    WebPFree(output);
+}
