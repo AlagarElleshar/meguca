@@ -121,13 +121,13 @@ func init() {
 }
 
 type webpackManifest struct {
-	MainJS   *string `json:"client/main.ts"`
-	StaticJS *string `json:"client/static/main.ts"`
+	MainJS   *string `json:"main"`
+	StaticJS *string `json:"staticMain"`
 }
 
 func reloadManifest() {
 	// Open the manifest.json file
-	file, err := os.Open("manifest.json")
+	file, err := os.Open("www/manifest.json")
 	if err != nil {
 		log.Fatal("Error opening manifest.json:", err)
 	}

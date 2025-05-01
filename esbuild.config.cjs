@@ -30,4 +30,4 @@ async function doBuildCSS() {
     })
 }
 
-await doBuildCSS();
+doBuildCSS();
