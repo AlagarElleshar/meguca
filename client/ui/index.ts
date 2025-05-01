@@ -1,5 +1,6 @@
 export * from "./banner"
-export { default as FormView, FormAttrs } from "./forms"
+export { default as FormView } from "./forms"
+export type { FormAttrs } from "./forms"
 export { postAdded } from "./tab"
 export { default as notifyAboutReply, OverlayNotification } from "./notification"
 export { renderCaptchaForm, captchaLoaded } from "./captcha"
