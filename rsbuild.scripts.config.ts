@@ -23,7 +23,6 @@ export default defineConfig({
     entry: getClientScriptEntries(),
   },
   output: {
-    cleanDistPath: false,
     distPath: {
       root: 'www', // IMPORTANT: Same root output directory
       js: 'js',    // Base JS output directory (www/js/)

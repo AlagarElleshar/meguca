@@ -6,16 +6,14 @@ export GO111MODULE=on
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
-	ROCKSDB_CFLAGS := $(shell pkg-config --cflags-only-I liblz4 libzstd ) -I/opt/homebrew/opt/snappy/include
-	ROCKSDB_LDFLAGS := $(shell pkg-config --libs-only-L liblz4 libzstd) -L/opt/homebrew/opt/snappy/lib -L/usr/local/lib
+	ROCKSDB_CFLAGS := $(shell pkg-config --cflags-only-I liblz4 libzstd) -I/opt/homebrew/opt/snappy/include
+	ROCKSDB_LDFLAGS := $(shell pkg-config --libs-only-L liblz4 libzstd) -L/opt/homebrew/opt/snappy/lib
 	WEBP_CFLAGS = $(shell pkg-config --cflags libwebp)
     WEBP_LDFLAGS = $(shell pkg-config --libs-only-L libwebp)
     GO_BUILD_TAGS = -tags "libsqlite3"
 endif
 
 ifeq ($(UNAME_S),Linux)
-	ROCKSDB_CFLAGS := $(shell pkg-config --cflags-only-I rocksdb)
-	ROCKSDB_LDFLAGS := $(shell pkg-config --libs rocksdb)
     GO_BUILD_TAGS = -tags "libsqlite3 linux"
 endif
 
@@ -23,17 +21,17 @@ endif
 
 all: client server
 
-client: client_deps proto_client css js
+client: client_deps proto_client
+	node esbuild.config.js --css --js
 
 client_deps:
 	npm install --include=dev --progress false --depth 0
 
 css:
-	node esbuild.config.cjs
+	node esbuild.config.js --css
 
 js:
-	rsbuild build --config rsbuild.app.config.ts
-	rsbuild build --config rsbuild.scripts.config.ts
+	node esbuild.config.js --js
 
 proto: proto_client proto_server
 
