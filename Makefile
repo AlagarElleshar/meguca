@@ -15,7 +15,7 @@ endif
 
 ifeq ($(UNAME_S),Linux)
 	ROCKSDB_CFLAGS := $(shell pkg-config --cflags-only-I rocksdb)
-	ROCKSDB_LDFLAGS := $(shell pkg-config --libs rocksdb)
+	ROCKSDB_LDFLAGS := $(shell pkg-config --libs rocksdb -lbz2)
     GO_BUILD_TAGS = -tags "libsqlite3 linux"
 endif
 
@@ -32,8 +32,8 @@ css:
 	node esbuild.config.cjs
 
 js:
-	rsbuild build --config rsbuild.app.config.ts
-	rsbuild build --config rsbuild.scripts.config.ts
+	npx rsbuild build --config rsbuild.app.config.ts
+	npx rsbuild build --config rsbuild.scripts.config.ts
 
 proto: proto_client proto_server
 
