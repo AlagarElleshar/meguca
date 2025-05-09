@@ -244,6 +244,26 @@ func GetTikTokMetadata(input string) (tokData *TWMTikTokData, err error) {
 	return
 }
 
+func runYtDlp(tokID, tempFilename string) (int64, error) {
+	// Format the target URL using the token data
+	url := fmt.Sprintf("https://www.tiktok.com/@/video/%s", tokID)
+
+	// Run yt-dlp and capture combined stdout/stderr
+	cmd := exec.Command("yt-dlp", url, "-o", tempFilename)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return 0, fmt.Errorf("yt-dlp error: %w, output: %s", err, output)
+	}
+
+	// Stat the file to get its size
+	info, err := os.Stat(tempFilename)
+	if err != nil {
+		return 0, fmt.Errorf("could not stat output file: %w", err)
+	}
+
+	// Return the size in bytes
+	return info.Size(), nil
+}
 func DownloadTikTok(input *common.PostCommand) (token string, filename string, err error) {
 	twmMutex.Lock()
 	twmRequestChannel <- input
@@ -258,19 +278,23 @@ func DownloadTikTok(input *common.PostCommand) (token string, filename string, e
 		return
 	}
 	tmpFilename := fmt.Sprintf("tmp/%s.mp4", tokData.ID)
-	var size int64
-	urls := []*string{&tokData.HDPlay, &tokData.Play, &tokData.Wmplay}
-	for _, url := range urls {
-		size, _, err = downloadFileWithSizeCheck(url, tmpFilename, 104857600)
-		if err == nil {
-			break
-		} else {
-			log.Error(err)
-		}
+	//var size int64
+	//urls := []*string{&tokData.HDPlay, &tokData.Play, &tokData.Wmplay}
+	//for _, url := range urls {
+	//	size, _, err = downloadFileWithSizeCheck(url, tmpFilename, 104857600)
+	//	if err == nil {
+	//		break
+	//	} else {
+	//		log.Error(err)
+	//	}
+	//}
+	size, err := runYtDlp(tokData.ID, tmpFilename)
+	if err != nil {
+		defer os.Remove(tmpFilename)
+		return
 	}
 	tmpFile, err := os.Open(tmpFilename)
 	defer tmpFile.Close()
-	defer os.Remove(tmpFilename)
 	log.Info("Rotation: ", input.Rotation)
 	if input.Rotation > 0 {
 		rotateVideoFile(tmpFilename, input.Rotation)
