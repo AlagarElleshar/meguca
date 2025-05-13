@@ -278,23 +278,24 @@ func DownloadTikTok(input *common.PostCommand) (token string, filename string, e
 		return
 	}
 	tmpFilename := fmt.Sprintf("tmp/%s.mp4", tokData.ID)
-	var size int64
-	urls := []*string{&tokData.HDPlay, &tokData.Play, &tokData.Wmplay}
-	for _, url := range urls {
-		size, _, err = downloadFileWithSizeCheck(url, tmpFilename, 104857600)
-		if err == nil {
-			break
-		} else {
-			log.Error(err)
-		}
-	}
-	//size, err := runYtDlp(tokData.ID, tmpFilename)
-	//if err != nil {
-	//	return
+	//var size int64
+	//urls := []*string{&tokData.HDPlay, &tokData.Play, &tokData.Wmplay}
+	//for _, url := range urls {
+	//	size, _, err = downloadFileWithSizeCheck(url, tmpFilename, 104857600)
+	//	if err == nil {
+	//		break
+	//	} else {
+	//		log.Error(err)
+	//	}
 	//}
+	size, err := runYtDlp(tokData.ID, tmpFilename)
+	if err != nil {
+		defer os.Remove(tmpFilename)
+		return
+	}
 	tmpFile, err := os.Open(tmpFilename)
 	defer tmpFile.Close()
-	defer os.Remove(tmpFilename)
+	log.Info("Rotation: ", input.Rotation)
 	if input.Rotation > 0 {
 		rotateVideoFile(tmpFilename, input.Rotation)
 	}
