@@ -3,8 +3,10 @@ package parser
 
 import (
 	"bytes"
+	"errors"
 	"github.com/rivo/uniseg"
 	"regexp"
+	"strconv"
 	"unicode"
 
 	"github.com/bakape/meguca/common"
@@ -75,10 +77,18 @@ func ParseBody(body []byte, board string, thread uint64, id uint64, ip string, i
 			if m == nil {
 				goto next
 			}
+			idBytes := m[1]
+			if len(idBytes) > 20 { // 20 digits is the max for a uint64
+				goto next
+			}
 			var l common.Link
 			l, err = parseLink(m)
 			switch {
 			case err != nil:
+				var numErr *strconv.NumError
+				if errors.As(err, &numErr) && errors.Is(numErr.Err, strconv.ErrRange) {
+					goto next
+				}
 				return
 			case l.ID != 0:
 				if !haveLink[l.ID] {
