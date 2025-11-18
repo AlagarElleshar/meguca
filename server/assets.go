@@ -8,7 +8,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"time"
 
 	"github.com/bakape/meguca/assets"
 	"github.com/bakape/meguca/common"
@@ -47,19 +46,21 @@ func newFileError(h *multipart.FileHeader, msg string) error {
 // (except deletion), so we can also set separate caching policies for them.
 func serveImages(w http.ResponseWriter, r *http.Request) {
 	path := extractParam(r, "path")
-	file, err := os.Open(cleanJoin(imageWebRoot, path))
-	if err != nil {
-		text404(w)
-		return
-	}
-	defer file.Close()
+	http.Redirect(w, r, "https://geckochen-test-bucket.s3.amazonaws.com/images/"+path, http.StatusMovedPermanently)
+	/*
+		file, err := os.Open(cleanJoin(imageWebRoot, path))
+		if err != nil {
+			text404(w)
+			return
+		}
+		defer file.Close()
 
-	head := w.Header()
-	for key, val := range imageHeaders {
-		head.Set(key, val)
-	}
+		head := w.Header()
+		for key, val := range imageHeaders {
+			head.Set(key, val)
+		}
 
-	http.ServeContent(w, r, path, time.Time{}, file)
+		http.ServeContent(w, r, path, time.Time{}, file)*/
 }
 
 func cleanJoin(a, b string) string {
