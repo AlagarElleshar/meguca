@@ -71,7 +71,7 @@ var ActionPrivilege = [...]ModerationLevel{
 	LockThread:        Moderator,
 	DeleteBoard:       BoardOwner,
 	MeidoVision:       Janitor,
-	PurgePost:         Admin,
+	PurgePost:         BoardOwner,
 	ShadowBinPost:     Moderator,
 	RedirectIP:        Admin,
 	RedirectThread:    Admin,

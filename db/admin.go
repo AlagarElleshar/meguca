@@ -326,12 +326,12 @@ func GetSameIPPosts(id uint64, board string, by string) (
 		return
 	})
 
-	err = moderatePost(id,
-		common.ModerationEntry{
-			Type: common.MeidoVision,
-			By:   by,
-		},
-		nil)
+	/*err = moderatePost(id,
+	common.ModerationEntry{
+		Type: common.MeidoVision,
+		By:   by,
+	},
+	nil)*/
 	return
 }
 
