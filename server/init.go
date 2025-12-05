@@ -3,7 +3,6 @@
 package server
 
 import (
-	"github.com/bakape/meguca/websockets"
 	"os"
 	"strconv"
 
@@ -53,7 +52,6 @@ func Start() (err error) {
 	}
 	mlog.Init(mlog.Console)
 	mlog.ConsoleHandler.SetDisplayColor(config.Server.Debug)
-	websockets.InitGemini()
 
 	err = util.Parallel(db.LoadDB, assets.CreateDirs)
 	if err != nil {

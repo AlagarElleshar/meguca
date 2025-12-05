@@ -9,7 +9,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"gopkg.in/vansante/go-ffprobe.v2"
 	"image"
 	"image/jpeg"
 	"io"
@@ -20,6 +19,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"gopkg.in/vansante/go-ffprobe.v2"
 
 	"github.com/bakape/meguca/auth"
 	"github.com/bakape/meguca/common"
@@ -212,11 +213,12 @@ func UploadMeguHash(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		sha1 := string(buf)
-
 		err = db.InTransaction(false, func(tx *sql.Tx) (err error) {
 			filename, err = db.GetImageFilename(sha1)
-			if err != nil {
-				return
+			//fallback because db can be non-consistent
+			if err != nil || filename == "" {
+				filename = sha1
+				err = nil // clear DB error
 			}
 			token, err = db.NewImageToken(tx, sha1)
 			return

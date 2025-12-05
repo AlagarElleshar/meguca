@@ -5,10 +5,11 @@ package config
 
 import (
 	"encoding/json"
-	"github.com/bakape/meguca/util"
 	"reflect"
 	"sort"
 	"sync"
+
+	"github.com/bakape/meguca/util"
 )
 
 var (
@@ -101,10 +102,9 @@ const defaultFAQ = `Supported upload file types are JPEG, PNG, APNG, WEBP, AVIF,
 #8ball - An 8ball
 #sw24:30 #sw2:24:30 #sw24:30+30 #sw24:30-30 - "Syncwatch" synchronized time counter
 #steal - steal the image of the first post linked; does not work on OPs
-#claude [prompt] - Generates text from a large language model named Claude
 <hr>NekoTV commands:
 .play [URL]    - Queue a video
-.remove [URL]  - Remove a video from queue 
+.remove [URL]  - Remove a video from queue
 .seek [TIME] - Seek to a timestamp in the video
 .clear         - Clears playlist
 .skip          - Skip current video

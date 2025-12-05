@@ -41,7 +41,6 @@ type ServerConfigs struct {
 	DefaultGeneralThread *string  `json:"default_general_thread"`
 	YoutubeApiKey        *string  `json:"youtube_api_key"`
 	Mp4Whitelist         []string `json:"mp4_whitelist"`
-	GeminiApiKey         string   `json:"gemini_api_key"`
 	GeminiModel          *string  `json:"gemini_model"`
 }
 

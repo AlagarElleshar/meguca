@@ -230,14 +230,7 @@ export default class FormView extends PostView {
             this.model.body = this.model.inputBody
             this.model.inputBody = null
         }
-        const claudeExists = /#claude\s\S.*/.test(this.model.body)
-        const claude = this.model.claude_state
-        if (!claudeExists) {
-            this.setEditing(false)
-        }
-        else if (claude != null && (claude.status == "error"|| claude.status == "done" )){
-            this.setEditing(false)
-        }
+        this.setEditing(false)
         this.reparseBody();
         if (oldBody) {
             this.model.body = oldBody

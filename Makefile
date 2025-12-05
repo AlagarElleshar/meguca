@@ -14,7 +14,12 @@ ifeq ($(UNAME_S),Darwin)
 endif
 
 ifeq ($(UNAME_S),Linux)
-	ROCKSDB_LDFLAGS := -lbz2
+	#$(HOME)/dockerfun/grocksdb-1.10.1/include
+	ROCKSDB_CFLAGS := -Wno-error=discarded-qualifiers -I/include
+	ROCKSDB_LDFLAGS := -L/lib -lrocksdb -lstdc++ -lm -lz -lsnappy -llz4 -lzstd -lbz2
+	MINE_LDFLAGS_NATIVE := -l:libavcodec.a -l:libavutil.a -l:libavformat.a -l:libswscale.a
+	WEBP_CFLAGS = $(shell pkg-config --cflags libwebp)
+    WEBP_LDFLAGS = $(shell pkg-config --libs-only-L libwebp)
     GO_BUILD_TAGS = -tags "libsqlite3 linux"
 endif
 
@@ -48,7 +53,7 @@ generate:
 
 server: proto_server
 	go generate
-	CGO_CFLAGS="$(ROCKSDB_CFLAGS) $(WEBP_CFLAGS)" CGO_LDFLAGS="$(ROCKSDB_LDFLAGS) $(WEBP_LDFLAGS)" go build -v $(GO_BUILD_TAGS)
+	CGO_CFLAGS="$(ROCKSDB_CFLAGS) $(WEBP_CFLAGS)" CGO_LDFLAGS="$(ROCKSDB_LDFLAGS) $(WEBP_LDFLAGS) $(MINE_LDFLAGS_NATIVE)" go build -v $(GO_BUILD_TAGS)
 
 client_clean:
 	rm -rf www/js www/css/*.css www/css/maps node_modules manifest.json

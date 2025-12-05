@@ -2,12 +2,12 @@
 package parser
 
 import (
-	"bytes"
 	"errors"
-	"github.com/rivo/uniseg"
 	"regexp"
 	"strconv"
 	"unicode"
+
+	"github.com/rivo/uniseg"
 
 	"github.com/bakape/meguca/common"
 	"github.com/bakape/meguca/config"
@@ -125,14 +125,14 @@ func ParseBody(body []byte, board string, thread uint64, id uint64, ip string, i
 	}
 
 	// Handles claude commands
-	m := common.ClaudeRegexp.FindSubmatch(body)
+	/*m := common.ClaudeRegexp.FindSubmatch(body)
 	if m != nil {
 		claude = &common.ClaudeState{
 			common.Waiting,
 			string(m[1]),
 			bytes.Buffer{},
 		}
-	}
+		}*/
 	mediaCommands = []common.MediaCommand{}
 	matches := common.MediaComRegexp.FindAllSubmatch(body, -1)
 	if matches != nil {

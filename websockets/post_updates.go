@@ -7,14 +7,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
+	"sync"
+	"unicode/utf8"
+
 	"github.com/bakape/meguca/imager"
 	"github.com/bakape/meguca/websockets/feeds"
 	"github.com/go-playground/log"
-	"math"
-	"os"
-	"path/filepath"
-	"sync"
-	"unicode/utf8"
 
 	"github.com/bakape/meguca/common"
 	"github.com/bakape/meguca/config"
@@ -253,7 +252,7 @@ func (c *Client) closePost() (err error) {
 			}
 		}
 	}
-	claudeOk := true
+	//claudeOk := true
 	//if claude != nil {
 	//	claudeOk = db.CheckIfClaudeAllowed(c.ip)
 	//	if !claudeOk {
@@ -275,51 +274,54 @@ func (c *Client) closePost() (err error) {
 	if err != nil {
 		return
 	}
-	if claude != nil && claudeOk {
-		//Include thumbnail of post
-		id := c.post.id
-		feed := c.feed
+	if cid == 0 {
 
-		var img common.ImageCommon
-		var image *[]byte = nil
-		img, err = db.GetImageByPost(id)
-		var ext string
-		if err == nil {
-			var file string
-			if img.Size < 20e6 && (img.FileType == common.PNG || img.FileType == common.JPEG || img.FileType == common.WEBP) {
-				file = fmt.Sprintf("images/src/%s.%s", img.SHA1, common.Extensions[img.FileType])
-				ext = common.Extensions[img.FileType]
-			} else {
-				file = filepath.Join("images/thumb/", img.SHA1+".webp")
-				ext = common.Extensions[common.WEBP]
-			}
-			//imgSha1, err := db.GetPostSha1(id)
-			//if err == nil && imgSha1 != nil {
-			//
-			fileData, err := os.ReadFile(file)
-			if err == nil {
-				image = &fileData
-			}
-			if ext == "jpg" {
-				ext = "jpeg"
-			}
-		} else {
-			err = nil
-			image = nil
-		}
-		//}
-		go GeminiStreamMessages(&DefaultSystemPrompt, claude, image, &ext, func() {
-			claude.Status = common.Generating
-			db.UpdateClaude(cid, claude)
-		}, func(token string) {
-			log.Info("Token: ", token)
-			feed.SendClaudeToken(id, token)
-		}, func() {
-			isError := claude.Status == common.Error
-			feed.SendClaudeComplete(id, isError, &claude.Response)
-			db.UpdateClaude(cid, claude)
-		})
 	}
+	// if claude != nil && claudeOk {
+	// 	//Include thumbnail of post
+	// 	id := c.post.id
+	// 	feed := c.feed
+
+	// 	var img common.ImageCommon
+	// 	var image *[]byte = nil
+	// 	img, err = db.GetImageByPost(id)
+	// 	var ext string
+	// 	if err == nil {
+	// 		var file string
+	// 		if img.Size < 20e6 && (img.FileType == common.PNG || img.FileType == common.JPEG || img.FileType == common.WEBP) {
+	// 			file = fmt.Sprintf("images/src/%s.%s", img.SHA1, common.Extensions[img.FileType])
+	// 			ext = common.Extensions[img.FileType]
+	// 		} else {
+	// 			file = filepath.Join("images/thumb/", img.SHA1+".webp")
+	// 			ext = common.Extensions[common.WEBP]
+	// 		}
+	// 		//imgSha1, err := db.GetPostSha1(id)
+	// 		//if err == nil && imgSha1 != nil {
+	// 		//
+	// 		fileData, err := os.ReadFile(file)
+	// 		if err == nil {
+	// 			image = &fileData
+	// 		}
+	// 		if ext == "jpg" {
+	// 			ext = "jpeg"
+	// 		}
+	// 	} else {
+	// 		err = nil
+	// 		image = nil
+	// 	}
+	// 	//}
+	// 	go GeminiStreamMessages(&DefaultSystemPrompt, claude, image, &ext, func() {
+	// 		claude.Status = common.Generating
+	// 		db.UpdateClaude(cid, claude)
+	// 	}, func(token string) {
+	// 		log.Info("Token: ", token)
+	// 		feed.SendClaudeToken(id, token)
+	// 	}, func() {
+	// 		isError := claude.Status == common.Error
+	// 		feed.SendClaudeComplete(id, isError, &claude.Response)
+	// 		db.UpdateClaude(cid, claude)
+	// 	})
+	// }
 	c.post = openPost{}
 	return
 }
