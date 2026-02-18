@@ -6,7 +6,9 @@ toolchain go1.24.2
 
 replace github.com/Sirupsen/logrus => github.com/sirupsen/logrus v1.4.0
 
-replace github.com/bakape/thumbnailer/v2 => github.com/meowmin/thumbnailer/v2 v2.0.7
+replace github.com/bakape/thumbnailer/v2 => github.com/AlagarElleshar/thumbnailer/v2 v2.0.9
+
+//replace github.com/bakape/thumbnailer/v2 => ../go-local/thumbnailer
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
@@ -23,7 +25,7 @@ require (
 	github.com/go-playground/log v6.3.0+incompatible
 	github.com/gorilla/websocket v1.5.3
 	github.com/lib/pq v1.10.9
-	github.com/linxGnu/grocksdb v1.10.1
+	github.com/linxGnu/grocksdb v1.10.0
 	github.com/oschwald/geoip2-golang v1.11.0
 	github.com/rakyll/statik v0.1.7
 	github.com/rivo/uniseg v0.4.7

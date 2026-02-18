@@ -9,8 +9,8 @@ ifeq ($(UNAME_S),Darwin)
 	ROCKSDB_CFLAGS := $(shell pkg-config --cflags-only-I liblz4 libzstd) -I/opt/homebrew/opt/snappy/include
 	ROCKSDB_LDFLAGS := $(shell pkg-config --libs-only-L liblz4 libzstd) -L/opt/homebrew/opt/snappy/lib
 	WEBP_CFLAGS = $(shell pkg-config --cflags libwebp)
-    WEBP_LDFLAGS = $(shell pkg-config --libs-only-L libwebp)
-    GO_BUILD_TAGS = -tags "libsqlite3"
+	WEBP_LDFLAGS = $(shell pkg-config --libs-only-L libwebp)
+	GO_BUILD_TAGS = -tags "libsqlite3"
 endif
 
 ifeq ($(UNAME_S),Linux)
@@ -19,8 +19,14 @@ ifeq ($(UNAME_S),Linux)
 	ROCKSDB_LDFLAGS := -L/lib -lrocksdb -lstdc++ -lm -lz -lsnappy -llz4 -lzstd -lbz2
 	MINE_LDFLAGS_NATIVE := -l:libavcodec.a -l:libavutil.a -l:libavformat.a -l:libswscale.a
 	WEBP_CFLAGS = $(shell pkg-config --cflags libwebp)
-    WEBP_LDFLAGS = $(shell pkg-config --libs-only-L libwebp)
-    GO_BUILD_TAGS = -tags "libsqlite3 linux"
+	WEBP_LDFLAGS = $(shell pkg-config --libs-only-L libwebp)
+	GO_BUILD_TAGS = -tags "libsqlite3 linux"
+endif
+
+ifeq ($(UNAME_S),Linux)
+	ROCKSDB_CFLAGS_LOCAL := -Wno-error=discarded-qualifiers -I/usr/include/
+	ROCKSDB_LDFLAGS_LOCAL := -L/usr/lib64 -lrocksdb -lstdc++ -lm -lz -lsnappy -llz4 -lzstd -lbz2
+	MINE_LDFLAGS_NATIVE_LOCAL := -lavcodec -lavutil -lavformat -lswscale
 endif
 
 .PHONY: client server imager test
@@ -70,3 +76,9 @@ test_no_race:
 test_docker:
 	docker-compose build
 	docker-compose run --rm -e CI=true meguca make test
+
+local: client local_server
+
+local_server: proto_server
+	go generate
+	CGO_CFLAGS="$(ROCKSDB_CFLAGS_LOCAL) $(WEBP_CFLAGS)" CGO_LDFLAGS="$(ROCKSDB_LDFLAGS_LOCAL) $(WEBP_LDFLAGS) $(MINE_LDFLAGS_NATIVE_LOCAL)" go build -v $(GO_BUILD_TAGS)
