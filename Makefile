@@ -15,12 +15,12 @@ endif
 
 ifeq ($(UNAME_S),Linux)
 	#$(HOME)/dockerfun/grocksdb-1.10.1/include
-	ROCKSDB_CFLAGS := -Wno-error=discarded-qualifiers -I/include
-	ROCKSDB_LDFLAGS := -L/lib -lrocksdb -lstdc++ -lm -lz -lsnappy -llz4 -lzstd -lbz2
-	MINE_LDFLAGS_NATIVE := -l:libavcodec.a -l:libavutil.a -l:libavformat.a -l:libswscale.a
+	ROCKSDB_CFLAGS := -Wno-error=discarded-qualifiers -I/$(HOME)/grocksdb-1.10.1/dist/linux_amd64/include
+	ROCKSDB_LDFLAGS := -L/$(HOME)/grocksdb-1.10.1/dist/linux_amd64/lib -lrocksdb -lstdc++ -lm -lz -lsnappy -llz4 -lzstd -lbz2
+	MINE_LDFLAGS_NATIVE := -lavcodec -lavutil -lavformat -lswscale -lopenjp2 -llzma
 	WEBP_CFLAGS = $(shell pkg-config --cflags libwebp)
-	WEBP_LDFLAGS = $(shell pkg-config --libs-only-L libwebp)
-	GO_BUILD_TAGS = -tags "libsqlite3 linux"
+    WEBP_LDFLAGS = $(shell pkg-config --libs-only-L libwebp)
+    GO_BUILD_TAGS = -tags "libsqlite3 linux"
 endif
 
 ifeq ($(UNAME_S),Linux)
