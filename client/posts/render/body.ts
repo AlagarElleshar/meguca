@@ -535,16 +535,6 @@ function parseURL(bit: string): string {
       bit = escape(bit);
       return bit.link(bit);
     }
-    if (bit.startsWith("https://pull") && bit.includes(".flv")) {
-      const link = newTabLink(bit, bit);
-      const attrs = {
-        type: "button",
-        class: "live-button",
-        "data-live-url": bit,
-        onclick: "playButtonClicked('" + bit + "')",
-      };
-      return `${link}<button ${makeAttrs(attrs)}>􀊄</button>`;
-    }
     return newTabLink(bit, bit);
   } catch (e) {
     return escape(bit);
