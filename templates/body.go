@@ -574,17 +574,19 @@ func (c *bodyContext) parseURL(bit string) {
 		c.string(`">`)
 		c.string(s)
 		c.string(`</a>`)
-	case strings.HasPrefix(s, "https://pull") && strings.Contains(s, ".flv"):
-		c.newTabLink(s, s)
-		attrs := map[string]string{
-			"type":          "button",
-			"class":         "live-button",
-			"data-live-url": bit,
-			"onclick":       "playButtonClicked('" + bit + "')",
-		}
-		c.string("<button ")
-		writeAttrs(attrs, c)
-		c.string(">􀊄</button>")
+	/*
+		case strings.HasPrefix(s, "https://pull") && strings.Contains(s, ".flv"):
+			c.newTabLink(s, s)
+			attrs := map[string]string{
+				"type":          "button",
+				"class":         "live-button",
+				"data-live-url": bit,
+				"onclick":       "playButtonClicked('" + bit + "')",
+			}
+			c.string("<button ")
+			writeAttrs(attrs, c)
+			c.string(">􀊄</button>")
+	*/
 	default:
 		c.newTabLink(s, s)
 	}

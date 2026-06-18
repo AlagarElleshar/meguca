@@ -1,4 +1,5 @@
-import {importTemplate} from "../util";
+/*
+import { importTemplate } from "../util";
 import Mpegts from "mpegts.js";
 
 let mpegts : typeof Mpegts = null;
@@ -85,3 +86,4 @@ export default function initFlvPlayer() {
     (window as any).playLive = playLive;
 }
 
+*/
