@@ -79,9 +79,9 @@ var (
 type bodyContext struct {
 	index bool     // Rendered for an index page
 	state struct { // Body parser state
-		spoiler, quote, code, bold, italic, red, blue, rbText, pyu bool
-		successiveNewlines                                         uint
-		iDice                                                      int
+		spoiler, quote, reversequote, code, bold, italic, red, blue, rbText, pyu bool
+		successiveNewlines                                                       uint
+		iDice                                                                    int
 	}
 	common.Post
 	OP    uint64
@@ -159,6 +159,10 @@ func streambody(
 			c.string("<em>")
 			c.state.quote = true
 		}
+		if l[0] == '<' {
+			c.string("<span class=\"orange\">")
+			c.state.reversequote = true
+		}
 		if c.state.spoiler {
 			c.string("<del>")
 		}
@@ -191,6 +195,9 @@ func streambody(
 		}
 		if c.state.spoiler {
 			c.string("</del>")
+		}
+		if c.state.reversequote {
+			c.string("</span>")
 		}
 		if c.state.quote {
 			c.string("</em>")

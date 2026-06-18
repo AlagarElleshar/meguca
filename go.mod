@@ -25,7 +25,7 @@ require (
 	github.com/go-playground/log v6.3.0+incompatible
 	github.com/gorilla/websocket v1.5.3
 	github.com/lib/pq v1.10.9
-	github.com/linxGnu/grocksdb v1.10.0
+	github.com/linxGnu/grocksdb v1.10.1
 	github.com/oschwald/geoip2-golang v1.11.0
 	github.com/rakyll/statik v0.1.7
 	github.com/rivo/uniseg v0.4.7
