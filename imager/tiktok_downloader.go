@@ -4,9 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/bakape/meguca/common"
-	"github.com/go-playground/log"
-	"golang.org/x/text/unicode/norm"
 	"io"
 	"net/http"
 	"net/url"
@@ -17,6 +14,10 @@ import (
 	"sync"
 	"time"
 	"unicode"
+
+	"github.com/bakape/meguca/common"
+	"github.com/go-playground/log"
+	"golang.org/x/text/unicode/norm"
 )
 
 type TWMTikTokData struct {
@@ -244,7 +245,7 @@ func GetTikTokMetadata(input string) (tokData *TWMTikTokData, err error) {
 	return
 }
 
-func runYtDlp(tokID, tempFilename string) (int64, error) {
+func runYtDlpTiktok(tokID, tempFilename string) (int64, error) {
 	// Format the target URL using the token data
 	url := fmt.Sprintf("https://www.tiktok.com/@/video/%s", tokID)
 
@@ -264,7 +265,91 @@ func runYtDlp(tokID, tempFilename string) (int64, error) {
 	// Return the size in bytes
 	return info.Size(), nil
 }
+
+func isInstagramInput(input string) (string, bool) {
+	input = strings.TrimSpace(input)
+	input = strings.TrimRight(input, "/")
+
+	// Already a full Instagram URL
+	if strings.Contains(strings.ToLower(input), "instagram.com") {
+		return input, true
+	}
+
+	// Last path component if someone pasted "p/DaQD2-AM2N7"
+	parts := strings.Split(input, "/")
+	shortcode := parts[len(parts)-1]
+	fmt.Println("extracted shortcode", shortcode)
+
+	// Instagram shortcodes are typically 11 characters
+	if len(shortcode) == 11 {
+		return "https://www.instagram.com/p/" + shortcode + "/", true
+	} else {
+		fmt.Println("length doesn't match")
+	}
+
+	return "", false
+}
+
+// Absolutely redundant code
+func runYtDlpInstagram(instaID, tempFilename string) (int64, error) {
+	// Format the target URL using the token data
+	fmt.Println("instaID", instaID)
+	url := fmt.Sprintf("https://www.instagram.com/p/%s/", instaID)
+
+	// Run yt-dlp and capture combined stdout/stderr
+	cmd := exec.Command("yt-dlp", url, "-o", tempFilename)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return 0, fmt.Errorf("yt-dlp error: %w, output: %s", err, output)
+	}
+
+	// Stat the file to get its size
+	info, err := os.Stat(tempFilename)
+	if err != nil {
+		return 0, fmt.Errorf("could not stat output file: %w", err)
+	}
+
+	// Return the size in bytes
+	return info.Size(), nil
+}
+
+// This would to be redundant with proper control flow
+func DownloadInstagram(instagramUrl string, input *common.PostCommand) (token string, filename string, err error) {
+	fmt.Println("passed instagramurl", instagramUrl)
+	parts := strings.Split(instagramUrl, "/")
+	fmt.Println("parts tab", parts)
+	shortcode := parts[len(parts)-2]
+	tmpFilename := fmt.Sprintf("tmp/%s.mp4", shortcode)
+	fmt.Println("passed shortcode", shortcode)
+	size, err := runYtDlpInstagram(shortcode, tmpFilename)
+	if err != nil {
+		defer os.Remove(tmpFilename)
+		return
+	}
+	tmpFile, err := os.Open(tmpFilename)
+	defer tmpFile.Close()
+	log.Info("Rotation: ", input.Rotation)
+	if input.Rotation > 0 {
+		rotateVideoFile(tmpFilename, input.Rotation)
+	}
+	if err != nil {
+		return
+	}
+	filename = shortcode
+	res := <-requestThumbnailing(tmpFile, filename, int(size), &shortcode)
+	if res.err != nil {
+		err = res.err
+		return
+	}
+	return res.imageID, filename, nil
+
+}
+
 func DownloadTikTok(input *common.PostCommand) (token string, filename string, err error) {
+	//Really bad code because I don't know how control flow works in go
+	if instagramURL, ok := isInstagramInput(input.Input); ok {
+		return DownloadInstagram(instagramURL, input)
+	}
 	twmMutex.Lock()
 	twmRequestChannel <- input
 	tokData := <-twmResponseChannel
@@ -288,7 +373,7 @@ func DownloadTikTok(input *common.PostCommand) (token string, filename string, e
 	//		log.Error(err)
 	//	}
 	//}
-	size, err := runYtDlp(tokData.ID, tmpFilename)
+	size, err := runYtDlpTiktok(tokData.ID, tmpFilename)
 	if err != nil {
 		defer os.Remove(tmpFilename)
 		return
