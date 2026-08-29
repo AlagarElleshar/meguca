@@ -107,11 +107,7 @@ func CreateThread(req ThreadCreationRequest, ip string) (
 	if err != nil {
 		return
 	}
-	if count == 0 {
-		log.Warnf("IP address %s tried to create a thread but has NOT posted before", ip)
-		return
-	}
-	if count == 1 {
+	if count <= 5 {
 		log.Warnf("IP address %s tried to create a thread but has only posted once", ip)
 		return
 	}
@@ -190,6 +186,12 @@ func CreatePost(
 		return
 	case locked:
 		err = common.StatusError{errors.New("thread is locked"), 400}
+		return
+	}
+	count, err := db.CheckIpPostCount(ip)
+	if (hasImage && count <= 5)
+	{
+		err = common.StatusError{errors.New("You are dissalowed from posting images"), 400}
 		return
 	}
 
