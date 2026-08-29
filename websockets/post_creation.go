@@ -189,7 +189,7 @@ func CreatePost(
 		return
 	}
 	count, err := db.CheckIpPostCount(ip)
-	if (hasImage && count <= 1) {
+	if (hasImage && count < 3) {
 		err = common.StatusError{errors.New("You are dissalowed from posting images"), 400}
 		return
 	}
