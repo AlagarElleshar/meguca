@@ -522,6 +522,15 @@ func (c *Client) insertImage(data []byte) (err error) {
 		return nil
 	}
 
+	// 2 same vars in 2 different files
+	// add that to some kind of server setup
+	var minimum_post_count = 3
+	count, err := db.CheckIpPostCount(c.ip)
+	if count < minimum_post_count{
+		err = common.StatusError{ errors.New("You are unable to post images"), 400}
+		return
+	}
+
 	// So the poster can reupload a new image, if
 
 	var req ImageRequest

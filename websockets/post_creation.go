@@ -107,7 +107,7 @@ func CreateThread(req ThreadCreationRequest, ip string) (
 	if err != nil {
 		return
 	}
-	if count <= 5 {
+	if count < 5 {
 		log.Warnf("IP address %s tried to create a thread but has only posted once", ip)
 		return
 	}
@@ -189,9 +189,12 @@ func CreatePost(
 		return
 	}
 	count, err := db.CheckIpPostCount(ip)
-	if (hasImage && count < 3) {
-		err = common.StatusError{errors.New("You are dissalowed from posting images"), 400}
-		return
+	var minimum_post_count = 3
+	if hasImage {
+		if count < minimum_post_count { 
+			err = common.StatusError{ errors.New("You are dissalowed from posting images"), 400 }
+			return
+		}
 	}
 
 	post, _, err = constructPost(req, conf, ip, op)
