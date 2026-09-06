@@ -33,6 +33,9 @@ endif
 
 all: client server
 
+statik:
+	go generate ./static
+
 client: client_deps proto_client
 	node esbuild.config.js --css --js
 
@@ -78,6 +81,8 @@ test_docker:
 	docker-compose run --rm -e CI=true meguca make test
 
 local: client local_server
+
+local_extra: clean statik local
 
 local_server: proto_server
 	go generate
