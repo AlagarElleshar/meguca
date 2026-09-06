@@ -20,6 +20,10 @@
 			"Anonymise",
 			"Display all posters as anonymous"
 		],
+		"arrowKeysNavigate": [
+			"Arrow keys navigation",
+			"Navigate to the next or previous post using the arrow keys"
+		],
 		"audioVolume": [
 			"Audio volume",
 			"Volume of audio in music and video players."
@@ -51,6 +55,14 @@
 		"body": [
 			"Body",
 			"Text body of the post"
+		],
+		"bunkerMode": [
+			"Bunker mode",
+			"Switch for activating global bunker mode on the server"
+		],
+		"bunkerModeMinimumPosts": [
+			"Bunker mode minimum posts",
+			"The amount of posts required before you can post an image to the server (by ip)"
 		],
 		"captcha": [
 			"Captcha",
@@ -196,10 +208,6 @@
 			"Image Hover Expansion",
 			"Display image previews on hover"
 		],
-		"arrowKeysNavigate": [
-			"Arrow keys navigation",
-			"Navigate to the next or previous post using the arrow keys"
-		],
 		"imageRootOverride": [
 			"Image root override",
 			"If you wish to host images from a separate location like a CDN, enter the full root address here. Leave empty to use the default address. Example: 'https://images.meguca.org'"
@@ -264,13 +272,13 @@
 			"Moderators",
 			"Moderator account IDs. Moderators can delete posts, ban posters and distinguish posters by their mnemonic IDs."
 		],
-		"nekoTVShortcut": [
-			"NekoTV",
-			"Plays synchronized videos for all users"
-		],
 		"name": [
 			"Name",
 			"Name to attach to new posts"
+		],
+		"nekoTVShortcut": [
+			"NekoTV",
+			"Plays synchronized videos for all users"
 		],
 		"newPassword": [
 			"New password",
@@ -315,10 +323,6 @@
 		"pruneBoards": [
 			"Prune boards",
 			"Delete boards that have not had any new posts for N days"
-		],
-		"pruneThreads": [
-			"Prune threads",
-			"Delete threads that have not had any posts in N days"
 		],
 		"pyu": [
 			"Slut enabler",
@@ -428,20 +432,20 @@
 			"",
 			"Image to use as the background"
 		],
-		"volumeUp": [
-			"Volume Up",
-			"Increase media volume"
-		],
 		"volumeDown": [
 			"Volume Down",
 			"Decrease media volume"
+		],
+		"volumeUp": [
+			"Volume Up",
+			"Increase media volume"
 		],
 		"watchThreadsOnReply": [
 			"Watch threads on reply",
 			"Automatically add thread to watched threads on reply"
 		],
 		"webmHover": [
-			"WebM Hover Expansion",
+			"WebM Hover Expansion KURWA",
 			"Display WebM previews on hover. Requires Image Hover Expansion enabled."
 		],
 		"workMode": [

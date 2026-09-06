@@ -20,6 +20,10 @@
 			"Анонимизация",
 			"Отображать всех постеров анонимами"
 		],
+		"arrowKeysNavigate": [
+			"Arrow keys navigation",
+			"Navigate to the next or previous post using the arrow keys"
+		],
 		"audioVolume": [
 			"Audio volume",
 			"Volume of audio in music and video players"
@@ -51,6 +55,14 @@
 		"body": [
 			"Body",
 			"Text body of the post"
+		],
+		"bunkerMode": [
+			"Bunker mode",
+			"Switch for activating global bunker mode on the server"
+		],
+		"bunkerModeMinimumPosts": [
+			"Bunker mode minimum posts",
+			"The amount of posts required before you can post an image to the server (by ip)"
 		],
 		"captcha": [
 			"Капча",
@@ -264,6 +276,10 @@
 			"Имя",
 			"Отображать имя у новых постов"
 		],
+		"nekoTVShortcut": [
+			"NekoTV",
+			"Plays synchronized videos for all users"
+		],
 		"newPassword": [
 			"Новый пароль",
 			""
@@ -307,10 +323,6 @@
 		"pruneBoards": [
 			"Автоочистка досок",
 			"Удалять доски на которых давно не было постов"
-		],
-		"pruneThreads": [
-			"Автоочистка тредов",
-			"Удалять треды в которых давно не было постов"
 		],
 		"pyu": [
 			"Slut enabler",
@@ -419,6 +431,14 @@
 		"userBGImage": [
 			"",
 			"Фоновое изображение"
+		],
+		"volumeDown": [
+			"Volume Down",
+			"Decrease media volume"
+		],
+		"volumeUp": [
+			"Volume Up",
+			"Increase media volume"
 		],
 		"watchThreadsOnReply": [
 			"Watch threads on reply",

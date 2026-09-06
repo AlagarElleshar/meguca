@@ -55,6 +55,7 @@ var (
 		ImageScore:        15000,
 		EmailErrPort:      587,
 		Salt:              "LALALALALALALALALALALALALALALALALALALALA",
+		BunkerModeMinimumPosts: 3,
 		EmailErrMail:      "admin@email.com",
 		EmailErrPass:      "sluts",
 		EmailErrSub:       "smtp.gmail.com",

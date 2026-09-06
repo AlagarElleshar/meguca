@@ -20,6 +20,10 @@
 			"Anonymiser",
 			"Cache le nom de tous les utilisateurs"
 		],
+		"arrowKeysNavigate": [
+			"Arrow keys navigation",
+			"Navigate to the next or previous post using the arrow keys"
+		],
 		"audioVolume": [
 			"Audio volume",
 			"Volume du son pour musique et lecteur vidéo"
@@ -51,6 +55,14 @@
 		"body": [
 			"Message",
 			"Votre message"
+		],
+		"bunkerMode": [
+			"Bunker mode",
+			"Switch for activating global bunker mode on the server"
+		],
+		"bunkerModeMinimumPosts": [
+			"Bunker mode minimum posts",
+			"The amount of posts required before you can post an image to the server (by ip)"
 		],
 		"captcha": [
 			"Captcha",
@@ -264,6 +276,10 @@
 			"Nom",
 			"Nom à joindre au message"
 		],
+		"nekoTVShortcut": [
+			"NekoTV",
+			"Plays synchronized videos for all users"
+		],
 		"newPassword": [
 			"Nouveau mot de passe",
 			""
@@ -307,10 +323,6 @@
 		"pruneBoards": [
 			"Suppr. auto des planches",
 			"Supprime automatiquement les planches sans nouveaux messages depuis un certain nombre de jours"
-		],
-		"pruneThreads": [
-			"Suppr. auto des sujets",
-			"Supprime automatiquement les sujets sans nouveaux messages depuis un certain nombre de jours"
 		],
 		"pyu": [
 			"Slut enabler",
@@ -419,6 +431,14 @@
 		"userBGImage": [
 			"",
 			"Image à utiliser en guise que fond"
+		],
+		"volumeDown": [
+			"Volume Down",
+			"Decrease media volume"
+		],
+		"volumeUp": [
+			"Volume Up",
+			"Increase media volume"
 		],
 		"watchThreadsOnReply": [
 			"Watch threads on reply",

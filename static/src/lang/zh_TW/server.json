@@ -20,6 +20,10 @@
 			"匿名化",
 			"將所有發文者顯示為匿名"
 		],
+		"arrowKeysNavigate": [
+			"Arrow keys navigation",
+			"Navigate to the next or previous post using the arrow keys"
+		],
 		"audioVolume": [
 			"音量",
 			"音樂和影片播放器中的音量。"
@@ -51,6 +55,14 @@
 		"body": [
 			"內文",
 			"貼文的內文"
+		],
+		"bunkerMode": [
+			"Bunker mode",
+			"Switch for activating global bunker mode on the server"
+		],
+		"bunkerModeMinimumPosts": [
+			"Bunker mode minimum posts",
+			"The amount of posts required before you can post an image to the server (by ip)"
 		],
 		"captcha": [
 			"驗證碼",
@@ -264,6 +276,10 @@
 			"名稱",
 			"要附加到新貼文的名稱"
 		],
+		"nekoTVShortcut": [
+			"NekoTV",
+			"Plays synchronized videos for all users"
+		],
 		"newPassword": [
 			"新密碼",
 			""
@@ -307,10 +323,6 @@
 		"pruneBoards": [
 			"刪除看板",
 			"刪除沒有新貼文達 N 天的看板"
-		],
-		"pruneThreads": [
-			"刪除討論串",
-			"刪除沒有任何貼文達 N 天的討論串"
 		],
 		"pyu": [
 			"蕩婦啟動器",
@@ -419,6 +431,14 @@
 		"userBGImage": [
 			"",
 			"用作背景的圖片"
+		],
+		"volumeDown": [
+			"Volume Down",
+			"Decrease media volume"
+		],
+		"volumeUp": [
+			"Volume Up",
+			"Increase media volume"
 		],
 		"watchThreadsOnReply": [
 			"在回覆時關注討論串",

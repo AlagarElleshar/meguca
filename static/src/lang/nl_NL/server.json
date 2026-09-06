@@ -20,6 +20,10 @@
 			"Anonimiseren",
 			"Toon alle posts als anoniem"
 		],
+		"arrowKeysNavigate": [
+			"Arrow keys navigation",
+			"Navigate to the next or previous post using the arrow keys"
+		],
 		"audioVolume": [
 			"Audio volume",
 			"Volume van audio in muziek- en videospelers."
@@ -51,6 +55,14 @@
 		"body": [
 			"Body",
 			"Text body van de post"
+		],
+		"bunkerMode": [
+			"Bunker mode",
+			"Switch for activating global bunker mode on the server"
+		],
+		"bunkerModeMinimumPosts": [
+			"Bunker mode minimum posts",
+			"The amount of posts required before you can post an image to the server (by ip)"
 		],
 		"captcha": [
 			"Captcha",
@@ -264,6 +276,10 @@
 			"Naam",
 			"Naam die aan nieuwe berichten moet worden toegevoegd"
 		],
+		"nekoTVShortcut": [
+			"NekoTV",
+			"Plays synchronized videos for all users"
+		],
 		"newPassword": [
 			"Niewe wachtwoord",
 			""
@@ -307,10 +323,6 @@
 		"pruneBoards": [
 			"Boards uitwissen",
 			"Verwijder borden die N dagen geen nieuwe berichten hebben gehad"
-		],
-		"pruneThreads": [
-			"Topics uitwissen",
-			"Verwijder topics die gedurende N dagen geen berichten hebben gehad"
 		],
 		"pyu": [
 			"Slet enabler",
@@ -419,6 +431,14 @@
 		"userBGImage": [
 			"",
 			"Afbeelding om te gebruiken als achtergrond."
+		],
+		"volumeDown": [
+			"Volume Down",
+			"Decrease media volume"
+		],
+		"volumeUp": [
+			"Volume Up",
+			"Increase media volume"
 		],
 		"watchThreadsOnReply": [
 			"Bekijk topics op replies",

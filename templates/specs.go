@@ -204,6 +204,17 @@ var specs = map[string][]inputSpec{
 			ID:   "salt",
 			Type: _string,
 		},
+		{
+			ID:   "bunkerMode",
+			//Should activate or deactivate the bunker mode
+		},
+		{
+			ID:       "bunkerModeMinimumPosts",
+			Type:     _number,
+			Min:      0,
+			Required: true,
+			//Posts required before you can attach an image
+		},
 		{ID: "captcha"},
 		{
 			ID:   "captchaTags",

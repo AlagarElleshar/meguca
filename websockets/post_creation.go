@@ -6,12 +6,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/go-playground/log"
 	"math/rand"
 	"strings"
 	"sync"
 	"time"
 	"unicode/utf8"
+
+	"github.com/go-playground/log"
 
 	"github.com/bakape/meguca/auth"
 	"github.com/bakape/meguca/common"
@@ -188,12 +189,14 @@ func CreatePost(
 		err = common.StatusError{errors.New("thread is locked"), 400}
 		return
 	}
-	count, err := db.CheckIpPostCount(ip)
-	var minimum_post_count = 3
-	if hasImage {
-		if count < minimum_post_count { 
-			err = common.StatusError{ errors.New("You are dissalowed from posting images"), 400 }
-			return
+	if (config.Get().BunkerMode){
+		var minimum_post_count = config.Get().BunkerModeMinimumPosts
+		count, _ := db.CheckIpPostCount(ip)
+		if hasImage {
+			if uint(count) < minimum_post_count {
+				err = common.StatusError{errors.New("You are disallowed from posting images"), 400}
+				return
+			}
 		}
 	}
 

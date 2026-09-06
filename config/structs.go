@@ -18,6 +18,8 @@ type Configs struct {
 	ImageScore          uint   `json:"imageScore"`
 	RootURL             string `json:"rootURL"`
 	Salt                string `json:"salt"`
+	BunkerMode					bool   `json:"bunkerMode"`
+	BunkerModeMinimumPosts	uint	`json:"bunkerModeMinimumPosts"`
 	EmailErrMail        string `json:"emailErrMail"`
 	EmailErrPass        string `json:"emailErrPass"`
 	EmailErrSub         string `json:"emailErrSub"`
