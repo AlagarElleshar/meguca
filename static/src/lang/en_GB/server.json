@@ -484,7 +484,29 @@
 		"banPage": [
 			"You have been banned from /%s/ by %s for the following reason:",
 			"Your ban will expire on %s or in %s.",
-			"According to our server, your IP is %s."
+			"According to our server, your IP is %s.",
+			"Please take this moment to read our ToS:",
+			"Terms of Service",
+			"Effective Date: NOW",
+			"These Terms of Service (the Terms) are a binding agreement between Geckochen (we, us, or our) and you (you or your) governing your access to and use of Geckochen, our website at Geckochen.lol, and any related applications, features, and content (collectively, the Service).",
+			"By using this website, you agree to these Terms. If you do not agree to these Terms, do not access or use the Service.",
+			"1. Eligibility",
+			"You must be at least 3³ years old, or the age of majority in your jurisdiction if higher, to use the Service. By using the Service, you represent and warrant that you meet this requirement, that you have the legal capacity to enter into these Terms.",
+			"3. License to Use the Service",
+			"Subject to your compliance with these Terms, we grant you a limited, non-exclusive, non-transferable, non-sublicensable, revocable license to access and use the Service for the purposes permitted by these Terms.",
+			"4. Acceptable Use and Prohibited Conduct",
+			"You agree not to, inter alia, use the Service to:",
+			"・ violate any applicable thread rule or regulation, or infringe the grandfathered rights of any oldgecko,",
+			"・ be a nuisanceposter or otherwise interrupt the modus vivendi of the geckos,",
+			"・ make any comment, inflammatory or otherwise, that may cause the elderly geckos to have a reality check regarding the hereinsofar duration of their lives,",
+			"・ engage in conduct that is harassing, abusive, defamatory, obscene or otherwise objectionable regarding Bubble 'bolhasuco' Juice or her toks.",
+			"We may investigate any suspected violation and may suspend or terminate access at will for conduct we reasonably determine violates these Terms. ",
+			"5. Term, Suspension and Termination",
+			"These Terms remain in effect for as long as you use the Service. You may stop using the Service at any time by closing the tab.",
+			"We may suspend or terminate your access to the Service, in whole or in part, at any time if (a) you breach these Terms, or (b) it would be incredibly funny.",
+			"Ban appeals may be submitted upon payment of eight (8) monthly installments of one hundred U.S. dollars (US$100) each.",
+			"6. Indemnification",
+			"You agree to indemnify and hold harmless Geckochen and its posters, committee members, meguminers, and administrators from any claims, or liabilities arising out of or related to (a) your access of the Service, (b) your violation of these Terms, (c) damages to feelings, or (d) losses of arguments."
 		]
 	},
 	"ui": {
