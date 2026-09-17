@@ -36,6 +36,23 @@ func Redirect(id uint64, act common.ModerationAction, url string) (err error) {
 	})
 }
 
+func UpdateCookie(ip string, cookieType string) (err error) {
+	var cookieTypeInt int
+	switch cookieType {
+	case "whitelist":
+		cookieTypeInt = 1
+	case "blacklist":
+		cookieTypeInt = 2
+	default:
+		return
+	}
+	_, err = sq.Update("cookies").
+		Set("type", cookieTypeInt).
+		Where("ip = ?", ip).
+		Exec()
+	return
+}
+
 // Clear post contents and remove any uploaded image from the server
 func PurgePost(tx *sql.Tx, id uint64, by, reason string, by_ip bool) (
 	err error,

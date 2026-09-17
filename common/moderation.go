@@ -18,6 +18,7 @@ const (
 	LockThread
 	DeleteBoard
 	MeidoVision
+	CookieAdder
 	PurgePost
 	ShadowBinPost
 	RedirectIP
@@ -71,6 +72,7 @@ var ActionPrivilege = [...]ModerationLevel{
 	LockThread:        Moderator,
 	DeleteBoard:       BoardOwner,
 	MeidoVision:       Janitor,
+	CookieAdder:       Moderator,
 	PurgePost:         BoardOwner,
 	ShadowBinPost:     Moderator,
 	RedirectIP:        Admin,

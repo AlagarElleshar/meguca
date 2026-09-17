@@ -165,6 +165,7 @@ func createRouter() http.Handler {
 		api.POST("/configure-board/:board", configureBoard)
 		api.POST("/config", servePrivateServerConfigs)
 		api.POST("/configure-server", configureServer)
+		api.POST("/cookie-add/", addCookieToIP)
 		api.POST("/create-board", createBoard)
 		api.POST("/delete-board", deleteBoard)
 		api.POST("/notification", sendNotification)

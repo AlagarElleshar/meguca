@@ -153,6 +153,8 @@ func streampostModeration(qw *quicktemplate.Writer, e common.ModerationEntry) {
 		fmt.Fprintf(w, f["threadLockToggled"], action, e.By)
 	case common.MeidoVision:
 		fmt.Fprintf(w, f["viewedSameIP"], e.By)
+	case common.CookieAdder:
+		fmt.Fprintf(w, f["cookieAdder"], e.By)
 	case common.PurgePost:
 		fmt.Fprintf(w, f["purgedPost"], e.By, e.Data)
 	}

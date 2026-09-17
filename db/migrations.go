@@ -1728,6 +1728,17 @@ END;
 $$ LANGUAGE plpgsql;`)
 		return
 	},
+	func(tx *sql.Tx) (err error) {
+		return execAll(tx,
+			`create table if not exists cookies (
+				token bytea not null,
+				time timestamp with time zone not null default now(),
+				ip inet not null,
+				type smallint not null default 0,
+				primary key (token)
+			)`,
+		)
+	},
 }
 
 func createIndex(table string, columns ...string) string {

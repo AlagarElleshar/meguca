@@ -45,6 +45,14 @@ export default class ModPanel extends View<null> {
 
 		document.getElementById("meidovision").addEventListener("click", () => {
 			this.viewAllByIP();
+    });
+
+		document.getElementById("cookieadder-whitelist").addEventListener("click", () => {
+    this.addCookieToIP("whitelist");
+		});
+
+		document.getElementById("cookieadder-blacklist").addEventListener("click", () => {
+    this.addCookieToIP("blacklist");
 		});
 
 		if (position == ModerationLevel.admin) {
@@ -90,8 +98,16 @@ export default class ModPanel extends View<null> {
 		localStorage.setItem("hideModCheckboxes", (!on).toString());
 		this.setSlideOut(on);
 		checkboxStyler(on);
-	}
+  }
 
+	private async addCookieToIP(cookieType: "whitelist" | "blacklist") {
+		const checked = this.getChecked();
+		if (!checked) {
+			return;
+		}
+		const id = getClosestID(checked);
+		await this.postJSON(`/api/cookie-add/`, { id, type: cookieType });
+	}
 	// Create display of all posts made by selected post's author
 	private async viewAllByIP() {
 		const checked = this.getChecked();

@@ -178,6 +178,24 @@ func resetSpamScore(tx *sql.Tx, session auth.Base64Token) (err error) {
 	return
 }
 
+// CheckCookie checks the cookie of the client
+// returns type of the cookie
+func CheckCookie(session auth.Base64Token, ip string) (cookieType int, err error) {
+
+	err = sq.
+		Select("type").
+		From("cookies").
+		Where("token = ?", session[:]).
+		QueryRow().
+		Scan(&cookieType)
+	if err == sql.ErrNoRows {
+		//log.Info("No cookie found for session ", session, " ip ", ip)
+		return 0, nil
+	}
+	//log.Info("Cookie found for session ", session, " ip ", ip)
+	return cookieType, nil
+}
+
 // NeedCaptcha returns, if the user needs a captcha
 // to proceed with usage of server resources
 func NeedCaptcha(session auth.Base64Token, ip string) (need bool, err error) {
@@ -250,6 +268,23 @@ func expireSpamScores() error {
 		Where("score < ?", time.Now().Add(-spamDetectionThreshold).Unix()).
 		Exec()
 	return err
+}
+
+func InsertCookie(session auth.Base64Token, ip string) error {
+	return InTransaction(false, func(tx *sql.Tx) (err error) {
+		_, err = sq.Insert("cookies").
+			Columns("token", "ip").
+			Values(session[:], ip).
+			Suffix(
+				`on conflict (token) do
+				update set time = now()`,
+			).
+			Exec()
+		if err != nil {
+			return
+		}
+		return
+	})
 }
 
 // ValidateCaptcha with captcha backend

@@ -4,16 +4,18 @@ package server
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/bakape/meguca/pb"
-	"github.com/go-playground/log"
-	"google.golang.org/protobuf/proto"
 	"io"
 	"net/http"
 	"regexp"
 	"strconv"
 	"time"
+
+	"github.com/bakape/meguca/pb"
+	"github.com/go-playground/log"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/bakape/meguca/auth"
 	"github.com/bakape/meguca/common"
@@ -538,6 +540,43 @@ func extractID(r *http.Request) (uint64, error) {
 		err = common.StatusError{err, 400}
 	}
 	return id, err
+}
+
+// addCookieToIP adds a cookie to the IP as a blacklist or whitelist
+func addCookieToIP(w http.ResponseWriter, r *http.Request) {
+	err := func() (err error) {
+		var params struct {
+			ID   uint64 `json:"id"`
+			Type string `json:"type"`
+		}
+
+		err = json.NewDecoder(r.Body).Decode(&params)
+		if err != nil {
+			return err
+		}
+
+		var id = params.ID
+		var cookieType = params.Type
+		if cookieType != "blacklist" && cookieType != "whitelist" {
+			httpError(w, r, common.ErrInvalidInput("invalid type"))
+			return
+		}
+		_, _, err = canModeratePost(w, r, id, common.MeidoVision)
+		if err != nil {
+			return
+		}
+
+		ip, err := db.GetIP(id)
+		if err != nil {
+			return
+		}
+		log.Info("updating cookie for ip ", ip, " as ", cookieType)
+		err = db.UpdateCookie(ip, cookieType)
+		return
+	}()
+	if err != nil {
+		httpError(w, r, err)
+	}
 }
 
 // Retrieve posts with the same IP on the target board

@@ -56,6 +56,10 @@
 			"Body",
 			"Text body of the post"
 		],
+		"pruneThreads": [
+			"Prune threads",
+			"Switch for activating pruning threads on the server"
+		],
 		"bunkerMode": [
 			"Bunker mode",
 			"Switch for activating global bunker mode on the server"

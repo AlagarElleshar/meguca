@@ -21,6 +21,7 @@ export const enum ModerationAction {
   lockThread,
   deleteBoard,
   meidoVision,
+  cookieAdder,
   purgePost,
   shadowBinPost,
   redirectIP,

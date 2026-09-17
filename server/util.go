@@ -175,7 +175,7 @@ func assertNotBanned(w http.ResponseWriter, r *http.Request, board string,
 	}
 }
 
-// Extract URL paramater from request context
+// Extract URL parameter from request context
 func extractParam(r *http.Request, id string) string {
 	return httptreemux.ContextParams(r.Context())[id]
 }

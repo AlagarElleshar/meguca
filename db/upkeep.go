@@ -59,6 +59,8 @@ func runHalfTasks() {
 }
 
 func runHourTasks() {
+	expireBy("time < now() at time zone 'utc' + '-31 days'",
+		"cookies")
 	if config.Server.ImagerMode != config.ImagerOnly {
 		expireRows("sessions")
 		expireBy("created < now() at time zone 'utc' + '-7 days'",

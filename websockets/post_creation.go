@@ -108,7 +108,8 @@ func CreateThread(req ThreadCreationRequest, ip string) (
 	if err != nil {
 		return
 	}
-	if count < 5 {
+	var minimum_post_count = config.Get().BunkerModeMinimumPosts
+	if count < 5 || count < int(minimum_post_count) {
 		log.Warnf("IP address %s tried to create a thread but has only posted once", ip)
 		return
 	}
@@ -189,7 +190,7 @@ func CreatePost(
 		err = common.StatusError{errors.New("thread is locked"), 400}
 		return
 	}
-	if (config.Get().BunkerMode){
+	if config.Get().BunkerMode {
 		var minimum_post_count = config.Get().BunkerModeMinimumPosts
 		count, _ := db.CheckIpPostCount(ip)
 		if hasImage {
@@ -250,6 +251,28 @@ func (c *Client) insertPost(data []byte) (err error) {
 	}
 	if needCaptcha {
 		return c.sendMessage(common.MessageCaptcha, 0)
+	}
+
+	if config.Get().BunkerMode {
+		log.Info("Checking cookie for bunker mode ", c.ip)
+		var checkCookie int
+		checkCookie, err = db.CheckCookie(c.secretSession, c.ip)
+		if err != nil {
+			return
+		}
+		log.Info("Cookie type ", checkCookie)
+		switch checkCookie {
+		case 2:
+			log.Info("Cookie blacklisted ", c.ip)
+			return
+		case 0:
+			//#TODO here more logic for the uninitialized
+			if false {
+				return
+			}
+		default:
+
+		}
 	}
 
 	var req ReplyCreationRequest

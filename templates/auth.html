@@ -126,6 +126,8 @@ Renders a moderation log page
 						{%s ln.Common.UI["deleteBoard"] %}
 					{% case common.MeidoVision %}
 						{%s ln.Common.UI["meidoVisionPost"] %}
+					{% case common.CookieAdder %}
+						{%s ln.Common.UI["cookieAdderPost"] %}
 					{% case common.PurgePost %}
 						{%s ln.UI["purgePost"] %}
 					{% case common.RedirectIP %}

@@ -120,6 +120,8 @@
 		"markSeen": "Mark as seen",
 		"meidoVisionPost": "Meido vision",
 		"meidovisionTT": "View all posts from the same IP as the selected post",
+		"cookieAdderPost": "Cookie adder",
+		"cookieAdderTT": "Modify the cookie of the selected post",
 		"mustMatch": "Passwords must match",
 		"newThread": "New thread",
 		"pointToCatalog": "Point to Catalog",

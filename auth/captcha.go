@@ -63,6 +63,7 @@ func (b *Base64Token) EnsureCookie(
 	w http.ResponseWriter,
 	r *http.Request,
 ) (err error) {
+	var expiry_time = time.Now().Add(time.Hour * 24)
 	c, err := r.Cookie(CaptchaCookie)
 	switch err {
 	case nil:
@@ -83,9 +84,58 @@ func (b *Base64Token) EnsureCookie(
 			Name:     CaptchaCookie,
 			Value:    string(text),
 			Path:     "/",
-			Expires:  time.Now().Add(time.Hour * 24),
+			Expires:  expiry_time,
 			SameSite: http.SameSiteStrictMode,
 		})
+		return
+	default:
+		return fmt.Errorf("auth: reading cookie: %s", err)
+	}
+}
+
+// Ensure client has a cookieName cookie.
+// If yes, read it into b.
+// If not, generate new one and set it on the client.
+func (b *Base64Token) EnsureCookieSecret(
+	w http.ResponseWriter,
+	r *http.Request,
+	cookieName string,
+) (err error) {
+
+	/*var expiry_time = time.Now().Add(time.Hour * 24)
+	if len(cookieName) == 0 {
+		cookieName = []string{CaptchaCookie}
+	} else {
+		expiry_time = time.Now().Add(time.Hour * 24 * 30) // a monthly special cookie?
+	}*/
+	c, err := r.Cookie(cookieName)
+	//log.Printf("Cookie write request: %s", cookieName)
+	switch err {
+	case nil:
+		return b.UnmarshalText([]byte(c.Value))
+	case http.ErrNoCookie:
+		*b, err = NewBase64Token()
+		if err != nil {
+			return
+		}
+
+		/*
+			var text []byte
+			text, err = b.MarshalText()
+			if err != nil {
+				return
+			}
+			// Does not set the cookie for whatever god forsaken reason
+			http.SetCookie(w, &http.Cookie{
+				Name:     cookieName,
+				Value:    string(text),
+				Path:     "/",
+				Expires:  expiry_time,
+				SameSite: http.SameSiteStrictMode,
+			})
+			log.Printf("Writing cookie to the client: %s %s", cookieName[0],
+				string(text))
+		*/
 		return
 	default:
 		return fmt.Errorf("auth: reading cookie: %s", err)

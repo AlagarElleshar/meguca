@@ -425,6 +425,12 @@
 							<input type="button" id="meidovision" value="{%s= ln.Common.UI["submit"] %}">
 						</span>
 						<hr>
+      		            <span title="{%s= ln.Common.UI["cookieAdderTT"] %}">
+                            {%s= ln.Common.UI["cookieAdderPost"] + ": " %}
+                            <input type="button" id="cookieadder-whitelist" value="Whitelist">
+                            <input type="button" id="cookieadder-blacklist" value="Blacklist">
+						</span>
+						<hr>
 						{% if pos >= common.ActionPrivilege[common.RedirectIP] %}
 							<span  title="{%s= ln.Common.UI["redirectTT"] %}">
 								{%s= ln.Common.UI["redirectPoster"] + ": " %}

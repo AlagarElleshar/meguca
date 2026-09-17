@@ -78,6 +78,9 @@ type Client struct {
 	// Client IP
 	ip string
 
+	// Secret session used for additional moderation actions
+	secretSession auth.Base64Token
+
 	// Captcha completion session used for antispam
 	captchaSession auth.Base64Token
 
@@ -127,12 +130,38 @@ func Handler(w http.ResponseWriter, r *http.Request) (err error) {
 		return
 	}
 
+	var secret_name = "secret"
+	var secret auth.Base64Token
+	err = secret.EnsureCookieSecret(w, r, secret_name)
+	if err != nil {
+		return
+	}
+
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		return
 	}
 
-	c, err := newClient(conn, r, ip, session)
+	c, err := newClient(conn, r, ip, session, secret)
+	if err != nil {
+		return
+	}
+	var text []byte
+	text, err = secret.MarshalText()
+	err = c.sendMessage(
+		common.MessageSetCookie,
+		struct {
+			Key   string `json:"key"`
+			Value string `json:"value"`
+		}{
+			secret_name,
+			string(text),
+		},
+	)
+	if err != nil {
+		return
+	}
+	err = db.InsertCookie(secret, ip)
 	if err != nil {
 		return
 	}
@@ -145,12 +174,14 @@ func newClient(
 	req *http.Request,
 	ip string,
 	captchaSession auth.Base64Token,
+	secretSession auth.Base64Token,
 ) (
 	*Client, error,
 ) {
 	return &Client{
 		ip:             ip,
 		captchaSession: captchaSession,
+		secretSession:  secretSession,
 		close:          make(chan error, 2),
 		receive:        make(chan receivedMessage),
 		redirect:       make(chan string),
