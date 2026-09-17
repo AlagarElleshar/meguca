@@ -60,6 +60,10 @@
 			"Prune threads",
 			"Switch for activating pruning threads on the server"
 		],
+		"bunkerStrict": [
+			"Whitelist mode",
+			"Switch for activating global bunker mode that allows only whitelisted IPs to post"
+		],
 		"bunkerMode": [
 			"Bunker mode",
 			"Switch for activating global bunker mode on the server"
@@ -449,7 +453,7 @@
 			"Automatically add thread to watched threads on reply"
 		],
 		"webmHover": [
-			"WebM Hover Expansion KURWA",
+			"WebM Hover Expansion",
 			"Display WebM previews on hover. Requires Image Hover Expansion enabled."
 		],
 		"workMode": [

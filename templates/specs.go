@@ -205,7 +205,11 @@ var specs = map[string][]inputSpec{
 			Type: _string,
 		},
 		{
-			ID:   "bunkerMode",
+			ID: "bunkerMode",
+			//Should activate or deactivate the bunker mode
+		},
+		{
+			ID: "bunkerStrict",
 			//Should activate or deactivate the bunker mode
 		},
 		{

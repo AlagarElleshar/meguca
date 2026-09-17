@@ -267,7 +267,7 @@ func (c *Client) insertPost(data []byte) (err error) {
 			return
 		case 0:
 			//#TODO here more logic for the uninitialized
-			if false {
+			if config.Get().BunkerStrict {
 				return
 			}
 		default:
