@@ -254,16 +254,16 @@ func (c *Client) insertPost(data []byte) (err error) {
 	}
 
 	if config.Get().BunkerMode {
-		log.Info("Checking cookie for bunker mode ", c.ip)
+		//log.Info("Checking cookie for bunker mode ", c.ip)
 		var checkCookie int
 		checkCookie, err = db.CheckCookie(c.secretSession, c.ip)
 		if err != nil {
 			return
 		}
-		log.Info("Cookie type ", checkCookie)
+		//log.Info("Cookie type ", checkCookie)
 		switch checkCookie {
 		case 2:
-			log.Info("Cookie blacklisted ", c.ip)
+			//log.Info("Cookie blacklisted ", c.ip)
 			return
 		case 0:
 			//#TODO here more logic for the uninitialized
