@@ -179,21 +179,20 @@ func resetSpamScore(tx *sql.Tx, session auth.Base64Token) (err error) {
 }
 
 // CheckCookie checks the cookie of the client
-// returns type of the cookie
-func CheckCookie(session auth.Base64Token, ip string) (cookieType int, err error) {
-
+// returns type of the cookie and the cookie age
+func CheckCookie(session auth.Base64Token, ip string) (cookieType int, cookieTime time.Time, err error) {
 	err = sq.
-		Select("type").
+		Select("type", "time").
 		From("cookies").
 		Where("token = ?", session[:]).
 		QueryRow().
-		Scan(&cookieType)
+		Scan(&cookieType, &cookieTime)
+
 	if err == sql.ErrNoRows {
-		//log.Info("No cookie found for session ", session, " ip ", ip)
-		return 0, nil
+		return 0, time.Time{}, nil
 	}
-	//log.Info("Cookie found for session ", session, " ip ", ip)
-	return cookieType, nil
+
+	return cookieType, cookieTime, err
 }
 
 // NeedCaptcha returns, if the user needs a captcha
