@@ -273,9 +273,8 @@ func (c *Client) insertPost(data []byte) (err error) {
 				if cookieTime.IsZero() {
 					return
 				} else {
-					log.Info("Cookie age deemed appropriate")
 					age := time.Since(cookieTime)
-					if age < time.Minute*30 {
+					if age < time.Minute*5 {
 						return
 					}
 				}

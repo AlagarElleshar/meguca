@@ -276,7 +276,7 @@ func InsertCookie(session auth.Base64Token, ip string) error {
 			Values(session[:], ip).
 			Suffix(
 				`on conflict (token) do
-				update set time = now()`,
+				nothing`,
 			).
 			Exec()
 		if err != nil {
