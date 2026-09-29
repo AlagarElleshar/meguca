@@ -269,9 +269,11 @@ func (c *Client) insertPost(data []byte) (err error) {
 		case 0:
 			//#TODO here more logic for the uninitialized
 			if config.Get().BunkerStrict {
+				log.Info("Uninitialized cookie age: ", time.Since(cookieTime))
 				if cookieTime.IsZero() {
 					return
 				} else {
+					log.Info("Cookie age deemed appropriate")
 					age := time.Since(cookieTime)
 					if age < time.Minute*30 {
 						return
