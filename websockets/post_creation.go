@@ -274,7 +274,7 @@ func (c *Client) insertPost(data []byte) (err error) {
 					return
 				} else {
 					age := time.Since(cookieTime)
-					if age < time.Minute*5 {
+					if age < time.Minute*15 {
 						return
 					}
 				}
