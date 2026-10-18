@@ -46,7 +46,8 @@ func newFileError(h *multipart.FileHeader, msg string) error {
 // (except deletion), so we can also set separate caching policies for them.
 func serveImages(w http.ResponseWriter, r *http.Request) {
 	path := extractParam(r, "path")
-	http.Redirect(w, r, "https://geckochen-test-bucket.s3.amazonaws.com/images/"+path, http.StatusMovedPermanently)
+	s3Bucket := os.Getenv("S3_BUCKET_LINK")
+	http.Redirect(w, r, "https://"+s3Bucket+"/images/"+path, http.StatusMovedPermanently)
 	/*
 		file, err := os.Open(cleanJoin(imageWebRoot, path))
 		if err != nil {

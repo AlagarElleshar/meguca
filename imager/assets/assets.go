@@ -61,8 +61,8 @@ var (
 // Initialize storage backend based on environment
 func init() {
 	// Check if S3 storage should be used
-	useS3 := "true"                    //os.Getenv("USE_S3_STORAGE")
-	s3Bucket = "geckochen-test-bucket" //os.Getenv("S3_BUCKET_NAME")
+	useS3 := os.Getenv("USE_S3_STORAGE")
+	s3Bucket = os.Getenv("S3_BUCKET_NAME")
 
 	if useS3 == "true" && s3Bucket != "" {
 		cfg, err := awsconfig.LoadDefaultConfig(context.TODO())
