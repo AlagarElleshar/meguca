@@ -3,11 +3,14 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	"github.com/linxGnu/grocksdb"
 	"net/url"
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/linxGnu/grocksdb"
+
+	"sync/atomic"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/bakape/meguca/auth"
@@ -65,22 +68,25 @@ func LoadTestDB(suffix string) (close func() error, err error) {
 	}
 
 	close = func() (err error) {
-		_, err = os.Stat("db.db")
+		_, err = os.Stat("rdb_test.db")
 		if err != nil {
 			if os.IsNotExist(err) {
 				return nil
 			}
 			return
 		}
-
-		rocksDB.Close()
+		if rocksDB != nil {
+			rocksDB.Close()
+		} else {
+			fmt.Println("rocksDB was nil at closing")
+		}
 		if err != nil {
 			return
 		}
-		return os.Remove("db.db")
+		return os.RemoveAll("rdb_test.db")
 	}
 
-	fmt.Println("creating test database:", dbName)
+	fmt.Println("creating test database:", dbName, "with user:", user)
 	err = run(
 		"psql",
 		"-c",
@@ -90,12 +96,22 @@ func LoadTestDB(suffix string) (close func() error, err error) {
 		),
 		config.Server.Database,
 	)
+	fmt.Println("ran the psql create successfully?")
 	if err != nil {
 		return
 	}
 
 	connURL.Path = "/" + dbName
 	err = loadDB(connURL.String(), suffix)
+	if err != nil {
+		return
+	}
+	ok, err := tryOpenTestRocksDB()
+	fmt.Println("tryOpenTestRocksDB ran")
+
+	if err != nil || !ok {
+		return
+	}
 	return
 }
 
@@ -251,4 +267,35 @@ func ClearTables(tables ...string) error {
 		}
 	}
 	return nil
+}
+
+func tryOpenTestRocksDB() (open bool, err error) {
+	rocksDBOnce.Do(func() {
+		opts := grocksdb.NewDefaultOptions()
+		opts.OptimizeForPointLookup(64)
+		opts.SetCreateIfMissing(true)
+		opts.SetCompression(grocksdb.NoCompression)
+		opts.SetCreateIfMissingColumnFamilies(true)
+
+		// Define column family names
+		cfNames := []string{"default", "open_body", "nekotv_state"}
+
+		// Open the DB with column families
+		db, cfHandles, err := grocksdb.OpenDbColumnFamilies(opts, "rdb_test.db", cfNames, []*grocksdb.Options{opts, opts, opts})
+		if err != nil {
+			return
+		}
+		rocksDB = db
+		openBodyCF = cfHandles[1]
+		nekoTVStateCF = cfHandles[2]
+
+		atomic.StoreUint32(&rocksDBState, rocksDBOpen)
+		return
+	})
+	if err != nil {
+		return
+	}
+
+	open = rocksDBisOpen()
+	return
 }

@@ -3,6 +3,7 @@ package imager
 import (
 	"strings"
 	"testing"
+	"fmt"
 
 	"github.com/bakape/meguca/common"
 	"github.com/bakape/meguca/test"
@@ -19,6 +20,7 @@ var (
 )
 
 func TestProcessArchive(t *testing.T) {
+	fmt.Println("TestProcessArchive entered")
 	t.Parallel()
 
 	cases := [...]struct {
@@ -68,7 +70,7 @@ func TestProcessArchive(t *testing.T) {
 			var img common.ImageCommon
 			f := test.OpenSample(t, c.file)
 			defer f.Close()
-			thumb, err := processFile(f, &img, dummyOpts, nil)
+			thumb, err := processFile(f, c.name, &img, nil, dummyOpts)
 			if c.err != "" {
 				if err == nil {
 					t.Fatalf("expected an error")

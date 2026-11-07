@@ -63,12 +63,12 @@ func TestImageProcessing(t *testing.T) {
 			var img common.ImageCommon
 			f := test.OpenSample(t, c.file)
 			defer f.Close()
-			thumb, err := processFile(f, &img, thumbnailer.Options{
+			thumb, err := processFile(f, c.name, &img, nil, thumbnailer.Options{
 				ThumbDims: thumbnailer.Dims{
 					Width:  150,
 					Height: 150,
 				},
-			}, nil)
+			})
 			if err != nil {
 				t.Fatal(err)
 			}

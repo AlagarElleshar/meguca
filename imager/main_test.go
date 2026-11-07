@@ -1,6 +1,7 @@
 package imager
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
@@ -11,26 +12,34 @@ import (
 )
 
 func TestMain(m *testing.M) {
+	fmt.Println("Entering TestMain")
 	err := config.Server.Load()
+	fmt.Println("Loading server config")
 	if err != nil {
 		panic(err)
 	}
 	close, err := db.LoadTestDB("imager")
+	fmt.Println("Loading test DB")
 	if err != nil {
 		panic(err)
 	}
 
 	config.Set(config.Configs{})
+	fmt.Println("Setting config")
 	if err := assets.CreateDirs(); err != nil {
 		panic(err)
 	}
 
 	code := m.Run()
+	fmt.Println("Running code")
 	err = close()
+	fmt.Println("Close finishing")
 	if err != nil {
+		fmt.Println("Close panic")
 		panic(err)
 	}
 	err = assets.DeleteDirs()
+	fmt.Println("Deleting dirs")
 	if err != nil {
 		panic(err)
 	}
