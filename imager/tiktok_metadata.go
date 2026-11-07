@@ -92,6 +92,9 @@ func getTiktokUsername(filename string) (string, error) {
 			if err != nil {
 				return "", errors.New("GetSourceEncode failed")
 			}
+			if result == nil {
+				return "", errors.New("GetSourceEncode returned empty string")
+			}
 			return result["unique_id"].(string), nil
 		}
 
